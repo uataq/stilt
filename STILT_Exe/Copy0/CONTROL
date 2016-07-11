@@ -1,0 +1,35 @@
+10 4 28 4
+1
+40.75 -111.87 5
+-12
+0
+25000.0
+3
+/uufs/chpc.utah.edu/common/home/u0791983/met/
+wrfout_d02.arl
+/uufs/chpc.utah.edu/common/home/u0791983/met/
+wrfout_d01.arl
+/uufs/chpc.utah.edu/common/home/u0791983/met/
+gdas1.apr10.arl
+1
+test
+1
+0.01
+00 00 00 00 00
+1
+0.0 0.0
+0.5 0.5
+30.0 30.0
+./
+cdump
+1
+100
+00 00 00 00 00
+00 00 00 00 00
+00 2 00
+1
+0.0 0.0 0.0
+0.0 0.0 0.0 0.0 0.0
+0.0 0.0 0.0
+0.0
+0.0

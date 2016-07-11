@@ -1,0 +1,41 @@
+30, 2, 20530.0
+The first line contains:
+ Number of levels
+ Sfc layer index ksfc
+ Model top zmdl
+
+The lines following the ENDHEADER line below contain:
+   model level height (m AGL), one per line
+The values in this file are derived from average WRF model (half-)layer AGL heights
+The model top ZMDL is set to the top full level AGL height
+ENDHEADER
+    28
+   107
+   215
+   336
+   471
+   625
+   799
+   989
+  1201
+  1440
+  1710
+  2012
+  2348
+  2724
+  3149
+  3622
+  4151
+  4751
+  5420
+  6172
+  7016
+  7966
+  9046
+ 10211
+ 11444
+ 12756
+ 14169
+ 15732
+ 17483
+ 19471
