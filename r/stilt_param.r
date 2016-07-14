@@ -12,10 +12,12 @@
 # r_agl   - receptor height above ground level
 # n_hour  - number of hours to run each simulation (negative indicates backward)
 
-paths <- list(rsc = '/uufs/chpc.utah.edu/common/home/u0791983/STILT_modeling/stiltR/',
-              met = '/uufs/chpc.utah.edu/common/home/u0791983/met/',
-              run = '/uufs/chpc.utah.edu/common/home/u0791983/STILT_modeling/STILT_Exe/',
-              out = '/uufs/chpc.utah.edu/common/home/u0791983/STILT_modeling/Output/')
+paths <- list()
+paths$stilt <- Sys.getenv('HOME')
+paths$r     <- file.path(paths$stilt, 'STILT_modeling/stiltR/')
+paths$met   <- file.path(paths$stilt, 'met/')
+paths$run   <- file.path(paths$stilt, 'STILT_modeling/STILT_Exe/')
+paths$out   <- file.path(paths$stilt, 'STILT_modeling/Output/')
 
 # t_start <- '2010-07-18 16:00:00'
 # t_end   <- '2010-07-18 17:00:00'
@@ -38,10 +40,10 @@ n_particle <- 1000
 
 
 # Source dependencies ----------------------------------------------------------
-setwd(paths$rsc)
-source(paste0(paths$rsc, 'sourceall.r'))
-library(dplyr)
-library(uataq)
+# setwd(paths$r)
+rsc <- dir(file.path(paths$r, 'src'), pattern = '.*\\.r$', full.names = T)
+lapply(rsc, source)
+load_libs('dplyr', 'uataq')
 
 # Model run timing -------------------------------------------------------------
 time <- data_frame(posix = seq(from = t_start %>% as.POSIXct(tz='UTC'),
@@ -55,7 +57,7 @@ time <- data_frame(posix = seq(from = t_start %>% as.POSIXct(tz='UTC'),
 
 
 # Met path auto symlink --------------------------------------------------------
-met_sym <- paste0(Sys.getenv('HOME'), format(time$posix[1], tz = 'UTC', format = '/.met-%Y-%m-%d/'))
+met_sym <- paste0(paths$stilt, format(time$posix[1], tz = 'UTC', format = '/.met-%Y-%m-%d/'))
 met_sym_init <- function() {
   system(paste('ln -s', paths$met, met_sym))
 }
