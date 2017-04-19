@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd fortran
+make
+mv hymodelc ../exe/hymodelc
+cd ..
+chmod +x exe/hymodelc
