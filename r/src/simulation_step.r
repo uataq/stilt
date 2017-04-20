@@ -104,8 +104,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   # outputs a FOOTPRINT.rds file, which can be read with readRDS() containing
   # the resultant footprint and various attributes
   footprint <- list()
-  footprint$file <- file.path(rundir, 'FOOTPRINT.nc')
-  footprint$data <- calc_footprint(particle, output = footprint$file,
+  footprint$data <- calc_footprint(particle, output = NULL,
                  n_cores_grid = n_cores_grid,
                  xmn = xmn, xmx = xmx, xres = xres,
                  ymn = ymn, ymx = ymx, yres = yres)
