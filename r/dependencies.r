@@ -10,5 +10,5 @@ invisible(lapply(rsc, source))
 
 if (!'lib.loc' %in% ls())
   lib.loc <- NULL
-load_libs('dplyr', 'parallel', 'raster', 'rslurm', 'uataq',
+load_libs('dplyr', 'ncdf4', 'parallel', 'raster', 'rslurm', 'uataq',
           lib.loc = lib.loc)
