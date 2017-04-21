@@ -93,7 +93,7 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
     m/sum(m)
   }
 
-  message(paste('Gridding to', xres, 'with', n_cores_grid, 'threads'))
+  message(paste('Gridding to', xres, 'with', n_cores_grid, 'threads...'))
   cl <- makeForkCluster(n_cores_grid, outfile = '')
 
   message('Generating gaussian particles...')
@@ -157,7 +157,7 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
 
   stopCluster(cl)
 
-  message('Gridding kernels...')
+  message('Aggregating kernels...')
   gk <- bind_rows(gk) %>%
     group_by(long, lati) %>%
     summarize(foot = sum(foot, na.rm = T) / np) %>%
