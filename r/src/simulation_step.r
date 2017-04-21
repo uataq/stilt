@@ -46,6 +46,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                        strftime(r_run_time, tz = 'UTC',
                                 format = paste0(X, '_%Y%m%d%H_', r_long, '_',
                                                 r_lati, '_', r_zagl)))
+  uataq::br()
   message(paste('Running simulation ID:  ', basename(rundir)))
 
   # Generate PARTICLE.DAT ------------------------------------------------------
