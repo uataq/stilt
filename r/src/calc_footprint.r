@@ -93,7 +93,7 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
     m/sum(m)
   }
 
-  message(paste('Gridding to', xres, 'with', n_cores_grid, 'threads...'))
+  message('Gridding to ', xres, 'x', yres, ' with ', n_cores_grid, ' threads...')
   cl <- makeForkCluster(n_cores_grid, outfile = '')
 
   message('Generating gaussian particles...')
@@ -120,7 +120,6 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
     k <- make_gauss_kernel(res, d)
     nk <- nrow(k)
 
-    # message(paste('Time:', x, '    Kernel size:', nk*xres, 'x', nk*yres, 'deg'))
     if (nk < 2)
       traj %>%
       mutate(long = glong[uataq::find_neighbor(long, glong + xres / 2)],
