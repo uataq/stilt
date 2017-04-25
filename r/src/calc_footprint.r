@@ -1,9 +1,10 @@
 #' calc_footprint generates upstream influence footprint
 #' @author Ben Fasoli
 #'
-#' Chooses apply function based on user parameters and available parallelization
-#' options. Uses lapply if n_cores is 1, slurm_apply if SLURM job management is
-#' available, and mclapply if SLURM is not available.
+#' Aggregates the upstream particle trajectories into a time integrated
+#' footprint, expanding particle influence using variable 2d gaussian kernels
+#' with bandwidths proportional to the mean pairwise distance between all
+#' particles at each time step.
 #'
 #' @param p data frame containing particle trajectories, typically obtained
 #'   from PARTICLE.rds but can be derived from PARTICLE.dat with column names
