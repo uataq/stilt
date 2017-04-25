@@ -123,8 +123,9 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
 
     if (nk < 2)
       traj %>%
-      mutate(long = glong[uataq::find_neighbor(long, glong + xres / 2)],
-             lati = glati[uataq::find_neighbor(lati, glati + yres / 2)]) %>%
+      transmute(long = glong[uataq::find_neighbor(long, glong + xres / 2)],
+                lati = glati[uataq::find_neighbor(lati, glati + yres / 2)],
+                foot) %>%
       group_by(long, lati) %>%
       summarize(foot = sum(foot, na.rm = T)) %>%
       ungroup() %>%
