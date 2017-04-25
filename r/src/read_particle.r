@@ -10,7 +10,6 @@
 read_particle <- function(file, varsiwant) {
   require(dplyr)
 
-  header <- scan(file, n = 3, quiet = T)
   n_lines <- uataq::count_lines(file)
 
   if (n_lines < 2) {
@@ -20,9 +19,6 @@ read_particle <- function(file, varsiwant) {
 
   read.table(file, header = F, skip = 1,
              colClasses = 'numeric', col.names = varsiwant) %>%
-  mutate(r_lati = header[1],
-         r_long = header[2],
-         r_zagl = header[3]) %>%
     as_data_frame() %>%
     return()
 }
