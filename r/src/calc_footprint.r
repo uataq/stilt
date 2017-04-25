@@ -76,6 +76,9 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
                 dist() %>%
                 mean(na.rm = T),
               lati = mean(lati, na.rm = T))
+  
+  # Remove zero influence particles
+  particle <- subset(particle, foot > 0)
 
   # Generate gaussian kernels
   make_gauss_kernel <- function (rs, sigma) {
