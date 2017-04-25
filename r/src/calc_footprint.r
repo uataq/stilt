@@ -34,10 +34,6 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
   glong <- seq(xmn, xmx, by = xres)
   glati <- seq(ymn, ymx, by = yres)
 
-  p <- p %>%
-    filter(long >= min(glong), long <= max(glong),
-           lati >= min(glati), lati <= max(glati))
-
   # Interpolate particle locations
   times <- c(seq(0, -10, by = -0.1),
              seq(-10.2, -20, by = -0.2),
@@ -77,8 +73,11 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
                 mean(na.rm = T),
               lati = mean(lati, na.rm = T))
   
-  # Remove zero influence particles
-  particle <- subset(particle, foot > 0)
+  # Remove zero influence particles and those outside of domain
+  particle <- particle %>%
+    filter(foot > 0,
+           long >= min(glong), long <= max(glong),
+           lati >= min(glati), lati <= max(glati))
 
   # Generate gaussian kernels
   make_gauss_kernel <- function (rs, sigma) {
