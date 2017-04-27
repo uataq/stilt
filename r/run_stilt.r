@@ -10,7 +10,6 @@ lib.loc <- NULL
 rm_dat  <- T
 n_nodes <- 1
 n_cores <- 1
-n_cores_grid <- 1
 
 slurm   <- F
 slurm_options <- list(
@@ -100,19 +99,16 @@ if (!is.null(varsiwant[1]))
 
 output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       slurm = slurm, slurm_options = slurm_options,
-                      n_cores = n_cores, n_nodes = n_nodes,
-                      n_cores_grid = n_cores_grid, rm_dat = rm_dat,
+                      n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
                       delt = delt, iconvect = iconvect, isot = isot,
-                      lib.loc = lib.loc,
-                      met_file_format = met_file_format, met_loc = met_loc,
-                      mgmin = mgmin, n_hours = n_hours, ndump = ndump,
-                      nturb = nturb, numpar = numpar, outdt = outdt,
-                      outfrac = outfrac, run_trajec = run_trajec,
+                      lib.loc = lib.loc, met_file_format = met_file_format,
+                      met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
+                      ndump = ndump, nturb = nturb, numpar = numpar,
+                      outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
                       r_run_time = receptors$run_time, r_lati = receptors$lati,
                       r_long = receptors$long, r_zagl = receptors$zagl,
-                      random = random, tlfrac = tlfrac,
-                      stilt_wd = stilt_wd, tratio = tratio,
-                      varsiwant = varsiwant, veght = veght,
+                      random = random, tlfrac = tlfrac, stilt_wd = stilt_wd,
+                      tratio = tratio, varsiwant = varsiwant, veght = veght,
                       w_option = w_option, winderrtf = winderrtf,
                       zicontroltf = zicontroltf, z_top = z_top,
                       xmn = xmn, xmx = xmx, xres = xres,
