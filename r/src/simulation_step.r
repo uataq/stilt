@@ -23,12 +23,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     r_lati <- r_lati[X]
     r_long <- r_long[X]
     r_zagl <- r_zagl[X]
-  } else {
-    # If job submission via sbatch, dependencies need to be loaded for each
-    # unique process. Receptor information is passed as single values for each
-    # simulation step
-    source(file.path(stilt_wd,'r/dependencies.r'), local = T)
   }
+  # Ensure dependencies are loaded for current node/process
+  source(file.path(stilt_wd, 'r/dependencies.r'), local = T)
 
   if (is.null(varsiwant)) {
     varsiwant <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr',
@@ -44,7 +41,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   # and a run-specific SETUP.CFG and CONTROL
   rundir  <- file.path(file.path(stilt_wd, 'out'),
                        strftime(r_run_time, tz = 'UTC',
-                                format = paste0(X, '_%Y%m%d%H_', r_long, '_',
+                                format = paste0('%Y%m%d%H_', r_long, '_',
                                                 r_lati, '_', r_zagl)))
   uataq::br()
   message(paste('Running simulation ID:  ', basename(rundir)))
@@ -104,12 +101,13 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   # Aggregate the particle trajectory into surface influence footprints. This
   # outputs a FOOTPRINT.rds file, which can be read with readRDS() containing
   # the resultant footprint and various attributes
-  footprint <- list()
-  footprint$data <- calc_footprint(particle, output = NULL,
-                                   xmn = xmn, xmx = xmx, xres = xres,
-                                   ymn = ymn, ymx = ymx, yres = yres)
+  f <- list()
+  f$data <- calc_footprint(particle,
+                           output = paste0(basename(rundir), '_foot.rds'),
+                           xmn = xmn, xmx = xmx, xres = xres,
+                           ymn = ymn, ymx = ymx, yres = yres)
 
-  output$footprint <- footprint
+  # output$footprint <- f
   output$particle <- particle
   saveRDS(output, output$file)
   return(T)

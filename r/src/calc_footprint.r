@@ -26,9 +26,6 @@ calc_footprint <- function(p, output = NULL,
                            xmn = -180, xmx = 180, xres = 0.1,
                            ymn = -90, ymx = 90, yres = xres) {
 
-  if (!file.exists('r/src/permute.so'))
-    stop('calc_footprint(): failed to find permute.so in r/src/')
-
   require(dplyr)
   require(raster)
   require(uataq)
@@ -151,8 +148,7 @@ calc_footprint <- function(p, output = NULL,
     nax <- ncol(grd)
     nay <- nrow(grd)
 
-    # Call permute fortran subprogram to build and aggregate kernels
-    dyn.load('r/src/permute.so')
+    # Call permute fortran subroutine to build and aggregate kernels
     out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
                     k = k, nkx = nkx, nky = nky,
                     len = len, lai = step$lai, loi = step$loi, foot = step$foot)
@@ -170,8 +166,11 @@ calc_footprint <- function(p, output = NULL,
   # Crop raster to original xmn, xmx, ymn, ymx
   footr <- crop(footr, extent(xmn, xmx, ymn, ymx))
 
-  if (!is.null(output))
-    raster::writeRaster(footr, output, overwrite = T)
+  if (!is.null(output)) {
+    if (tail(unlist(strsplit(output, '.', fixed = T)), 1)) {
+      saveRDS(footr, output)
+    } else raster::writeRaster(footr, output, overwrite = T)
+  }
 
   return(footr)
 }
