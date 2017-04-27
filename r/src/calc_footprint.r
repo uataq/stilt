@@ -4,15 +4,14 @@
 #' Aggregates the upstream particle trajectories into a time integrated
 #' footprint, expanding particle influence using variable 2d gaussian kernels
 #' with bandwidths proportional to the mean pairwise distance between all
-#' particles at each time step.
+#' particles at each time step. Requires compiled permute.so to build the
+#' gaussian kernels with fortran.
 #'
 #' @param p data frame containing particle trajectories, typically obtained
 #'   from PARTICLE.rds but can be derived from PARTICLE.dat with column names
 #'   equivalent to \code{varsiwant}. Must contain colums specifying long, lati,
 #'   indx, foot, and time.
 #' @param output filename argument passed to \code{raster::writeRaster}
-#' @param n_cores_grid number of cores to use in parallel while calculating
-#'   gaussian kernel matrices
 #' @param xmn sets grid start longitude
 #' @param xmx sets grid end longitude
 #' @param xres resolution for longitude grid
@@ -20,26 +19,34 @@
 #' @param ymx sets grid end latitude
 #' @param yres resolution for latitude grid
 #'
-#' @import dplyr, parallel, raster, uataq
+#' @import dplyr, raster, uataq
 #' @export
 
-calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
+calc_footprint <- function(p, output = NULL,
                            xmn = -180, xmx = 180, xres = 0.1,
                            ymn = -90, ymx = 90, yres = xres) {
+
+  if (!file.exists('r/src/permute.so'))
+    stop('calc_footprint(): failed to find permute.so in r/src/')
+
   require(dplyr)
-  require(parallel)
   require(raster)
   require(uataq)
+
+  np <- max(p$indx, na.rm = T)
 
   glong <- seq(xmn, xmx, by = xres)
   glati <- seq(ymn, ymx, by = yres)
 
-  # Interpolate particle locations
+  # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
              seq(-10.2, -20, by = -0.2),
              seq(-20.5, -100, by = -0.5))
+
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
+    filter(long >= min(glong), long <= max(glong),
+           lati >= min(glati), lati <= max(glati)) %>%
     full_join(expand.grid(time = times,
                           indx = unique(p$indx)), by = c('indx', 'time')) %>%
     arrange(indx, -time) %>%
@@ -62,26 +69,30 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
   mp <- p$time < -20 & p$time >= -100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
 
-  particle <- i
-  np <- max(particle$indx, na.rm = T)
-
-  # Calculate pairwise distances
-  pd <- particle %>%
-    group_by(time) %>%
-    summarize(dist = matrix(c(long, lati), ncol = 2) %>%
-                dist() %>%
-                mean(na.rm = T),
-              lati = mean(lati, na.rm = T))
-  
   # Remove zero influence particles and those outside of domain
-  particle <- particle %>%
-    filter(foot > 0,
-           long >= min(glong), long <= max(glong),
-           lati >= min(glati), lati <= max(glati))
+  xyzt <- i %>%
+    filter(foot > 0)
+
+  # Bootstrap pairwise distance calculation
+  calc_dist <- function(x, y) {
+    df <- data_frame(x, y)
+    foo <- function(df) {
+      matrix(c(df$x, df$y), ncol = 2) %>%
+        dist() %>%
+        mean(na.rm = T)
+    }
+    mean(bootstrap(df, foo, size = 50, iter = 4), na.rm = T)
+  }
+
+  pd <- xyzt %>%
+    group_by(time) %>%
+    summarize(dist = calc_dist(long, lati),
+              lati = mean(lati, na.rm = T))
 
   # Generate gaussian kernels
   make_gauss_kernel <- function (rs, sigma) {
     # Modified from raster:::.Gauss.weight()
+    require(raster)
     d <- 3 * sigma
     nx <- 1 + 2 * floor(d/rs[1])
     ny <- 1 + 2 * floor(d/rs[2])
@@ -96,79 +107,71 @@ calc_footprint <- function(p, output = NULL, n_cores_grid = 1,
     m/sum(m)
   }
 
-  message('Gridding to ', xres, 'x', yres, ' with ', n_cores_grid, ' threads...')
-  cl <- makeForkCluster(n_cores_grid, outfile = '')
+  # Gaussian kernel bandwidth scaling
+  calc_bandwidth <- function(dist, lati, xyres) {
+    dist / (40 * cos(lati * pi/180)) + max(xyres) / 8
+  }
 
-  message('Generating gaussian particles...')
-  gk <- parLapply(cl, pd$time, function(x) {
-    traj <- particle %>%
+  xyres <- c(xres, yres)
+
+  # Determine maximum kernel size
+  max_k <- make_gauss_kernel(xyres, calc_bandwidth(max(pd$dist), min(pd$lati), xyres))
+  xbuf <- (ncol(max_k) - 1) / 2
+  ybuf <- (nrow(max_k) - 1) / 2
+
+  max_glong <- seq(xmn - (xbuf*xres), xmx + (xbuf*xres), by = xres)
+  max_glati <- seq(ymn - (xbuf*xres), ymx + (xbuf*xres), by = yres)
+
+  # Pre grid particle locations
+  xyzt <- xyzt %>%
+    transmute(loi = as.integer(findInterval(long, max_glong)),
+              lai = as.integer(findInterval(lati, max_glati)),
+              foot = foot,
+              time = time) %>%
+    group_by(loi, lai, time) %>%
+    summarize(foot = sum(foot, na.rm = T)) %>%
+    ungroup()
+
+  grd <- matrix(0, ncol = length(max_glong), nrow = length(max_glati))
+
+  # Build gaussian kernels by time step
+  gk <- sapply(pd$time, simplify = 'array', function(x) {
+    step <- xyzt %>%
       filter(time == x)
 
-    if (nrow(traj) < 2) return()
-
-    traj <- traj %>%
-      dplyr::select(long, lati, foot) %>%
-      group_by(long, lati) %>%
-      summarize(foot = sum(foot, na.rm = T)) %>%
-      ungroup()
-
-    res <- c(xres, yres)
-
-    # d gives gaussian bandwidth sensitivity scalar
-    # lower numbers yield larger gaussian matrices
-    # higher numbers allow faster computation
-    # pd$dist is mean pairwise distance within particle cloud at timestep
+    # Dispersion kernel
     idx <- pd$time == x
-    d <- pd$dist[idx] / (40 * cos(pd$lati[idx] * pi/180)) + max(res) / 8
-    k <- make_gauss_kernel(res, d)
-    nk <- nrow(k)
+    d <- calc_bandwidth(pd$dist[idx], pd$lati[idx], xyres)
+    k <- make_gauss_kernel(xyres, d)
 
-    if (nk < 2)
-      traj %>%
-      transmute(long = glong[uataq::find_neighbor(long, glong + xres / 2)],
-                lati = glati[uataq::find_neighbor(lati, glati + yres / 2)],
-                foot) %>%
-      group_by(long, lati) %>%
-      summarize(foot = sum(foot, na.rm = T)) %>%
-      ungroup() %>%
-      return()
+    # Array dimensions
+    len <- nrow(step)
+    nkx <- ncol(k)
+    nky <- nrow(k)
+    nax <- ncol(grd)
+    nay <- nrow(grd)
 
-    lo <- 1:nk - ((nk + 1) / 2)
+    # Call permute fortran subprogram to build and aggregate kernels
+    dyn.load('r/src/permute.so')
+    out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
+                    k = k, nkx = nkx, nky = nky,
+                    len = len, lai = step$lai, loi = step$loi, foot = step$foot)
 
-    df <- lapply(1:nk, function(i) {
-      lapply(1:nk, function(j) {
-        xi <- lo[i]
-        yi <- lo[j]
-        ki <- k[i, j]
-        traj %>%
-          transmute(long = long + xi * xres,
-                    lati = lati + yi * yres,
-                    foot = foot * ki)
-
-      })
-    })
-
-    lapply(df, bind_rows) %>%
-      bind_rows() %>%
-      mutate(long = glong[uataq::find_neighbor(long, glong + xres / 2)],
-             lati = glati[uataq::find_neighbor(lati, glati + yres / 2)]) %>%
-      group_by(long, lati) %>%
-      summarize(foot = sum(foot, na.rm = T)) %>%
-      ungroup() %>%
-      return()
+    foot <- out$ans
+    return(foot)
   })
 
-  stopCluster(cl)
-
-  message('Aggregating kernels...')
-  gk <- bind_rows(gk) %>%
-    group_by(long, lati) %>%
-    summarize(foot = sum(foot, na.rm = T) / np) %>%
-    ungroup() %>%
+  # Sum footprint 3d array across 3rd dimension
+  foot <- apply(gk, c(1, 2), sum) / np
+  footr <- cbind(expand.grid(long = max_glong + xres/2, lati = max_glati + yres/2),
+                 foot = c(foot)) %>%
     rasterFromXYZ(crs = '+proj=longlat +ellps=WGS84')
 
-  if (!is.null(output))
-    raster::writeRaster(gk, output, overwrite = T)
+  # Crop raster to original xmn, xmx, ymn, ymx
+  footr <- crop(footr, extent(xmn, xmx, ymn, ymx))
 
-  return(gk)
+  if (!is.null(output))
+    raster::writeRaster(footr, output, overwrite = T)
+
+  return(footr)
 }

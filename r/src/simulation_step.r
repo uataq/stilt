@@ -6,7 +6,7 @@
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                             slurm = F, met_file_format, met_loc,
                             delt = 0, iconvect = 0, isot = 0,
-                            mgmin = 2000, n_cores_grid = 1, n_hours = -72,
+                            mgmin = 2000, n_hours = -72,
                             ndump = 0, nturb = 0, numpar = 100, outdt = 0,
                             outfrac = 0.9, run_trajec = T, random = 1,
                             r_run_time, r_lati, r_long, r_zagl,
@@ -84,8 +84,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     n_lines <- uataq::count_lines(pf)
     if (n_lines < 2) return()
 
-    particle <- read_particle(file = pf,
-                              varsiwant = varsiwant)
+    particle <- read_particle(file = pf, varsiwant = varsiwant)
     if (rm_dat) system(paste('rm', pf))
   } else {
     # If user opted to recycle existing PARTICLE.DAT files, read in the recycled
@@ -107,9 +106,8 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   # the resultant footprint and various attributes
   footprint <- list()
   footprint$data <- calc_footprint(particle, output = NULL,
-                 n_cores_grid = n_cores_grid,
-                 xmn = xmn, xmx = xmx, xres = xres,
-                 ymn = ymn, ymx = ymx, yres = yres)
+                                   xmn = xmn, xmx = xmx, xres = xres,
+                                   ymn = ymn, ymx = ymx, yres = yres)
 
   output$footprint <- footprint
   output$particle <- particle

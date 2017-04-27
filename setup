@@ -1,6 +1,8 @@
 #!/bin/bash
 
 cd fortran
+R CMD SHLIB permute.f90
+mv permute.so ../r/src/permute.so
 make
 mv hymodelc ../exe/hymodelc
 cd ..
