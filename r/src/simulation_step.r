@@ -53,9 +53,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   output$runtime <- r_run_time
   output$file <- file.path(rundir, 'STILT_OUTPUT.rds')
   output$receptor <- data_frame(run_time = r_run_time,
-    lati = r_lati,
-    long = r_long,
-    zagl = r_zagl)
+                                lati = r_lati,
+                                long = r_long,
+                                zagl = r_zagl)
 
   if (run_trajec) {
     dir.create(rundir)
@@ -82,6 +82,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     if (n_lines < 2) return()
 
     particle <- read_particle(file = pf, varsiwant = varsiwant)
+    output$particle <- particle
+    saveRDS(output, output$file)
+    
     if (rm_dat) system(paste('rm', pf))
   } else {
     # If user opted to recycle existing PARTICLE.DAT files, read in the recycled
@@ -103,12 +106,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   # the resultant footprint and various attributes
   f <- list()
   f$data <- calc_footprint(particle,
-                           output = paste0(basename(rundir), '_foot.rds'),
+                           output = file.path(rundir,paste0(basename(rundir),
+                                                            '_foot.rds')),
                            xmn = xmn, xmx = xmx, xres = xres,
                            ymn = ymn, ymx = ymx, yres = yres)
-
-  # output$footprint <- f
-  output$particle <- particle
-  saveRDS(output, output$file)
   return(T)
 }
