@@ -167,7 +167,8 @@ calc_footprint <- function(p, output = NULL,
   footr <- crop(footr, extent(xmn, xmx, ymn, ymx))
 
   if (!is.null(output)) {
-    if (tail(unlist(strsplit(output, '.', fixed = T)), 1)) {
+    if (grepl('rds', tail(unlist(strsplit(output, '.', fixed = T)), 1),
+              ignore.case = T)) {
       saveRDS(footr, output)
     } else raster::writeRaster(footr, output, overwrite = T)
   }
