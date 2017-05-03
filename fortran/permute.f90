@@ -1,7 +1,10 @@
+! Shifts grid locations and applies a gaussian-scaled influence over a grid
+! Ben Fasoli
+
 subroutine permute(ans, nax, nay, k, nkx, nky, len, lai, loi, foot)
   implicit none
 
-  integer, intent(in)           :: lai(len), loi(len), nax, nay, nkx, nky, len
+  integer,          intent(in)  :: lai(len), loi(len), nax, nay, nkx, nky, len
   double precision, intent(in)  :: k(nkx,nky), foot(len)
   integer                       :: lox(nkx), loy(nky)
   integer                       :: i, j, n, xs, ys
