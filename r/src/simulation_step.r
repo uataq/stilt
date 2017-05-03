@@ -65,7 +65,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
 
     # Find met files necessary for simulation ------------------------------------
     met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
-    if (length(met_files) < 1) return(NULL)
+    if (length(met_files) < 1) {
+      message('No meteorological data files found...')
+      return(NULL)
+    }
 
     write_setup(numpar, delt, tratio, isot, tlfrac, ndump, random, outdt, nturb,
                 veght, outfrac, iconvect, winderrtf, zicontroltf, mgmin,
