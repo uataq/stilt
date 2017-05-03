@@ -36,7 +36,7 @@ receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
                          zagl = zagl, KEEP.OUT.ATTRS = F, stringsAsFactors = F)
 
 # Meteorological data input
-met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group2/btf/hrrr'
+met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/west'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
 
 # Model control
@@ -87,6 +87,8 @@ source(file.path(stilt_wd,'r/dependencies.r'))
 # eliminate issues with long (>80 char) paths in fortran. Note that this assumes
 # that all meteorological data is found in the same directory.
 met_loc <- file.path(path.expand('~'), paste0('m', project))
+if (file.exists(met_loc))
+  system(paste('unlink', met_loc))
 system(paste('ln -s', met_directory, met_loc))
 
 
