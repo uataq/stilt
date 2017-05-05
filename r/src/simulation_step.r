@@ -58,6 +58,8 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                 zagl = r_zagl)
   
   if (run_trajec) {
+    if (dir.exists(rundir))
+      system(paste('rm -r', rundir))
     dir.create(rundir)
     link_files <- c('ASCDATA.CFG', 'CONC.CFG', 'hymodelc',
                     'LANDUSE.ASC', 'ROUGLEN.ASC')
