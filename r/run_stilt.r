@@ -75,6 +75,7 @@ ymn <- -90
 ymx <- 90
 xres <- 0.1
 yres <- xres
+time_integrate <- F
 
 
 # Source dependencies ----------------------------------------------------------
@@ -109,7 +110,8 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
                       r_run_time = receptors$run_time, r_lati = receptors$lati,
                       r_long = receptors$long, r_zagl = receptors$zagl,
-                      random = random, tlfrac = tlfrac, stilt_wd = stilt_wd,
+                      random = random, stilt_wd = stilt_wd,
+                      time_integrate = time_integrate, tlfrac = tlfrac,
                       tratio = tratio, varsiwant = varsiwant, veght = veght,
                       w_option = w_option, winderrtf = winderrtf,
                       zicontroltf = zicontroltf, z_top = z_top,
