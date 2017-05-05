@@ -46,7 +46,6 @@ convect    <- F
 delt       <- 0
 numpar     <- 200
 outdt      <- 0
-overwrite  <- T
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas',
                 'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout',
