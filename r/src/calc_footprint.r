@@ -33,8 +33,8 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
 
   np <- max(p$indx, na.rm = T)
 
-  glong <- seq(xmn, xmx, by = xres)
-  glati <- seq(ymn, ymx, by = yres)
+  glong <- head(seq(xmn, xmx, by = xres), -1)
+  glati <- head(seq(ymn, ymx, by = yres), -1)
 
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
@@ -43,8 +43,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
 
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
-    filter(long >= min(glong), long <= max(glong),
-           lati >= min(glati), lati <= max(glati)) %>%
+    filter(long >= xmn, long <= xmx, lati >= ymn, lati <= ymx) %>%
     full_join(expand.grid(time = times,
                           indx = unique(p$indx)), by = c('indx', 'time')) %>%
     arrange(indx, -time) %>%
@@ -117,8 +116,8 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   xbuf <- (ncol(max_k) - 1) / 2
   ybuf <- (nrow(max_k) - 1) / 2
 
-  max_glong <- seq(xmn - (xbuf*xres), xmx + (xbuf*xres), by = xres)
-  max_glati <- seq(ymn - (xbuf*xres), ymx + (xbuf*xres), by = yres)
+  max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
+  max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
 
   # Pre grid particle locations
   xyzt <- xyzt %>%
@@ -168,8 +167,10 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   }
 
   # Subset domain to extent specified with xmn/xmx/ymn/ymx
-  foot <- foot[rev(max_glati < ymx & max_glati >= ymn),
-               max_glong < xmx & max_glong >= xmn, ] / np
+  # Use tolerance range to eliminate issues with floating point comparisons
+  tol <- 1e-8
+  foot <- foot[rev(max_glati < ymx-tol & max_glati >= ymn-tol),
+               max_glong < xmx-tol & max_glong >= xmn-tol, ] / np
 
   # Time integrate footprint by summing across 3rd dimension
   if (time_integrate) {
@@ -195,11 +196,11 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     lati = list(unit = 'Degrees',
                 res = yres,
                 extent = c(ymn, ymx),
-                data = rev(head(glati, -1))),
+                data = rev(glati)),
     long = list(unit = 'Degrees',
                 res = xres,
                 extent = c(xmn, xmx),
-                data = head(glong, -1)),
+                data = glong),
     time = time_out,
     foot = list(unit = 'ppm umol-1 m2 s',
                 dims = foot_dims, data = foot)
