@@ -186,7 +186,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     }
     foot <- foot_hour
     time_out <- list(unit = 'POSIXct Time',
-                     data = r_run_time + hid * 3600)
+                     data = r_run_time + unique(hid) * 3600)
     foot_dims <- c('lati', 'long', 'time')
   }
 
