@@ -168,7 +168,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   }
 
   # Subset domain to extent specified with xmn/xmx/ymn/ymx
-  foot <- foot[max_glati <= ymx & max_glati > ymn,
+  foot <- foot[rev(max_glati < ymx & max_glati >= ymn),
                max_glong < xmx & max_glong >= xmn, ] / np
 
   # Time integrate footprint by summing across 3rd dimension
