@@ -84,7 +84,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     pf <- file.path(rundir, 'PARTICLE.DAT')
     
     n_lines <- uataq::count_lines(pf)
-    if (n_lines < 2) return()
+    if (n_lines < 2) {
+      warning('No trajectory data found in ', pf)
+      return()
+    }
     
     particle <- read_particle(file = pf, varsiwant = varsiwant)
     output$particle <- particle
@@ -96,9 +99,8 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     # file to a data_frame with an adjusted timestamp and index for the
     # simulation step. If none exists, report an error and try the next timestep
     if (!file.exists(output$file)) {
-      warning(paste(
-        'simulation_step(): No STILT_OUTPUT.rds file found in', rundir, '\n',
-        'skipping this timestep and trying the next...'))
+      warning('simulation_step(): No STILT_OUTPUT.rds file found in ', rundir,
+              '\nskipping this timestep and trying the next...')
       return()
     }
     particle <- readRDS(output$file)$particle
