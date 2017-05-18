@@ -43,7 +43,6 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
-    filter(long >= xmn, long <= xmx, lati >= ymn, lati <= ymx) %>%
     full_join(expand.grid(time = times,
                           indx = unique(p$indx)), by = c('indx', 'time')) %>%
     arrange(indx, -time) %>%
@@ -66,10 +65,6 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   mp <- p$time < -20 & p$time >= -100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
   
-  # Remove zero influence particles and those outside of domain
-  xyzt <- i %>%
-    filter(foot > 0)
-  
   # Bootstrap pairwise distance calculation
   calc_dist <- function(x, y) {
     df <- data_frame(x, y)
@@ -85,6 +80,10 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     group_by(time) %>%
     summarize(dist = calc_dist(long, lati),
               lati = mean(lati, na.rm = T))
+  
+  # Remove zero influence particles and positions outside of domain
+  xyzt <- i %>%
+    filter(foot > 0, long >= xmn, long <= xmx, lati >= ymn, lati <= ymx)
   
   # Generate gaussian kernels
   make_gauss_kernel <- function (rs, sigma) {
