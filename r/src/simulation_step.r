@@ -139,9 +139,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   # Aggregate the particle trajectory into surface influence footprints. This
   # outputs a .rds file, which can be read with readRDS() containing the
   # resultant footprint and various attributes
-  foot <- calc_footprint(particle,
+  footr <- calc_footprint(particle,
                          output = file.path(rundir, paste0(basename(rundir),
-                                                           '_foot.rds')),
+                                                           '_foot.nc')),
                          r_run_time = r_run_time,
                          time_integrate = time_integrate,
                          xmn = xmn, xmx = xmx, xres = xres,
