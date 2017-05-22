@@ -12,7 +12,7 @@ write_runhymodelc <- function(file) {
     stop('write_runhymodelc(): file argument must end with runhymodelc.sh')
 
   txt  <- c(paste('cd', dirname(file)),
-            './hymodelc &> hymodelc.out & echo $!')
+            './hymodelc &> ./hymodelc.out 2>&1 & echo $!')
 
   write(txt, file)
   return(file)
