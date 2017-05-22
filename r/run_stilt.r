@@ -46,6 +46,7 @@ convect    <- F
 delt       <- 0
 numpar     <- 200
 outdt      <- 0
+timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas',
                 'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout',
@@ -112,9 +113,9 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       r_run_time = receptors$run_time, r_lati = receptors$lati,
                       r_long = receptors$long, r_zagl = receptors$zagl,
                       random = random, stilt_wd = stilt_wd,
-                      time_integrate = time_integrate, tlfrac = tlfrac,
-                      tratio = tratio, varsiwant = varsiwant, veght = veght,
-                      w_option = w_option, winderrtf = winderrtf,
+                      time_integrate = time_integrate, timeout = timeout,
+                      tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
+                      veght = veght, w_option = w_option, winderrtf = winderrtf,
                       zicontroltf = zicontroltf, z_top = z_top,
                       xmn = xmn, xmx = xmx, xres = xres,
                       ymn = ymn, ymx = ymx, yres = yres)
