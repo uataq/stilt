@@ -68,8 +68,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     # Find met files necessary for simulation ------------------------------------
     met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
     if (length(met_files) < 1) {
-      message('No meteorological data files found...')
-      return(NULL)
+      warning('No meteorological data files found...')
+      cat('No meteorological data files found. Check specifications in ',
+          'run_stilt.r', file = file.path(rundir, 'ERROR'))
+      return()
     }
 
     write_setup(numpar, delt, tratio, isot, tlfrac, ndump, random, outdt, nturb,
@@ -87,7 +89,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       if (file.exists(sh) && length(readLines(sh)) > 0) {
         break
       } else if (elapsed > timeout) {
-        message(basename(rundir), ' timed out. Killing hymodelc pid ', pid)
+        warning(basename(rundir), ' timed out. Killing hymodelc pid ', pid)
         tools::pskill(pid, signal = SIGTERM)
         cat('hymodelc timeout after ', elapsed, ' seconds',
             file = file.path(rundir, 'ERROR'))
@@ -97,10 +99,18 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     }
 
     pf <- file.path(rundir, 'PARTICLE.DAT')
+    if (!file.exists(pf)) {
+      warning('Failed to output PARTICLE.DAT in ', basename(rundir))
+      cat('No PARTICLE.DAT found. Check for errors in hymodelc.out',
+          file = file.path(rundir, 'ERROR'))
+      return()
+    }
 
     n_lines <- uataq::count_lines(pf)
     if (n_lines < 2) {
       warning('No trajectory data found in ', pf)
+      cat('PARTICLE.DAT does not contain any trajectory data. Check for ',
+          'errors in hymodelc.out', file = file.path(rundir, 'ERROR'))
       return()
     }
 
@@ -114,8 +124,8 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     # file to a data_frame with an adjusted timestamp and index for the
     # simulation step. If none exists, report an error and try the next timestep
     if (!file.exists(output$file)) {
-      warning('simulation_step(): No STILT_OUTPUT.rds file found in ', rundir,
-              '\nskipping this timestep and trying the next...')
+      warning('simulation_step(): No _traj.rds file found in ', rundir,
+              '\n    skipping this timestep and trying the next...')
       return()
     }
     particle <- readRDS(output$file)$particle
