@@ -325,7 +325,7 @@ SUBROUTINE METSET(KG,KT,KFOR)
           WRITE(*,*)'*ERROR* metset: meteorological data time interval varies' 
           WRITE(*,*)' Changed from ',DREC(KG,KT)%DELTA,' min to ',(N-K),' min'
           WRITE(*,*)' At day/hr ',FILE(KG,KT)%LAST%DA,FILE(KG,KT)%LAST%HR
-!##       STOP 900          
+          STOP 900          
        ELSE
           K=N
        END IF
