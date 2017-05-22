@@ -5,7 +5,7 @@
 # User inputs ------------------------------------------------------------------
 project <- '{{project}}'
 stilt_wd <- file.path('{{wd}}', project)
-lib.loc <- .libPaths()
+lib.loc <- .libPaths()[1]
 
 rm_dat  <- T
 n_nodes <- 1
@@ -19,8 +19,8 @@ slurm_options <- list(
 )
 
 # Simulation timing, yyyy-mm-dd HH:MM:SS
-t_start <- '2015-06-16 00:00:00'
-t_end   <- '2015-06-16 00:00:00'
+t_start <- '2015-06-17 00:00:00'
+t_end   <- '2015-06-17 00:00:00'
 run_times <- seq(from = as.POSIXct(t_start, tz='UTC'),
                  to   = as.POSIXct(t_end, tz='UTC'),
                  by   = 'hour')
@@ -38,7 +38,7 @@ receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
 # Meteorological data input
 met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/west'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
-n_met_min       <- 1
+n_met_min       <- 5
 
 # Model control
 run_trajec <- T
