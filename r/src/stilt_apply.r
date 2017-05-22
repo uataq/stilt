@@ -27,7 +27,7 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
     if (length(sbatch_avail) == 0 || nchar(sbatch_avail[1]) == 0)
       stop('Problem identifying sbatch executable for slurm...')
 
-    print('Parallelization using slurm. Dispatching jobs...')
+    message('Parallelization using slurm. Dispatching jobs...')
     load_libs('rslurm')
     Y <- data.frame(X = X, slurm = T, ..., stringsAsFactors = F)
     sjob <- rslurm::slurm_apply(FUN, Y,
@@ -37,7 +37,7 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
     uataq::br(2)
     return(sjob)
   } else if (n_cores > 1) {
-    print('Parallelization using multiple R jobs. Dispatching processes...')
+    message('Parallelization using multiple R jobs. Dispatching processes...')
     load_libs('parallel')
     cl <- makeForkCluster(n_cores, outfile = '')
     out <- parallel::parLapply(cl, X, FUN, ...)
@@ -45,6 +45,6 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
     return(out)
   }
 
-  print('Parallelization disabled...')
+  message('Parallelization disabled...')
   return(lapply(X, FUN, ...))
 }
