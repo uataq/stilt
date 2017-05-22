@@ -5,7 +5,7 @@
 # User inputs ------------------------------------------------------------------
 project <- '{{project}}'
 stilt_wd <- file.path('{{wd}}', project)
-lib.loc <- NULL
+lib.loc <- .libPaths()
 
 rm_dat  <- T
 n_nodes <- 1
@@ -38,6 +38,7 @@ receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
 # Meteorological data input
 met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/west'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
+n_met_min       <- 1
 
 # Model control
 run_trajec <- T
@@ -69,10 +70,10 @@ z_top       <- 25000
 zicontroltf <- 0
 
 # Footprint grid settings
-xmn <- -180
-xmx <- 180
-ymn <- -90
-ymx <- 90
+xmn <- -114.5
+xmx <- -109
+ymn <- 37
+ymx <- 42
 xres <- 0.1
 yres <- xres
 time_integrate <- F
@@ -87,7 +88,7 @@ source(file.path(stilt_wd,'r/dependencies.r'))
 # Auto symlink the meteorological data path to the working directory to
 # eliminate issues with long (>80 char) paths in fortran. Note that this assumes
 # that all meteorological data is found in the same directory.
-if (nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
+if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
   met_loc <- file.path(path.expand('~'), paste0('m', project))
   if (file.exists(met_loc))
     system(paste('unlink', met_loc))
@@ -108,16 +109,16 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       delt = delt, iconvect = iconvect, isot = isot,
                       lib.loc = lib.loc, met_file_format = met_file_format,
                       met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
-                      ndump = ndump, nturb = nturb, numpar = numpar,
-                      outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
-                      r_run_time = receptors$run_time, r_lati = receptors$lati,
-                      r_long = receptors$long, r_zagl = receptors$zagl,
-                      random = random, stilt_wd = stilt_wd,
-                      time_integrate = time_integrate, timeout = timeout,
-                      tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
-                      veght = veght, w_option = w_option, winderrtf = winderrtf,
-                      zicontroltf = zicontroltf, z_top = z_top,
-                      xmn = xmn, xmx = xmx, xres = xres,
+                      n_met_min = n_met_min, dump = ndump, nturb = nturb,
+                      numpar = numpar, outdt = outdt, outfrac = outfrac,
+                      run_trajec = run_trajec, r_run_time = receptors$run_time,
+                      r_lati = receptors$lati, r_long = receptors$long,
+                      r_zagl = receptors$zagl, random = random,
+                      stilt_wd = stilt_wd, time_integrate = time_integrate,
+                      timeout = timeout, tlfrac = tlfrac, tratio = tratio,
+                      varsiwant = varsiwant, veght = veght, w_option = w_option,
+                      winderrtf = winderrtf, zicontroltf = zicontroltf,
+                      z_top = z_top, xmn = xmn, xmx = xmx, xres = xres,
                       ymn = ymn, ymx = ymx, yres = yres)
 
 q('no')

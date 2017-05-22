@@ -6,9 +6,9 @@
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                             slurm = F, met_file_format, met_loc, delt = 0,
                             iconvect = 0, isot = 0, mgmin = 2000, n_hours = -72,
-                            ndump = 0, nturb = 0, numpar = 100, outdt = 0,
-                            outfrac = 0.9, run_trajec = T, random = 1,
-                            r_run_time, r_lati, r_long, r_zagl,
+                            n_met_min = 1, ndump = 0, nturb = 0, numpar = 100,
+                            outdt = 0, outfrac = 0.9, run_trajec = T,
+                            random = 1, r_run_time, r_lati, r_long, r_zagl,
                             time_integrate = F, timeout = 3600, tlfrac = 0.1,
                             tratio = 0.9, varsiwant = NULL, veght = 0.5,
                             w_option = 0, winderrtf = 0, zicontroltf = 0,
@@ -67,10 +67,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
 
     # Find met files necessary for simulation ------------------------------------
     met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
-    if (length(met_files) < 1) {
-      warning('No meteorological data files found...')
-      cat('No meteorological data files found. Check specifications in ',
-          'run_stilt.r', file = file.path(rundir, 'ERROR'))
+    if (length(met_files) < n_met_min) {
+      warning('Insufficient amount of meteorological data found...')
+      cat('Insufficient amount of meteorological data found. Check ',
+          'specifications in run_stilt.r\n', file = file.path(rundir, 'ERROR'))
       return()
     }
 
@@ -81,17 +81,20 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                   file.path(rundir, 'CONTROL'))
     sh <- write_runhymodelc(file.path(rundir, 'runhymodelc.sh'))
 
+    of <- file.path(rundir, 'hymodelc.out')
+
     elapsed <- 0
     eval_start <- Sys.time()
     pid <- system(paste('bash', sh), intern = T)
+    on.exit(tools::pskill(pid))
     repeat {
-      elapsed <- as.numeric(Sys.time() - eval_start)
-      if (file.exists(sh) && length(readLines(sh)) > 0) {
+      elapsed <- as.double.difftime(Sys.time() - eval_start, units = 'secs')
+      if (file.exists(of) && length(readLines(of)) > 0) {
+        on.exit()
         break
       } else if (elapsed > timeout) {
-        warning(basename(rundir), ' timed out. Killing hymodelc pid ', pid)
-        tools::pskill(pid, signal = SIGTERM)
-        cat('hymodelc timeout after ', elapsed, ' seconds',
+        warning(basename(rundir), ' timeout. Killing hymodelc pid ', pid, '\n')
+        cat('hymodelc timeout after ', elapsed, ' seconds\n',
             file = file.path(rundir, 'ERROR'))
         return()
       }
@@ -101,7 +104,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     pf <- file.path(rundir, 'PARTICLE.DAT')
     if (!file.exists(pf)) {
       warning('Failed to output PARTICLE.DAT in ', basename(rundir))
-      cat('No PARTICLE.DAT found. Check for errors in hymodelc.out',
+      cat('No PARTICLE.DAT found. Check for errors in hymodelc.out\n',
           file = file.path(rundir, 'ERROR'))
       return()
     }
@@ -110,7 +113,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     if (n_lines < 2) {
       warning('No trajectory data found in ', pf)
       cat('PARTICLE.DAT does not contain any trajectory data. Check for ',
-          'errors in hymodelc.out', file = file.path(rundir, 'ERROR'))
+          'errors in hymodelc.out\n', file = file.path(rundir, 'ERROR'))
       return()
     }
 
