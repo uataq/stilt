@@ -5,14 +5,15 @@
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                             slurm = F, met_file_format, met_loc, delt = 0,
-                            iconvect = 0, isot = 0, mgmin = 2000, n_hours = -72,
-                            n_met_min = 1, ndump = 0, nturb = 0, numpar = 100,
-                            outdt = 0, outfrac = 0.9, run_trajec = T,
-                            random = 1, r_run_time, r_lati, r_long, r_zagl,
-                            time_integrate = F, timeout = 3600, tlfrac = 0.1,
-                            tratio = 0.9, varsiwant = NULL, veght = 0.5,
-                            w_option = 0, winderrtf = 0, zicontroltf = 0,
-                            z_top = 25000,
+                            dist_factor = 1, iconvect = 0, isot = 0,
+                            mgmin = 2000, n_hours = -72, n_met_min = 1,
+                            ndump = 0, nturb = 0, numpar = 100, outdt = 0,
+                            outfrac = 0.9, run_trajec = T, random = 1,
+                            r_run_time, r_lati, r_long, r_zagl,
+                            time_integrate = F, time_factor = 1, timeout = 3600,
+                            tlfrac = 0.1, tratio = 0.9, varsiwant = NULL,
+                            veght = 0.5, w_option = 0, winderrtf = 0,
+                            zicontroltf = 0, z_top = 25000,
                             xmn = -180, xmx = 180, xres = 0.1,
                             ymn = -90, ymx = 90, yres = xres) {
 
@@ -135,16 +136,16 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   }
 
 
-  # Produce FOOTPRINT.rds ------------------------------------------------------
+  # Produce footprint ----------------------------------------------------------
   # Aggregate the particle trajectory into surface influence footprints. This
   # outputs a .rds file, which can be read with readRDS() containing the
   # resultant footprint and various attributes
-  footr <- calc_footprint(particle,
+  foot <- calc_footprint(particle,
                          output = file.path(rundir, paste0(basename(rundir),
                                                            '_foot.nc')),
                          r_run_time = r_run_time,
                          time_integrate = time_integrate,
                          xmn = xmn, xmx = xmx, xres = xres,
                          ymn = ymn, ymx = ymx, yres = yres)
-  return(T)
+  return(foot)
 }

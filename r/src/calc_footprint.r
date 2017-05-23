@@ -11,7 +11,11 @@
 #'   from PARTICLE.rds but can be derived from PARTICLE.dat with column names
 #'   equivalent to \code{varsiwant}. Must contain colums specifying long, lati,
 #'   indx, foot, and time.
-#' @param output filename argument passed to \code{saveRDS}
+#' @param output filename argument. Must end with .nc (for ncdf output,
+#'   preferred) or .rds (for serialized R data output). .nc files are saved
+#'   in a format natively compatible with raster::brick() and raster::raster()
+#'   while .rds files do not require any additional libraries and have better
+#'   compression
 #' @param xmn sets grid start longitude
 #' @param xmx sets grid end longitude
 #' @param xres resolution for longitude grid
@@ -23,7 +27,7 @@
 #' @export
 
 calc_footprint <- function(p, output = NULL, r_run_time = NULL,
-                           time_integrate = F,
+                           time_integrate = F, dist_factor = 1, time_factor = 1,
                            xmn = -180, xmx = 180, xres = 0.1,
                            ymn = -90, ymx = 90, yres = xres) {
   
@@ -73,17 +77,13 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
         dist() %>%
         mean(na.rm = T)
     }
-    mean(bootstrap(df, foo, size = 50, iter = 4), na.rm = T)
+    mean(bootstrap(df, foo, size = 50, iter = 5), na.rm = T)
   }
   
   pd <- i %>%
     group_by(time) %>%
     summarize(dist = calc_dist(long, lati),
               lati = mean(lati, na.rm = T))
-  
-  # Remove zero influence particles and positions outside of domain
-  xyzt <- i %>%
-    filter(foot > 0, long >= xmn, long <= xmx, lati >= ymn, lati <= ymx)
   
   # Generate gaussian kernels
   make_gauss_kernel <- function (rs, sigma) {
@@ -104,19 +104,27 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   }
   
   # Gaussian kernel bandwidth scaling
-  calc_bandwidth <- function(dist, lati, xyres) {
-    dist / (40 * cos(lati * pi/180)) + max(xyres) / 8
+  calc_bandwidth <- function(dist, dist_factor, time, time_factor, lati, xyres) {
+    (time_factor * log10(1 + abs(time))/60 + dist_factor * dist / 10) /
+      (25 * cos(lati * pi/180)) + max(xyres) / 4
   }
-  
-  xyres <- c(xres, yres)
-  
+
   # Determine maximum kernel size
-  max_k <- make_gauss_kernel(xyres, calc_bandwidth(max(pd$dist), min(pd$lati), xyres))
+  xyres <- c(xres, yres)
+  sigma <- max(calc_bandwidth(pd$dist, dist_factor, pd$time, time_factor,
+                              pd$lati, xyres))
+  max_k <- make_gauss_kernel(xyres, sigma)
   xbuf <- (ncol(max_k) - 1) / 2
   ybuf <- (nrow(max_k) - 1) / 2
   
   max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
   max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
+  
+  # Remove zero influence particles and positions outside of domain
+  xyzt <- i %>%
+    filter(foot > 0, long >= xmn, long <= xmx,
+           lati >= ymn, lati <= ymx)
+  pd <- pd[is.element(pd$time, xyzt$time), ]
   
   # Pre grid particle locations
   xyzt <- xyzt %>%
@@ -132,13 +140,19 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   
   # Build gaussian kernels by time step
   foot <- sapply(pd$time, simplify = 'array', function(x) {
+    print(x)
     step <- xyzt %>%
       filter(time == x)
     
+    if (nrow(step) < 2) {
+      return(grd)
+    }
+    
     # Dispersion kernel
     idx <- pd$time == x
-    d <- calc_bandwidth(pd$dist[idx], pd$lati[idx], xyres)
-    k <- make_gauss_kernel(xyres, d)
+    sigma <- calc_bandwidth(pd$dist[idx], dist_factor, x, time_factor,
+                            pd$lati[idx], xyres)
+    k <- make_gauss_kernel(xyres, sigma)
     
     # Array dimensions
     len <- nrow(step)
@@ -156,50 +170,72 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     return(foot)
   })
   
+  # Remove added buffer around domain
   size <- dim(foot)
+  foot <- array(foot, dim = size[c(2, 1, 3)])
+  foot <- foot[xbuf:(size[2]-xbuf-1), ybuf:(size[1]-ybuf-1), ] / np
   
-  # Flip matrix vertically to align with lati domain and fill by row for
-  # compatibility with raster
-  foot[size[1]:1, , ] <- aperm(array(foot, dim = size[c(2, 1, 3)]),
-                               perm = c(2, 1, 3))
-  
-  
-  # Subset domain to extent specified with xmn/xmx/ymn/ymx
-  # Use tolerance range to eliminate issues with floating point comparisons
-  tol <- 1e-8
-  foot <- foot[rev(max_glati < ymx-tol & max_glati >= ymn-tol),
-               max_glong < xmx-tol & max_glong >= xmn-tol, ] / np
-  
-  # Time integrate footprint by summing across 3rd dimension
+  # Time integrate footprint by aggregating across 3rd dimension
   if (time_integrate) {
     foot <- apply(foot, c(1, 2), sum)
-    footr <- raster(extent(xmn, xmx, ymn, ymx),
-                    crs = '+proj=longlat +ellps=WGS84')
-    dim(footr) <- dim(foot)
-    footr <- setValues(footr, foot)
-    footr <- setZ(footr, r_run_time, 'Time_UTC')
+    time_out <- as.numeric(r_run_time)
   } else {
-    size <- dim(foot)
     hid <- floor(pd$time / 60)
-    foot_hour <- array(0, dim = c(size[1], size[2], length(unique(hid))))
-    foot_hour <- sapply(unique(hid), simplify = 'array', function(hour) {
+    foot <- sapply(unique(hid), simplify = 'array', function(hour) {
       apply(foot[ , ,hid == hour], c(1, 2), sum)
     })
+    time_out <- as.numeric(r_run_time + unique(hid) * 3600)
+  }
+  
+  # Format footprints to CF-1.4 convention and save to file
+  if (is.null(output)) return()
+  if (file.exists(output)) system(paste('rm', output))
+  
+  if (grepl('\\.nc$', output, ignore.case = T) &&
+      'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
+    xdim <- ncdim_def('longitude', 'degrees E', glong + xres/2)
+    ydim <- ncdim_def('latitude', 'degrees N', glati + yres/2)
+    tdim <- ncdim_def('time', 'seconds since 1970-01-01',
+                      as.numeric(time_out))
+    fvar <- ncvar_def('Footprint', 'umol CO2 m-2 s-1',
+                      list(xdim, ydim, tdim), -1)
     
-    foot <- foot_hour
-    footr <- brick(extent(xmn, xmx, ymn, ymx),
-                   crs = '+proj=longlat +ellps=WGS84')
-    dim(footr) <- dim(foot)
-    footr <- setValues(footr, foot)
-    footr <- setZ(footr, r_run_time + unique(hid) * 3600, 'Time_UTC')
+    nc <- nc_create(output, fvar)
+    ncvar_put(nc, fvar, foot)
+    ncatt_put(nc, 'longitude', 'position', 'grid center')
+    ncatt_put(nc, 'latitude', 'position', 'grid center')
+    ncatt_put(nc, 'time', 'timezone', 'UTC')
+    ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
+    ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
+    ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
+    ncatt_put(nc, 0, 'Compatibility', 'raster::raster() and raster::brick()')
+    ncatt_put(nc, 0, 'Documentation', 'benfasoli.github.io/stilt')
+    return(output)
   }
   
-  if (!is.null(output)) {
-    if (grepl('rds', tail(unlist(strsplit(output, '.', fixed = T)), 1),
-              ignore.case = T)) {
-      saveRDS(footr, output)
-    } else raster::writeRaster(footr, output, overwrite = T)
+  if (grepl('\\.rds$', output, ignore.case = T)) {
+    out_custom <- list(
+      longitude = list(unit = 'degrees E',
+                       position = 'grid center',
+                       values = glong + xres/2),
+      latitude = list(unit = 'degrees N',
+                      position = 'grid center',
+                      values = glati + yres/2),
+      time = list(unit = 'seconds since 1970-01-01',
+                  position = 'beginning of hour',
+                  values = as.numeric(time_out)),
+      Footprint = list(unit = 'umol CO2 m-2 s-1',
+                       dimensions = c('longitude', 'latitude', 'time'),
+                       values = foot),
+      attributes = list(crs = '+proj=longlat +ellpsWGS84',
+                        crs_format = 'PROJ.4',
+                        Conventions = 'CF-1.4',
+                        Documentation = 'benfasoli.github.io/stilt')
+    )
+    saveRDS(out_custom, output)
+    return(output)
   }
   
-  return(footr)
+  warning('Output format must end in .nc (preferred) or .rds')
+  return()
 }
