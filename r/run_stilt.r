@@ -76,6 +76,8 @@ ymn <- 37
 ymx <- 42
 xres <- 0.1
 yres <- xres
+dist_factor <- 1
+time_factor <- 1
 time_integrate <- F
 
 
@@ -106,19 +108,20 @@ if (!is.null(varsiwant[1]))
 output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       slurm = slurm, slurm_options = slurm_options,
                       n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                      delt = delt, iconvect = iconvect, isot = isot,
-                      lib.loc = lib.loc, met_file_format = met_file_format,
-                      met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
-                      n_met_min = n_met_min, ndump = ndump, nturb = nturb,
-                      numpar = numpar, outdt = outdt, outfrac = outfrac,
-                      run_trajec = run_trajec, r_run_time = receptors$run_time,
-                      r_lati = receptors$lati, r_long = receptors$long,
-                      r_zagl = receptors$zagl, random = random,
-                      stilt_wd = stilt_wd, time_integrate = time_integrate,
-                      timeout = timeout, tlfrac = tlfrac, tratio = tratio,
-                      varsiwant = varsiwant, veght = veght, w_option = w_option,
-                      winderrtf = winderrtf, zicontroltf = zicontroltf,
-                      z_top = z_top, xmn = xmn, xmx = xmx, xres = xres,
-                      ymn = ymn, ymx = ymx, yres = yres)
+                      delt = delt, dist_factor = dist_factor,
+                      iconvect = iconvect, isot = isot, lib.loc = lib.loc,
+                      met_file_format = met_file_format, met_loc = met_loc,
+                      mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
+                      ndump = ndump, nturb = nturb, numpar = numpar,
+                      outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
+                      r_run_time = receptors$run_time, r_lati = receptors$lati,
+                      r_long = receptors$long, r_zagl = receptors$zagl,
+                      random = random, stilt_wd = stilt_wd,
+                      time_integrate = time_integrate,
+                      time_factor = time_factor, timeout = timeout,
+                      tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
+                      veght = veght, w_option = w_option, winderrtf = winderrtf,
+                      zicontroltf = zicontroltf, z_top = z_top, xmn = xmn,
+                      xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres)
 
 q('no')
