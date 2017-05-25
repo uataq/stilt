@@ -30,21 +30,21 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
                            time_integrate = F, dist_factor = 1, time_factor = 1,
                            xmn = -180, xmx = 180, xres = 0.1,
                            ymn = -90, ymx = 90, yres = xres) {
-  
+
   require(dplyr)
   require(raster)
   require(uataq)
-  
+
   np <- max(p$indx, na.rm = T)
-  
+
   glong <- head(seq(xmn, xmx, by = xres), -1)
   glati <- head(seq(ymn, ymx, by = yres), -1)
-  
+
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
              seq(-10.2, -20, by = -0.2),
              seq(-20.5, -100, by = -0.5))
-  
+
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
     full_join(expand.grid(time = times,
@@ -57,7 +57,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     ungroup() %>%
     na.omit() %>%
     mutate(time = round(time, 1))
-  
+
   # Scale interpolated values to retain total field
   mi <- i$time >= -10
   mp <- p$time >= -10
@@ -68,7 +68,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
   mi <- i$time < -20 & i$time >= -100
   mp <- p$time < -20 & p$time >= -100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
-  
+
   # Bootstrap pairwise distance calculation
   calc_dist <- function(x, y) {
     df <- data_frame(x, y)
@@ -79,12 +79,12 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     }
     mean(bootstrap(df, foo, size = 50, iter = 5), na.rm = T)
   }
-  
+
   pd <- i %>%
     group_by(time) %>%
     summarize(dist = calc_dist(long, lati),
               lati = mean(lati, na.rm = T))
-  
+
   # Generate gaussian kernels
   make_gauss_kernel <- function (rs, sigma) {
     # Modified from raster:::.Gauss.weight()
@@ -102,30 +102,32 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     m <- matrix(m, ncol = nx, nrow = ny, byrow = TRUE)
     m/sum(m)
   }
-  
+
   # Gaussian kernel bandwidth scaling
-  calc_bandwidth <- function(dist, dist_factor, time, time_factor, lati, xyres) {
+  calc_bandwidth <- function(dist, dist_factor, time, time_factor, lati) {
     (time_factor * log10(1 + abs(time))/60 + dist_factor * dist / 10) /
-      (25 * cos(lati * pi/180)) + max(xyres) / 4
+      (25 * cos(lati * pi/180))
   }
 
   # Determine maximum kernel size
   xyres <- c(xres, yres)
   sigma <- max(calc_bandwidth(pd$dist, dist_factor, pd$time, time_factor,
-                              pd$lati, xyres))
+                              pd$lati))
   max_k <- make_gauss_kernel(xyres, sigma)
-  xbuf <- (ncol(max_k) - 1) / 2
-  ybuf <- (nrow(max_k) - 1) / 2
-  
+  xbuf <- ncol(max_k)
+  xbufh <- (xbuf - 1) / 2
+  ybuf <- nrow(max_k)
+  ybufh <- (ybuf - 1) / 2
+
   max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
   max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
-  
+
   # Remove zero influence particles and positions outside of domain
   xyzt <- i %>%
-    filter(foot > 0, long >= xmn, long <= xmx,
-           lati >= ymn, lati <= ymx)
+    filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
+           lati >= (ymn - ybufh*yres), lati < (ymx + ybufh*yres))
   pd <- pd[is.element(pd$time, xyzt$time), ]
-  
+
   # Pre grid particle locations
   xyzt <- xyzt %>%
     transmute(loi = as.integer(findInterval(long, max_glong)),
@@ -135,46 +137,46 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     group_by(loi, lai, time) %>%
     summarize(foot = sum(foot, na.rm = T)) %>%
     ungroup()
-  
+
   grd <- matrix(0, ncol = length(max_glong), nrow = length(max_glati))
-  
+
   # Build gaussian kernels by time step
   foot <- sapply(pd$time, simplify = 'array', function(x) {
-    print(x)
     step <- xyzt %>%
       filter(time == x)
-    
+
     if (nrow(step) < 2) {
       return(grd)
     }
-    
+
     # Dispersion kernel
     idx <- pd$time == x
     sigma <- calc_bandwidth(pd$dist[idx], dist_factor, x, time_factor,
-                            pd$lati[idx], xyres)
+                            pd$lati[idx])
     k <- make_gauss_kernel(xyres, sigma)
-    
+
     # Array dimensions
     len <- nrow(step)
     nkx <- ncol(k)
     nky <- nrow(k)
     nax <- ncol(grd)
     nay <- nrow(grd)
-    
+
     # Call permute fortran subroutine to build and aggregate kernels
     out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
                     k = k, nkx = nkx, nky = nky,
                     len = len, lai = step$lai, loi = step$loi, foot = step$foot)
-    
+
     foot <- out$ans
     return(foot)
   })
-  
-  # Remove added buffer around domain
+
+  # Reorder dimensions in accordance with CF-1.4 convention and remove added
+  # buffer around requested domain
+  foot <- aperm(foot, c(2, 1, 3))
   size <- dim(foot)
-  foot <- array(foot, dim = size[c(2, 1, 3)])
-  foot <- foot[xbuf:(size[2]-xbuf-1), ybuf:(size[1]-ybuf-1), ] / np
-  
+  foot <- foot[xbuf:(size[1]-xbuf-1), ybuf:(size[2]-ybuf-1), ] / np
+
   # Time integrate footprint by aggregating across 3rd dimension
   if (time_integrate) {
     foot <- apply(foot, c(1, 2), sum)
@@ -186,11 +188,12 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     })
     time_out <- as.numeric(r_run_time + unique(hid) * 3600)
   }
-  
-  # Format footprints to CF-1.4 convention and save to file
+
+
+  # Save footprint fo file
   if (is.null(output)) return()
   if (file.exists(output)) system(paste('rm', output))
-  
+
   if (grepl('\\.nc$', output, ignore.case = T) &&
       'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
     xdim <- ncdim_def('longitude', 'degrees E', glong + xres/2)
@@ -199,7 +202,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
                       as.numeric(time_out))
     fvar <- ncvar_def('Footprint', 'umol CO2 m-2 s-1',
                       list(xdim, ydim, tdim), -1)
-    
+
     nc <- nc_create(output, fvar)
     ncvar_put(nc, fvar, foot)
     ncatt_put(nc, 'longitude', 'position', 'grid center')
@@ -209,10 +212,11 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
     ncatt_put(nc, 0, 'Compatibility', 'raster::raster() and raster::brick()')
+    ncatt_put(nc, 0, 'Author', 'Ben Fasoli')
     ncatt_put(nc, 0, 'Documentation', 'benfasoli.github.io/stilt')
     return(output)
   }
-  
+
   if (grepl('\\.rds$', output, ignore.case = T)) {
     out_custom <- list(
       longitude = list(unit = 'degrees E',
@@ -235,7 +239,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     saveRDS(out_custom, output)
     return(output)
   }
-  
+
   warning('Output format must end in .nc (preferred) or .rds')
   return()
 }
