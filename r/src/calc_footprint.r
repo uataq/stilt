@@ -211,9 +211,10 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
+    ncatt_put(nc, 0, 'Title', 'STILT Footprint Output')
     ncatt_put(nc, 0, 'Compatibility', 'raster::raster() and raster::brick()')
-    ncatt_put(nc, 0, 'Author', 'Ben Fasoli')
     ncatt_put(nc, 0, 'Documentation', 'benfasoli.github.io/stilt')
+    ncatt_put(nc, 0, 'Author', 'Ben Fasoli')
     return(output)
   }
 
