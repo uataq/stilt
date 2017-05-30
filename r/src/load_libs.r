@@ -21,7 +21,8 @@ load_libs <- function(..., lib.loc = NULL) {
 
   load_check <- function(pkg, lib.loc) {
     suppressWarnings(
-      require(pkg, character.only = T, quiet = T, lib.loc = lib.loc)
+      require(pkg, character.only = T, quiet = T,
+              warn.conflicts = F, lib.loc = lib.loc)
     )
   }
 
