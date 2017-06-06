@@ -200,7 +200,7 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     ydim <- ncdim_def('latitude', 'degrees N', glati + yres/2)
     tdim <- ncdim_def('time', 'seconds since 1970-01-01',
                       as.numeric(time_out))
-    fvar <- ncvar_def('Footprint', 'umol CO2 m-2 s-1',
+    fvar <- ncvar_def('Footprint', 'ppm (umol-1 m2 s)',
                       list(xdim, ydim, tdim), -1)
 
     nc <- nc_create(output, fvar)
