@@ -5,6 +5,7 @@
 if (!'stilt_wd' %in% ls())
   stilt_wd <- getwd()
 
+
 rsc <- dir(file.path(stilt_wd, 'r', 'src'), pattern = '.*\\.r$', full.names = T)
 invisible(lapply(rsc, source))
 
