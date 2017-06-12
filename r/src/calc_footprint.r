@@ -12,10 +12,19 @@
 #'   equivalent to \code{varsiwant}. Must contain colums specifying long, lati,
 #'   indx, foot, and time.
 #' @param output filename argument. Must end with .nc (for ncdf output,
-#'   preferred) or .rds (for serialized R data output). .nc files are saved
-#'   in a format natively compatible with raster::brick() and raster::raster()
-#'   while .rds files do not require any additional libraries and have better
-#'   compression
+#'   preferred), .rds (for serialized R data output), .csv (for comma separated
+#'   value table), or NULL to return the footprint object for programatic use.
+#'   .nc files are saved in the CF-1.4 (Climate and Forcast Metadata) convention
+#'   for native use with raster::brick() and raster::raster(). rds files do not
+#'   require any additional libraries and have better compression
+#' @param r_run_time receptor run time as a POSIXct object. Can be NULL
+#'   resulting in NULL timestamp outputs
+#' @param time_integrate logical indicating whether to integrate footprint over
+#'   time or retain discrete time steps
+#' @param time_factor factor by which to linearly scale time dependence for
+#'   footprint smoothing; 0 to disable, defaults to 1
+#' @param dist_factor factor by which to linearly scale mean pairwise particle
+#'   distance dependence for footprint smoothing; 0 to disable, defaults to 1
 #' @param xmn sets grid start longitude
 #' @param xmx sets grid end longitude
 #' @param xres resolution for longitude grid
@@ -26,10 +35,9 @@
 #' @import dplyr, raster, uataq
 #' @export
 
-calc_footprint <- function(p, output = NULL, r_run_time = NULL,
-                           time_integrate = F, dist_factor = 1, time_factor = 1,
-                           xmn = -180, xmx = 180, xres = 0.1,
-                           ymn = -90, ymx = 90, yres = xres) {
+calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
+                           dist_factor = 1, time_factor = 1,
+                           xmn, xmx, xres, ymn, ymx, yres = xres) {
 
   require(dplyr)
   require(raster)
@@ -191,23 +199,27 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
 
 
   # Save footprint fo file
-  if (is.null(output)) return()
-  if (file.exists(output)) system(paste('rm', output))
+  if (!is.null(output) && file.exists(output))
+    system(paste('rm', output))
 
   if (grepl('\\.nc$', output, ignore.case = T) &&
       'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
-    xdim <- ncdim_def('longitude', 'degrees E', glong + xres/2)
-    ydim <- ncdim_def('latitude', 'degrees N', glati + yres/2)
+    xdim <- ncdim_def('longitude_center', 'degrees_east', glong + xres/2)
+    ydim <- ncdim_def('latitude_center', 'degrees_north', glati + yres/2)
     tdim <- ncdim_def('time', 'seconds since 1970-01-01',
                       as.numeric(time_out))
+    xlldim <- ncdim_def('longitude_lowerleft', 'degrees_east', glong)
+    ylldim <- ncdim_def('latitude_lowerleft', 'degrees_north', glati)
     fvar <- ncvar_def('Footprint', 'ppm (umol-1 m2 s)',
-                      list(xdim, ydim, tdim), -1)
+                      list(xdim, ydim, tdim, xlldim, ylldim), -1)
 
     nc <- nc_create(output, fvar)
     ncvar_put(nc, fvar, foot)
-    ncatt_put(nc, 'longitude', 'position', 'grid center')
-    ncatt_put(nc, 'latitude', 'position', 'grid center')
+    ncatt_put(nc, 'longitude_center', 'position', 'cell center')
+    ncatt_put(nc, 'latitude_center', 'position', 'cell center')
     ncatt_put(nc, 'time', 'timezone', 'UTC')
+    ncatt_put(nc, 'longitude', 'position', 'cell left')
+    ncatt_put(nc, 'latitude', 'position', 'cell bottom')
     ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
@@ -218,29 +230,42 @@ calc_footprint <- function(p, output = NULL, r_run_time = NULL,
     return(output)
   }
 
+  out_custom <- list(
+    longitude = list(unit = 'degrees_east',
+                     position = 'grid_center',
+                     values = glong + xres/2),
+    latitude = list(unit = 'degrees_north',
+                    position = 'grid_center',
+                    values = glati + yres/2),
+    time = list(unit = 'seconds since 1970-01-01',
+                position = 'beginning of hour',
+                values = as.numeric(time_out)),
+    Footprint = list(unit = 'ppm (umol-1 m2 s)',
+                     dimensions = c('longitude', 'latitude', 'time'),
+                     values = foot),
+    attributes = list(crs = '+proj=longlat +ellpsWGS84',
+                      crs_format = 'PROJ.4',
+                      Conventions = 'CF-1.4',
+                      Documentation = 'benfasoli.github.io/stilt')
+  )
+
+  if (grepl('\\.csv$', output, ignore.case = T)) {
+    csv <- data_frame(expand.grid(longitude = glong + xres/2,
+                                  latitude  = glati + yres/2),
+                      c(foot)) %>%
+      filter(foot > 0)
+    write('STILT Footprint. For documentation, see benfasoli.github.io/stilt',
+          file = output)
+    write('latitude/longitude positions indicate cell center',
+          file = output, append = T)
+    write.table(csv, append = T, quote = F, sep = ',', row.names = F)
+    return(output)
+  }
+
   if (grepl('\\.rds$', output, ignore.case = T)) {
-    out_custom <- list(
-      longitude = list(unit = 'degrees E',
-                       position = 'grid center',
-                       values = glong + xres/2),
-      latitude = list(unit = 'degrees N',
-                      position = 'grid center',
-                      values = glati + yres/2),
-      time = list(unit = 'seconds since 1970-01-01',
-                  position = 'beginning of hour',
-                  values = as.numeric(time_out)),
-      Footprint = list(unit = 'umol CO2 m-2 s-1',
-                       dimensions = c('longitude', 'latitude', 'time'),
-                       values = foot),
-      attributes = list(crs = '+proj=longlat +ellpsWGS84',
-                        crs_format = 'PROJ.4',
-                        Conventions = 'CF-1.4',
-                        Documentation = 'benfasoli.github.io/stilt')
-    )
     saveRDS(out_custom, output)
     return(output)
   }
 
-  warning('Output format must end in .nc (preferred) or .rds')
-  return()
+  return(out_custom)
 }
