@@ -208,18 +208,16 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     ydim <- ncdim_def('latitude_center', 'degrees_north', glati + yres/2)
     tdim <- ncdim_def('time', 'seconds since 1970-01-01',
                       as.numeric(time_out))
-    xlldim <- ncdim_def('longitude_lowerleft', 'degrees_east', glong)
-    ylldim <- ncdim_def('latitude_lowerleft', 'degrees_north', glati)
     fvar <- ncvar_def('Footprint', 'ppm (umol-1 m2 s)',
-                      list(xdim, ydim, tdim, xlldim, ylldim), -1)
+                      list(xdim, ydim, tdim), -1)
 
     nc <- nc_create(output, fvar)
     ncvar_put(nc, fvar, foot)
-    ncatt_put(nc, 'longitude_center', 'position', 'cell center')
-    ncatt_put(nc, 'latitude_center', 'position', 'cell center')
+    ncatt_put(nc, 'longitude_center', 'position', 'cell_center')
+    ncatt_put(nc, 'latitude_center', 'position', 'cell_center')
     ncatt_put(nc, 'time', 'timezone', 'UTC')
-    ncatt_put(nc, 'longitude', 'position', 'cell left')
-    ncatt_put(nc, 'latitude', 'position', 'cell bottom')
+    ncatt_put(nc, 'longitude', 'position', 'cell_left')
+    ncatt_put(nc, 'latitude', 'position', 'cell_bottom')
     ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
@@ -232,11 +230,11 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
 
   out_custom <- list(
     longitude = list(unit = 'degrees_east',
-                     position = 'grid_center',
-                     values = glong + xres/2),
+                     position = 'cell_left',
+                     values = glong),
     latitude = list(unit = 'degrees_north',
-                    position = 'grid_center',
-                    values = glati + yres/2),
+                    position = 'cell_bottom',
+                    values = glati),
     time = list(unit = 'seconds since 1970-01-01',
                 position = 'beginning of hour',
                 values = as.numeric(time_out)),
@@ -250,13 +248,13 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   )
 
   if (grepl('\\.csv$', output, ignore.case = T)) {
-    csv <- data_frame(expand.grid(longitude = glong + xres/2,
-                                  latitude  = glati + yres/2),
+    csv <- data_frame(expand.grid(longitude = glong,
+                                  latitude  = glati),
                       c(foot)) %>%
       filter(foot > 0)
     write('STILT Footprint. For documentation, see benfasoli.github.io/stilt',
           file = output)
-    write('latitude/longitude positions indicate cell center',
+    write('latitude/longitude positions indicate lower left corner of cell',
           file = output, append = T)
     write.table(csv, append = T, quote = F, sep = ',', row.names = F)
     return(output)
