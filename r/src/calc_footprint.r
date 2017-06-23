@@ -216,8 +216,6 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     ncatt_put(nc, 'longitude_center', 'position', 'cell_center')
     ncatt_put(nc, 'latitude_center', 'position', 'cell_center')
     ncatt_put(nc, 'time', 'timezone', 'UTC')
-    ncatt_put(nc, 'longitude', 'position', 'cell_left')
-    ncatt_put(nc, 'latitude', 'position', 'cell_bottom')
     ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
