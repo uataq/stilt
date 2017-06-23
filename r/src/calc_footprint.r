@@ -202,7 +202,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   if (!is.null(output) && file.exists(output))
     system(paste('rm', output))
 
-  if (grepl('\\.nc$', output, ignore.case = T) &&
+  if (!is.null(output) && grepl('\\.nc$', output, ignore.case = T) &&
       'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
     xdim <- ncdim_def('longitude_center', 'degrees_east', glong + xres/2)
     ydim <- ncdim_def('latitude_center', 'degrees_north', glati + yres/2)
@@ -247,7 +247,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
                       Documentation = 'benfasoli.github.io/stilt')
   )
 
-  if (grepl('\\.csv$', output, ignore.case = T)) {
+  if (!is.null(output) && grepl('\\.csv$', output, ignore.case = T)) {
     csv <- data_frame(expand.grid(longitude = glong,
                                   latitude  = glati),
                       c(foot)) %>%
@@ -260,7 +260,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     return(output)
   }
 
-  if (grepl('\\.rds$', output, ignore.case = T)) {
+  if (!is.null(output) && grepl('\\.rds$', output, ignore.case = T)) {
     saveRDS(out_custom, output)
     return(output)
   }
