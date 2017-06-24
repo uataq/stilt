@@ -183,7 +183,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   # buffer around requested domain
   foot <- aperm(foot, c(2, 1, 3))
   size <- dim(foot)
-  foot <- foot[xbuf:(size[1]-xbuf-1), ybuf:(size[2]-ybuf-1), ] / np
+  foot <- foot[(xbuf+1):(size[1]-xbuf), (ybuf+1):(size[2]-ybuf), ] / np
 
   # Time integrate footprint by aggregating across 3rd dimension
   if (time_integrate) {
@@ -204,8 +204,8 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
 
   if (!is.null(output) && grepl('\\.nc$', output, ignore.case = T) &&
       'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
-    xdim <- ncdim_def('longitude_center', 'degrees_east', glong + xres/2)
-    ydim <- ncdim_def('latitude_center', 'degrees_north', glati + yres/2)
+    xdim <- ncdim_def('longitude', 'degrees_east', glong + xres/2)
+    ydim <- ncdim_def('latitude', 'degrees_north', glati + yres/2)
     tdim <- ncdim_def('time', 'seconds since 1970-01-01',
                       as.numeric(time_out))
     fvar <- ncvar_def('Footprint', 'ppm (umol-1 m2 s)',
@@ -213,11 +213,9 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
 
     nc <- nc_create(output, fvar)
     ncvar_put(nc, fvar, foot)
-    ncatt_put(nc, 'longitude_center', 'position', 'cell_center')
-    ncatt_put(nc, 'latitude_center', 'position', 'cell_center')
+    ncatt_put(nc, 'longitude', 'position', 'left')
+    ncatt_put(nc, 'latitude', 'position', 'bottom')
     ncatt_put(nc, 'time', 'timezone', 'UTC')
-    ncatt_put(nc, 'longitude', 'position', 'cell_left')
-    ncatt_put(nc, 'latitude', 'position', 'cell_bottom')
     ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
