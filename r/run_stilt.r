@@ -19,16 +19,16 @@ slurm_options <- list(
 )
 
 # Simulation timing, yyyy-mm-dd HH:MM:SS
-t_start <- '2015-06-17 00:00:00'
-t_end   <- '2015-06-17 00:00:00'
+t_start <- '2015-06-18 22:00:00'
+t_end   <- '2015-06-18 22:00:00'
 run_times <- seq(from = as.POSIXct(t_start, tz='UTC'),
                  to   = as.POSIXct(t_end, tz='UTC'),
                  by   = 'hour')
 
 # Receptor locations
-lati <- 40.766189
-long <- -111.847672
-zagl <- 10
+lati <- 40.782561
+long <- -111.980323
+zagl <- 5
 
 # Expand the run times, latitudes, and longitudes to form the unique receptors
 # that are used for each simulation
@@ -36,7 +36,7 @@ receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
                          zagl = zagl, KEEP.OUT.ATTRS = F, stringsAsFactors = F)
 
 # Meteorological data input
-met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/west'
+met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/wasatch'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
 n_met_min       <- 5
 
@@ -74,10 +74,9 @@ xmn <- -114.5
 xmx <- -109
 ymn <- 37
 ymx <- 42
-xres <- 0.1
+xres <- 0.01
 yres <- xres
-dist_factor <- 1
-time_factor <- 1
+smooth_factor <- 1
 time_integrate <- F
 
 
@@ -108,20 +107,20 @@ if (!is.null(varsiwant[1]))
 output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       slurm = slurm, slurm_options = slurm_options,
                       n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                      delt = delt, dist_factor = dist_factor,
-                      iconvect = iconvect, isot = isot, lib.loc = lib.loc,
-                      met_file_format = met_file_format, met_loc = met_loc,
-                      mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
-                      ndump = ndump, nturb = nturb, numpar = numpar,
-                      outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
-                      r_run_time = receptors$run_time, r_lati = receptors$lati,
-                      r_long = receptors$long, r_zagl = receptors$zagl,
-                      random = random, stilt_wd = stilt_wd,
-                      time_integrate = time_integrate,
-                      time_factor = time_factor, timeout = timeout,
-                      tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
-                      veght = veght, w_option = w_option, winderrtf = winderrtf,
-                      zicontroltf = zicontroltf, z_top = z_top, xmn = xmn,
-                      xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres)
+                      delt = delt, iconvect = iconvect, isot = isot,
+                      lib.loc = lib.loc, met_file_format = met_file_format,
+                      met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
+                      n_met_min = n_met_min, ndump = ndump, nturb = nturb,
+                      numpar = numpar, outdt = outdt, outfrac = outfrac,
+                      run_trajec = run_trajec, r_run_time = receptors$run_time,
+                      r_lati = receptors$lati, r_long = receptors$long,
+                      r_zagl = receptors$zagl, random = random, smooth_factor,
+                      stilt_wd = stilt_wd, time_integrate = time_integrate,
+                      timeout = timeout, tlfrac = tlfrac, tratio = tratio,
+                      varsiwant = varsiwant, veght = veght, w_option = w_option,
+                      winderrtf = winderrtf, zicontroltf = zicontroltf,
+                      z_top = z_top, xmn = xmn, xmx = xmx, xres = xres,
+                      ymn = ymn, ymx = ymx, yres = yres)
 
 q('no')
+
