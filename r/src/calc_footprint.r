@@ -83,7 +83,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
               lati = mean(lati, na.rm = T))
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$time/1440)^(1/2)
-  w <- dist_factor * 0.052 * di * ti / (cos(kernel$lati * pi/180))
+  w <- smooth_factor * 0.052 * di * ti / (cos(kernel$lati * pi/180))
 
   
   # Gaussian kernel weighting calculation
@@ -148,7 +148,6 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     # Dispersion kernel
     idx <- kernel$time == x
     k <- make_gauss_kernel(xyres, w[idx])
-    message(x, '       ', nrow(k))
     
     # Array dimensions
     len <- nrow(step)
