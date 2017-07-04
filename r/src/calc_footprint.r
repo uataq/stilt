@@ -80,7 +80,8 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   kernel <- i %>%
     group_by(time) %>%
     summarize(varsum = var(long, na.rm = T) + var(lati, na.rm = T),
-              lati = mean(lati, na.rm = T))
+              lati = mean(lati, na.rm = T)) %>%
+    na.omit()
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$time/1440)^(1/2)
   w <- smooth_factor * 0.052 * di * ti / (cos(kernel$lati * pi/180))
