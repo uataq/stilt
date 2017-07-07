@@ -24,7 +24,7 @@ subroutine permute(ans, nax, nay, k, nkx, nky, len, lai, loi, foot)
 
       ! Add all footprint values to their locations in arrays
       do n = 1, len
-        ans(lai(n)+ys, loi(n)+xs) = ans(lai(n)+ys, loi(n)+xs) + foot(n)*ks
+        ans(loi(n)+ys, lai(n)+xs) = ans(loi(n)+ys, lai(n)+xs) + foot(n)*ks
       end do
     end do
   end do
