@@ -1,5 +1,7 @@
 Documentation available at [https://uataq.github.io/stilt/](https://uataq.github.io/stilt/)
 
+![STILT Footprint Example](https://air.utah.edu/~benfasoli/img/stilt-heb.png)
+
 Done this before and just looking to start a new project?
 
 - Initialize myproject with `Rscript -e "uataq::stilt_init('myproject')"`  
