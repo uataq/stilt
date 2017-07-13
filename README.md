@@ -1,4 +1,4 @@
-Documentation available at [https://uataq.github.io/stilt/](https://uataq.github.io/stilt/)
+Documentation available at [https://github.com/uataq/stilt/wiki](https://github.com/uataq/stilt/wiki)
 
 ![STILT Footprint Example](https://air.utah.edu/~benfasoli/img/stilt-heb.png)
 
