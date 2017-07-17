@@ -84,7 +84,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     na.omit()
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$time/1440)^(1/2)
-  w <- smooth_factor * 0.05 * di * ti / (cos(kernel$lati * pi/180))
+  w <- smooth_factor * 0.06 * di * ti / (cos(kernel$lati * pi/180))
 
   
   # Gaussian kernel weighting calculation
