@@ -4,15 +4,15 @@
 
 Done this before and just looking to start a new project?
 
-1. Initialize myproject with `Rscript -e "uataq::stilt_init('myproject')"`  
-1. Edit `r/run_stilt.r` to set receptor timing/locations and model parameters  
-1. Run the model with `Rscript r/run_stilt.r`  
+1. Initialize myproject with `Rscript -e "uataq::stilt_init('myproject')"`
+1. Edit `r/run_stilt.r` to set receptor timing/locations and model parameters
+1. Run the model with `Rscript r/run_stilt.r`
 
 # Installation
 
 STILT has been compiled to run on UNIX platforms (Mac, Linux). Required software includes
 
-- R (v >= 3.25), [https://www.r-project.org/](https://www.r-project.org/)  
+- R (v >= 3.25), [https://www.r-project.org/](https://www.r-project.org/)
     - `dplyr` package, for speed and data manipulation
     - `parallel` package, for parallel computation on a single node
     - `raster` package, for raster-based spatial analysis
@@ -27,7 +27,7 @@ STILT has been compiled to run on UNIX platforms (Mac, Linux). Required software
 
 ## Install methods
 
-Two options exist to initialize a new STILT project. 
+Two options exist to initialize a new STILT project.
 
 ### R (preferred)
 
@@ -44,11 +44,11 @@ A new STILT project can then be initialized in plain R code with
 uataq::stilt_init('myproject')
 ```
 
-This function  
-1. clones the stilt Github repository into a local `stilt` directory which is then renamed `myproject`  
+This function
+1. clones the stilt Github repository into a local `stilt` directory which is then renamed `myproject`
 2. builds the `permute.so` dynamic link library used to apply gaussian kernels for footprint output
 3. compiles the hymodelc executable and moves to the `exe` directory
-4. populates the project name and paths in `myproject/r/run_stilt.r`  
+4. populates the project name and paths in `myproject/r/run_stilt.r`
 
 ### Manual
 
@@ -105,7 +105,7 @@ Location for the compiled `hymodelc` executable as well as shared model configur
 
 ## fortran/
 
-`hymodelc` fortran source code and make file used for compilation. Compilation is most easily done with the included `setup` script (which runs as part of the standard `uataq::stilt_init()`{r} installation) or manually with
+`hymodelc` fortran source code and make file used for compilation. Compilation is most easily done with the included `setup` script (which runs as part of the standard `uataq::stilt_init()` installation) or manually with
 
 ```
 cd fortran
@@ -125,11 +125,11 @@ mv permute.so ../r/src/permute.so
 
 ## out/
 
-Initially empty, this folder propagates subdirectories with the naming convention `yyyymmddHH_lati_long_zagl` when simulations begin. See Model output.
+Initially empty, this folder propagates subdirectories with the naming convention `yyyymmddHH_lati_long_zagl` when simulations begin. See [Model output](#model-output).
 
 ## r/
 
-`run_stilt.r` is used to adjust model parameters, execute the simulations, and produce upstream influence footprints. See Workflow and run_stilt.r.
+`run_stilt.r` is used to adjust model parameters, execute the simulations, and produce upstream influence footprints. See [Workflow and run_stilt.r](#workflow-and-run_stiltr).
 
 `dependencies.r` is used to load the necessary functions and packages for `run_stilt.r` and is loaded on each forked process during parallelization.
 
