@@ -138,6 +138,8 @@ The `src/` subdirectory contains the bulk of the R source code but should not ne
 
 # Workflow and run_stilt.r
 
+<img src="https://air.utah.edu/~benfasoli/img/stilt-workflow.png">
+
 After turning the desired knobs in the sections below, the `r/run_stilt.r` script symlinks the meteorological data path to the user's home directory, with the default format `paste0('m', project)`. This is done to avoid issues with paths longer than 80 characters, which will result in unsuccessful fortran simulations.
 
 User parameters are then passed to `stilt_apply`, which chooses the appropriate parallel or serial function to dispatch the simulations. If using SLURM for job submission, `stilt_apply` will use the `rslurm` package to submit jobs across `n_nodes` and `n_cores` per node. If running in parallel on a single node without SLURM, `stilt_apply` will use the `parallel` package to run simulations on the current node across `n_cores`. Otherwise, `stilt_apply` will run the simulations serially using `lapply()`.
