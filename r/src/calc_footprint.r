@@ -34,23 +34,23 @@
 #' @export
 
 calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
-                           smooth_factor = 1, 
+                           smooth_factor = 1,
                            xmn, xmx, xres, ymn, ymx, yres = xres) {
-  
+
   require(dplyr)
   require(raster)
   require(uataq)
-  
+
   np <- max(p$indx, na.rm = T)
-  
+
   glong <- head(seq(xmn, xmx, by = xres), -1)
   glati <- head(seq(ymn, ymx, by = yres), -1)
-  
+
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
              seq(-10.2, -20, by = -0.2),
              seq(-20.5, -100, by = -0.5))
-  
+
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
     full_join(expand.grid(time = times,
@@ -63,7 +63,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     ungroup() %>%
     na.omit() %>%
     mutate(time = round(time, 1))
-  
+
   # Scale interpolated values to retain total field
   mi <- i$time >= -10
   mp <- p$time >= -10
@@ -74,8 +74,8 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   mi <- i$time < -20 & i$time >= -100
   mp <- p$time < -20 & p$time >= -100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
-  
-  
+
+
   # Gaussian kernel bandwidth scaling
   kernel <- i %>%
     group_by(time) %>%
@@ -86,7 +86,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   ti <- abs(kernel$time/1440)^(1/2)
   w <- smooth_factor * 0.06 * di * ti / (cos(kernel$lati * pi/180))
 
-  
+
   # Gaussian kernel weighting calculation
   make_gauss_kernel <- function (rs, sigma) {
     # Modified from raster:::.Gauss.weight()
@@ -104,7 +104,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     m <- matrix(m, ncol = nx, nrow = ny, byrow = TRUE)
     m/sum(m)
   }
-  
+
   # Determine maximum kernel size
   xyres <- c(xres, yres)
   max_k <- make_gauss_kernel(xyres, max(w))
@@ -112,18 +112,19 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   xbufh <- (xbuf - 1) / 2
   ybuf <- nrow(max_k)
   ybufh <- (ybuf - 1) / 2
-  
+
   max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
   max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
-  
+
   # Remove zero influence particles and positions outside of domain
   xyzt <- i %>%
     filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
            lati >= (ymn - ybufh*yres), lati < (ymx + ybufh*yres))
+  if (nrow(xyzt) == 0) return(NULL)
   mask <- is.element(kernel$time, xyzt$time)
   kernel <- kernel[mask, ]
   w <- w[mask]
-  
+
   # Pre grid particle locations
   xyzt <- xyzt %>%
     transmute(loi = as.integer(findInterval(long, max_glong)),
@@ -133,43 +134,43 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     group_by(loi, lai, time) %>%
     summarize(foot = sum(foot, na.rm = T)) %>%
     ungroup()
-  
+
   # Dimensions in accordance with CF-1.4 convention (x, y, t)
   grd <- matrix(0, nrow = length(max_glong), ncol = length(max_glati))
-  
+
   # Build gaussian kernels by time step
   foot <- sapply(kernel$time, simplify = 'array', function(x) {
     step <- xyzt %>%
       filter(time == x)
-    
+
     if (nrow(step) < 2) {
       return(grd)
     }
-    
+
     # Dispersion kernel
     idx <- kernel$time == x
     k <- make_gauss_kernel(xyres, w[idx])
-    
+
     # Array dimensions
     len <- nrow(step)
     nkx <- ncol(k)
     nky <- nrow(k)
     nax <- ncol(grd)
     nay <- nrow(grd)
-    
+
     # Call permute fortran subroutine to build and aggregate kernels
     out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
                     k = k, nkx = nkx, nky = nky,
                     len = len, lai = step$lai, loi = step$loi, foot = step$foot)
-    
+
     return(out$ans)
   })
-  
-  
+
+
   # Remove added buffer around requested domain
   size <- dim(foot)
   foot <- foot[(xbuf+1):(size[1]-xbuf), (ybuf+1):(size[2]-ybuf), ] / np
-  
+
   # Time integrate footprint by aggregating across 3rd dimension
   if (time_integrate) {
     foot <- apply(foot, c(1, 2), sum)
@@ -181,12 +182,12 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     })
     time_out <- as.numeric(r_run_time + unique(hid) * 3600)
   }
-  
-  
+
+
   # Save footprint fo file
   if (!is.null(output) && file.exists(output))
     system(paste('rm', output))
-  
+
   if (!is.null(output) && grepl('\\.nc$', output, ignore.case = T) &&
       'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
     xdim <- ncdim_def('longitude_center', 'degrees_east', glong + xres/2)
@@ -195,7 +196,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
                       as.numeric(time_out))
     fvar <- ncvar_def('Footprint', 'ppm (umol-1 m2 s)',
                       list(xdim, ydim, tdim), -1)
-    
+
     nc <- nc_create(output, fvar)
     ncvar_put(nc, fvar, foot)
     ncatt_put(nc, 'longitude_center', 'position', 'cell_center')
@@ -210,7 +211,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     ncatt_put(nc, 0, 'Author', 'Ben Fasoli')
     return(output)
   }
-  
+
   out_custom <- list(
     longitude = list(unit = 'degrees_east',
                      position = 'cell_center',
@@ -229,7 +230,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
                       Conventions = 'CF-1.4',
                       Documentation = 'benfasoli.github.io/stilt')
   )
-  
+
   if (!is.null(output) && grepl('\\.csv$', output, ignore.case = T)) {
     csv <- data_frame(expand.grid(longitude = glong,
                                   latitude  = glati),
@@ -242,11 +243,11 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     write.table(csv, append = T, quote = F, sep = ',', row.names = F)
     return(output)
   }
-  
+
   if (!is.null(output) && grepl('\\.rds$', output, ignore.case = T)) {
     saveRDS(out_custom, output)
     return(output)
   }
-  
+
   return(out_custom)
 }
