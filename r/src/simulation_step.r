@@ -146,5 +146,11 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                          time_integrate = time_integrate,
                          xmn = xmn, xmx = xmx, xres = xres,
                          ymn = ymn, ymx = ymx, yres = yres)
+  if (is.null(foot)) {
+   warning('No non-zero footprint values found within the footprint domain.')
+   cat('No non-zero footprint values found within the footprint domain.\n',
+       file = file.path(rundir, 'ERROR'))
+   return()
+  }
   return(foot)
 }
