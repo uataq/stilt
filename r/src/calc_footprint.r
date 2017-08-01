@@ -207,7 +207,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
     ncatt_put(nc, 0, 'Title', 'STILT Footprint Output')
     ncatt_put(nc, 0, 'Compatibility', 'raster::raster() and raster::brick()')
-    ncatt_put(nc, 0, 'Documentation', 'benfasoli.github.io/stilt')
+    ncatt_put(nc, 0, 'Documentation', 'github.com/uataq/stilt')
     ncatt_put(nc, 0, 'Author', 'Ben Fasoli')
     return(output)
   }
