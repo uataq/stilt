@@ -45,9 +45,12 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                                 r_lati, '_', r_zagl)))
   uataq::br()
   message(paste('Running simulation ID:  ', basename(rundir)))
+  
+  # Save workspace to recreate simulation in settings.RData
+  save.image(file = file.path(rundir, 'settings.RData'))
 
   # Generate PARTICLE.DAT ------------------------------------------------------
-  # run_trajec determines whether to try using existing PARTICLE.DAT files or to
+  # run_trajec determines whether to try using existing trajectory files or to
   # recycle existing files
   output <- list()
   output$runtime <- r_run_time
@@ -82,7 +85,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     sh <- write_runhymodelc(file.path(rundir, 'runhymodelc.sh'))
 
     of <- file.path(rundir, 'hymodelc.out')
-
+    
+    # Initialize simulation timeout ----------------------------------------------
+    # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
+    # specified in run_stilt.r, kills hymodelc and moves on to next simulation
     elapsed <- 0
     eval_start <- Sys.time()
     pid <- system(paste('bash', sh), intern = T)
@@ -123,7 +129,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
 
     if (rm_dat) system(paste('rm', pf))
   } else {
-    # If user opted to recycle existing PARTICLE.DAT files, read in the recycled
+    # If user opted to recycle existing trajectory files, read in the recycled
     # file to a data_frame with an adjusted timestamp and index for the
     # simulation step. If none exists, report an error and try the next timestep
     if (!file.exists(output$file)) {
