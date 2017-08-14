@@ -45,9 +45,6 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                                 r_lati, '_', r_zagl)))
   uataq::br()
   message(paste('Running simulation ID:  ', basename(rundir)))
-  
-  # Save workspace to recreate simulation in settings.RData
-  save.image(file = file.path(rundir, 'settings.RData'))
 
   # Generate PARTICLE.DAT ------------------------------------------------------
   # run_trajec determines whether to try using existing trajectory files or to
@@ -67,6 +64,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     link_files <- c('ASCDATA.CFG', 'CONC.CFG', 'hymodelc',
                     'LANDUSE.ASC', 'ROUGLEN.ASC')
     file.symlink(file.path(file.path(stilt_wd, 'exe'), link_files), rundir)
+    
+    # Save workspace to recreate simulation in settings.RData
+    save.image(file = file.path(rundir, 'settings.RData'))
 
     # Find met files necessary for simulation ------------------------------------
     met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
