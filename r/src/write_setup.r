@@ -73,8 +73,11 @@ write_setup <- function(numpar = 100, delt = 0, tratio = 0.9, isot = 0,
   ivmax <- length(varsiwant)
   varsiwant <- paste0('\'', paste(varsiwant, collapse = '\', \''), '\'')
 
-  eq <- function(lhs, rhs)
+  eq <- function(lhs, rhs) {
+    if (is.logical(rhs))
+      rhs <- as.numeric(rhs)
     paste0(lhs, '=', rhs, ',')
+  }
 
   txt <- c('$SETUP',
            eq('DELT', delt),
