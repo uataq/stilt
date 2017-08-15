@@ -16,20 +16,19 @@ gauss_dilute_plume <- function(p, numpar, r_zagl, veght) {
   
   # Calculate gaussian plume height using vertical velocity standard deviations
   p <- p %>%
-    mutate(sigma = sqrt(2) * sigw * sqrt(tlgr*abs(time*60) +
-                                           tlgr^2 * exp(-abs(time*60)/tlgr)-1),
-           pbl_mixing = veght * mlht,
-           gauss_plume = r_zagl + sigma)
+    mutate(sigma = samt * sqrt(2) * sigw *
+             sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr)-1),
+           pbl_mixing = veght * mlht)
   
   # Compare average gaussian plume height with dilution height calculated at
   # each time stepusing veght * mlht, or the fraction of the mixed layer height
   # (defaults to veght = 0.5) to apply the influence of a particle
   dilute <- p %>%
     group_by(time) %>%
-    summarize_at(c('pbl_mixing', 'gauss_plume'),
+    summarize_at(c('pbl_mixing', 'sigma'),
                  funs(mean(., na.rm = T))) %>%
     arrange(-time) %>%
-    mutate(gauss_plume = cumsum(gauss_plume),
+    mutate(gauss_plume = r_zagl + cumsum(sigma),
            mask = gauss_plume < pbl_mixing)
   
   # Recalculate near-field foot values until the average gaussian plume height
