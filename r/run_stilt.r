@@ -95,6 +95,17 @@ if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
 } else met_loc <- met_directory
 
 
+# Structure out directory ------------------------------------------------------
+# Outputs are organized in three formats. by-id contains simulation files by
+# unique simulation identifier. particles and footprints contain symbolic links
+# to the particle trajectory and footprint files in by-id
+for (d in c('by-id', 'particles', 'footprints')) {
+  d <- file.path('out', d)
+  if (!file.exists(d))
+    dir.create(d)
+}
+
+
 # Run trajectory simulations ---------------------------------------------------
 # Gather varsiwant into a single character string and fork the process to apply
 # simulation_step() to each receptor across n_cores and n_nodes
