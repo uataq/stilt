@@ -21,7 +21,7 @@ gauss_dilute_plume <- function(p, numpar, r_zagl, veght) {
              sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr)-1),
            pbl_mixing = veght * mlht) %>%
     arrange(-time) %>%
-    group_by(indx)%>%
+    group_by(indx) %>%
     mutate(gauss_plume = r_zagl + cumsum(sigma),
            foot = ifelse(gauss_plume < pbl_mixing,
                          0.02884 / (gauss_plume * dens) * samt*60,
