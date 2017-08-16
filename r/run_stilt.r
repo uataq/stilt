@@ -91,9 +91,7 @@ source(file.path(stilt_wd,'r/dependencies.r'))
 # that all meteorological data is found in the same directory.
 if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
   met_loc <- file.path(path.expand('~'), paste0('m', project))
-  if (file.exists(met_loc))
-    system(paste('unlink', met_loc))
-  system(paste('ln -s', met_directory, met_loc))
+  link(met_directory, met_loc)
 } else met_loc <- met_directory
 
 
