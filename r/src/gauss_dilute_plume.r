@@ -14,6 +14,8 @@
 
 gauss_dilute_plume <- function(p, numpar, r_zagl, veght) {
   
+  require(dplyr)
+  
   # Calculate gaussian plume height using vertical velocity standard deviations
   p <- p %>%
     mutate(sigma = samt * sqrt(2) * sigw *
