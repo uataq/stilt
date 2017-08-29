@@ -22,8 +22,6 @@
 stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
                         n_nodes = 1, n_cores = 1, ...) {
 
-  tryFUN <- function(...) try(FUN(...))
-
   if (slurm) {
     sbatch_avail <- system('which sbatch', intern = T)
     if (length(sbatch_avail) == 0 || nchar(sbatch_avail[1]) == 0)
@@ -32,7 +30,7 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
     message('Parallelization using slurm. Dispatching jobs...')
     load_libs('rslurm')
     Y <- data.frame(X = X, slurm = T, ..., stringsAsFactors = F)
-    sjob <- rslurm::slurm_apply(tryFUN, Y,
+    sjob <- rslurm::slurm_apply(FUN, Y,
                                 jobname = basename(getwd()), pkgs = 'base',
                                 nodes = n_nodes, cpus_per_node = n_cores,
                                 slurm_options = slurm_options)
@@ -42,11 +40,11 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
     message('Parallelization using multiple R jobs. Dispatching processes...')
     load_libs('parallel')
     cl <- makeForkCluster(n_cores, outfile = '')
-    out <- parallel::parLapply(cl, X, tryFUN, ...)
+    out <- parallel::parLapply(cl, X, FUN, ...)
     stopCluster(cl)
     return(out)
   }
 
   message('Parallelization disabled...')
-  return(lapply(X, tryFUN, ...))
+  return(lapply(X, FUN, ...))
 }
