@@ -4,7 +4,7 @@
 #' @export
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            slurm = F, met_file_format, met_loc, delt = 0,
+                            met_file_format, met_loc, delt = 0,
                             iconvect = 0, isot = 0, mgmin = 2000, n_hours = -72,
                             n_met_min = 1, ndump = 0, nturb = 0, numpar = 100,
                             outdt = 0, outfrac = 0.9, run_trajec = T, random = 1,
@@ -18,7 +18,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
   try({
     # If using lapply or parLapply, receptors are passed as vectors and need to
     # be subsetted for the specific simulation index
-    if (!slurm) {
+    if (length(r_run_time) > 1) {
       r_run_time <- r_run_time[X]
       r_lati <- r_lati[X]
       r_long <- r_long[X]
