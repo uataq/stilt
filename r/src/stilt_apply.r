@@ -29,7 +29,7 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
 
     message('Parallelization using slurm. Dispatching jobs...')
     load_libs('rslurm')
-    Y <- data.frame(X = X, slurm = T, ..., stringsAsFactors = F)
+    Y <- data.frame(X = X, ..., stringsAsFactors = F)
     sjob <- rslurm::slurm_apply(FUN, Y,
                                 jobname = basename(getwd()), pkgs = 'base',
                                 nodes = n_nodes, cpus_per_node = n_cores,
