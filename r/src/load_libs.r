@@ -19,6 +19,8 @@
 load_libs <- function(..., lib.loc = NULL) {
   args <- list(...)
 
+  repo <- 'https://cran.rstudio.com/'
+
   load_check <- function(pkg, lib.loc) {
     suppressWarnings(
       require(pkg, character.only = T, quiet = T,
@@ -31,12 +33,12 @@ load_libs <- function(..., lib.loc = NULL) {
       # If package is not installed
       if (!load_check(pkg, lib.loc)) {
         # Try installing from CRAN
-        try( install.packages(pkg, lib = lib.loc) )
+        try( install.packages(pkg, repo = repo, lib = lib.loc) )
         # If the package is not found on CRAN
         if (!load_check(pkg, lib.loc)) {
           # Try Ben Fasoli's github
           if (!load_check('devtools', lib.loc))
-            install.packages('devtools', lib = lib.loc)
+            install.packages('devtools', repo = repo, lib = lib.loc)
           try( devtools::install_github(pkg, username = 'benfasoli') )
           # Throw error if the package can't be found on CRAN or github
           if (!load_check(pkg, lib.loc)) {

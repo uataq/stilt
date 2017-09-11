@@ -36,7 +36,9 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
                                 slurm_options = slurm_options)
     uataq::br(2)
     return(sjob)
-  } else if (n_cores > 1) {
+  }
+
+  if (n_cores > 1) {
     message('Parallelization using multiple R jobs. Dispatching processes...')
     load_libs('parallel')
     cl <- makeForkCluster(n_cores, outfile = '')
