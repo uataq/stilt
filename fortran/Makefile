@@ -36,13 +36,13 @@ IFOR = -free -O -w -I. -assume byterecl -mcmodel=medium
 #LDFLAGS = -shared-intel #needed for old stilt on Pleiades, not needed for multi (?)
 
 HUM = -qsource -O2 -qmaxmem=-1 -q64 -C #AER-humboldt for xlf compilers; -C does bounds checking
-#CFLAGS = $(GFOR)
-CFLAGS = $(PGF9)
+CFLAGS = $(GFOR)
+#CFLAGS = $(PGF9)
 # LFLAGS = -vr -X64   (NCEP implementation)           
 LFLAGS = -vr           
 #FC = f90
-#FC = gfortran
-FC = pgf90
+FC = gfortran
+#FC = pgf90
 #FC = pgf95
 CODE =          \
        funits.f \
