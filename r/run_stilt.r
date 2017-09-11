@@ -1,5 +1,5 @@
 # STILT R Executable
-# For documentation, see https://github.com/benfasoli/stilt
+# For documentation, see https://uataq.github.io/stilt/
 # Ben Fasoli
 
 # User inputs ------------------------------------------------------------------
@@ -80,19 +80,16 @@ smooth_factor <- 1
 time_integrate <- F
 
 
+# Startup messages -------------------------------------------------------------
+message('Initializing STILT')
+grd <- array(dim = c((xmx - xmn) / xres, (ymx - ymn) / yres, abs(n_hours) * 60))
+ram <- format(object.size(grd) * 1.2, units = 'MB', standard = 'SI')
+message('Estimated footprint grid RAM allocation: ', ram)
+
+
 # Source dependencies ----------------------------------------------------------
 setwd(stilt_wd)
 source(file.path(stilt_wd,'r/dependencies.r'))
-
-
-# Met path symlink -------------------------------------------------------------
-# Auto symlink the meteorological data path to the working directory to
-# eliminate issues with long (>80 char) paths in fortran. Note that this assumes
-# that all meteorological data is found in the same directory.
-if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
-  met_loc <- file.path(path.expand('~'), paste0('m', project))
-  link(met_directory, met_loc)
-} else met_loc <- met_directory
 
 
 # Structure out directory ------------------------------------------------------
@@ -104,6 +101,16 @@ for (d in c('by-id', 'particles', 'footprints')) {
   if (!file.exists(d))
     dir.create(d)
 }
+
+
+# Met path symlink -------------------------------------------------------------
+# Auto symlink the meteorological data path to the working directory to
+# eliminate issues with long (>80 char) paths in fortran. Note that this assumes
+# that all meteorological data is found in the same directory.
+if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
+  met_loc <- file.path(path.expand('~'), paste0('m', project))
+  link(met_directory, met_loc)
+} else met_loc <- met_directory
 
 
 # Run trajectory simulations ---------------------------------------------------
@@ -132,4 +139,3 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       ymn = ymn, ymx = ymx, yres = yres)
 
 q('no')
-
