@@ -133,7 +133,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       # Calculate near-field dilution height based on gaussian plume width
       # approximation and recalculate footprint sensitivity for cases when the
       # plume height is less than the PBL height scaled by veght
-      particle <- gauss_dilute_plume(particle, numpar, r_zagl, veght)
+      particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
       output$particle <- particle
       saveRDS(output, output$file)
 
