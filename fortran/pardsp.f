@@ -44,7 +44,7 @@
 !   MACHINE:  IBM RS6000
 !
 !$$$
-!************************************************ 
+!************************************************
 ! JCL:(5/16/2000)Conduct well-mixed test, but implement Thomson [1997] scheme for
 !   treatment of interfaces between step changes in high & low turbulence
 ! JCL:in this version of PARDSP, switch off vertical interpolation
@@ -84,9 +84,9 @@
 ! CHG:(03/17/2004) pass on rel. humidity and temperature profile to get dry air density column integrated
 !  also provide output for specific humidity, and output for "foot" (footprint in ppm per micro-moles/m2/s)
 ! JCL:(07/14/2004) split up GDIS=>GDISX&GDISY for global grids (non-conformal)
-!************************************************ 
+!************************************************
 
-!************************************************ 
+!************************************************
 !dwen(20090318): add some arguments according to STILT
 !dwen(20090816): remove SMIN,useless
 !dwen(20090817): remove seeveg,isot and ecmflg from argument list, useless in PARDSP
@@ -109,7 +109,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
                   sigmaw,sigmau,samptt,samptt2,wwprev,veght,             &
                  convdur,zloc,ramsflg,tempnext,tempprev,rhfrnext,        &
                   rhfrprev,sphu,foot)
-!************************************************ 
+!************************************************
 
   IMPLICIT NONE
 
@@ -118,16 +118,16 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 !*************************************
 
 !-------------------------------------------------------------------------------
-! argument list variables 
+! argument list variables
 !-------------------------------------------------------------------------------
 
   REAL,         INTENT(IN)     :: umix        ! u-component turbulence (m2/s2)
   REAL,         INTENT(IN)     :: vmix        ! v-component turbulence (m2/s2)
-  REAL,         INTENT(IN)     :: gdisx       ! horizontal grid distance (m) 
-  REAL,         INTENT(IN)     :: gdisy       ! horizontal grid distance (m) 
-  REAL,         INTENT(IN)     :: dtm         ! advection time step (min)  
-  REAL,         INTENT(IN)     :: zmdl        ! top of domain (m)          
-  REAL,         INTENT(IN)     :: zsfc        ! terrain height (m)         
+  REAL,         INTENT(IN)     :: gdisx       ! horizontal grid distance (m)
+  REAL,         INTENT(IN)     :: gdisy       ! horizontal grid distance (m)
+  REAL,         INTENT(IN)     :: dtm         ! advection time step (min)
+  REAL,         INTENT(IN)     :: zmdl        ! top of domain (m)
+  REAL,         INTENT(IN)     :: zsfc        ! terrain height (m)
   INTEGER,      INTENT(IN)     :: nlvl        ! number of levels in subgrid
   REAL,         INTENT(IN)     :: wmix (:)    ! vertical turbulence (m2/s2)
   REAL,         INTENT(IN)     :: zsg  (:)    ! internal model sigma levels
@@ -139,7 +139,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
   REAL,         INTENT(INOUT)  :: wprime      ! last w turbulent velocity (z)
   REAL,         INTENT(INOUT)  :: uprime      ! last u turbulent velocity (x)
   INTEGER,      INTENT(IN)     :: hdwp        ! horizontal distribution index
-  REAL,         INTENT(IN)     :: zndx        ! fractional vertical index  
+  REAL,         INTENT(IN)     :: zndx        ! fractional vertical index
   INTEGER,      INTENT(INOUT)  :: iseed       ! seed number for dispersion
 
 !-------------------------------------------------------------------------------
@@ -155,9 +155,9 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
   INTEGER                      :: kz,kb,kt          ! vertical indicies
   REAL                         :: uu,vv,ww          ! new velocity components
   REAL                         :: rauto             ! velocity autocorrelation
-!dwen(20090817)  REAL                         :: wprime            ! vertical velocity turb  
+!dwen(20090817)  REAL                         :: wprime            ! vertical velocity turb
   REAL                         :: delz              ! min vertical layer depth
-  REAL                         :: delt              ! vertical time step 
+  REAL                         :: delt              ! vertical time step
   INTEGER                      :: knum              ! numb integration steps
   REAL                         :: fact              ! interp factor
   REAL                         :: vm                ! interp vertical mixing
@@ -220,7 +220,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 !     Temperature [K], vapor pressure (mbar), sat. vap. pr. (mbar), and spec. hum. (g/g)
 !      REAL*8 DENSDRY(NLVL),PRS(NLVL),TK(NLVL),E(NLVL),ES(NLVL),R(NLVL)  &
 !     & ,ZADD(NLVL)
-      REAL,allocatable :: DENSDRY(:),PRS(:),TK(:),E(:),ES(:),R(:),ZADD(:) 
+      REAL,allocatable :: DENSDRY(:),PRS(:),TK(:),E(:),ES(:),R(:),ZADD(:)
 
 ! JCL:(4/13/00) interpolation factor in TIME
 !dwen(20090318)      REAL*8 TF
@@ -234,7 +234,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 
 ! JCL:the random seed
       INTEGER,intent(in)        :: RSEED
-!dwen(20090822): RAN3 is already defined in DEFARG1.INC 
+!dwen(20090822): RAN3 is already defined in DEFARG1.INC
 !     REAL(KIND(1d0)), EXTERNAL :: RAN3
 
 
@@ -313,7 +313,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 !-------------------------------------------------------------------------------
 
   INTERFACE
-    SUBROUTINE parvar (sigma,veloc,iseed) 
+    SUBROUTINE parvar (sigma,veloc,iseed)
       IMPLICIT NONE
       REAL,         INTENT(IN )    :: sigma
       REAL,         INTENT(OUT)    :: veloc
@@ -324,8 +324,8 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 !-------------------------------------------------------------------------------
       allocate(tl(nlvl+1),stdw(nlvl+1),dens(nlvl+1),ubar(nlvl+1),vbar(nlvl+1))
       allocate(ZSGADD(nlvl+1),dmass(nlvl+1))
-      allocate(DENSDRY(nlvl),PRS(nlvl),TK(nlvl),E(nlvl),ES(nlvl), & 
-               R(nlvl),ZADD(nlvl)) 
+      allocate(DENSDRY(nlvl),PRS(nlvl),TK(nlvl),E(nlvl),ES(nlvl), &
+               R(nlvl),ZADD(nlvl))
 !******************************************
 !dwen(20090318):adopted from PARDSP of STILT
 ! JCL:initialize VSCALE as 100 s (will be modified in PARDSP)
@@ -333,7 +333,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 
 !      xpos=xposprev
 !      ypos=yposprev
-  
+
 ! JCL(03/31/03):make sure that TL not = 0 when sigmaw is 0
       DO I=1,NLVL
          IF(STDWPREV(I).EQ.0.0)STDWPREV(I)=0.001
@@ -345,8 +345,8 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 
 ! only compute dispersion for appropriate particle distributions (9/15/03)
 
-  IF(HDWP.EQ.1.OR.HDWP.EQ.2.OR.HDWP.EQ.5.OR.HDWP.EQ.6) RETURN 
-  
+  IF(HDWP.EQ.1.OR.HDWP.EQ.2.OR.HDWP.EQ.5.OR.HDWP.EQ.6) RETURN
+
   DT=ABS(DTM*60.0)                    ! advection time step from min to sec
   ZX=ZNDX                             ! initial particle position index
 
@@ -354,7 +354,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 ! horizontal turbulence (only with 3D particle when hdwp=0)
 !-------------------------------------------------------------------------------
 
-  IF(HDWP.EQ.0)THEN 
+  IF(HDWP.EQ.0)THEN
 !    horizontal velocity standard deviations
      SIGU=SQRT(UMIX)
      SIGV=SQRT(VMIX)
@@ -383,7 +383,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 !*************************************
 !    call random number generator for each component
 !    where prime defines the velocity standard deviation
-!dwen(20090318):use GASDEV instead 
+!dwen(20090318):use GASDEV instead
 !     CALL PARVAR(SIGU,UU,ISEED)
 !     CALL PARVAR(SIGV,VV,ISEED)
 !*************************************
@@ -424,7 +424,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 
 ! JCL:(5/9/01)set direction of time, used in updating horizontal position below
       TDIRSIGN=1.0
-!dwen(20090319):remove back and use DTM 
+!dwen(20090319):remove back and use DTM
 !      IF(BACK)TDIRSIGN=-1.0
       IF(int(DTM).LT.0)TDIRSIGN=-1.0
 
@@ -451,7 +451,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 ! the following to cover the case that mixed layer height is below first model level
 ! this can happen even though zml>zlvls(1) in advpnt because of independent interpolations
 ! of zml, zsfc
-            kzm=1  
+            kzm=1
 !           DNINT used to prevent numerical errors
 !dwen(20090825)            DO WHILE(DNINT(ZSG(KK)*1E4).GT.DNINT(ZMLSIGMA*1E4))
             DO WHILE(aNINT(ZSG(KK)*1E4).GT.aNINT(ZMLSIGMA*1E4))
@@ -563,7 +563,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 ! the following to cover the case that mixed layer height is below first model level
 ! this can happen even though zml>zlvls(1) in advpnt because of independent interpolations
 ! of zml, zsfc
-            kzm=1  
+            kzm=1
 !           DNINT used to prevent numerical errors
 !dwen(20090825)            DO WHILE(DNINT(ZSG(KK)*1E4).GT.DNINT(ZMLSIGMA*1E4))
             DO WHILE(aNINT(ZSG(KK)*1E4).GT.aNINT(ZMLSIGMA*1E4))
@@ -662,7 +662,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
          END IF
 
 ! JCL:(11/14/02)initialize vertical index
-! JEL:(10/01/07)restrict the search to valid range 
+! JEL:(10/01/07)restrict the search to valid range
 !     This prevents errors for particles above the top level.
 !     Could be done prior to calling pardsp (using is_off_grid?)
          KZ=1
@@ -980,7 +980,8 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 
          IF(ZPOS.GT.VEGHTSIGMA)THEN
            SAMPTT=SAMPTT+DELT
-           FOOT=FOOT+DELT*0.02884*60.0/DENSINT
+           FOOT=FOOT+DELT*0.02897*60.0/DENSINT
+!           FOOT=FOOT+DELT*0.02884*60.0/DENSINT
          END IF
 !           28.84e-3 is mass of a mol of air in kg, 60 is to get from minuts to seconds
 
@@ -1029,7 +1030,7 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
       CONVDUR=0
 
 !******************************************************
-!dwen(20090319):comment out the following lines because of using  
+!dwen(20090319):comment out the following lines because of using
 !                  the above lines
 ! determine the required vertical dispersion time step (sec)
 ! by computing the minimum time step for vertical stability
@@ -1116,6 +1117,6 @@ SUBROUTINE pardsp(umix,vmix,gdisx,gdisy,dtm,zmdl,zsfc,nlvl,wmix,zsg,xpos,&
 
       deallocate(tl,stdw,dens,ubar,vbar)
       deallocate(ZSGADD,dmass)
-      deallocate(DENSDRY,PRS,TK,E,ES,R,ZADD) 
+      deallocate(DENSDRY,PRS,TK,E,ES,R,ZADD)
 
 END SUBROUTINE pardsp

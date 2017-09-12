@@ -1,8 +1,8 @@
-#' gauss_dilute_plume modifies foot influence by recalculating dilution depth
-#'   using estimated gaussian plume height based on average vertical velocity
-#'   standard deviations at each time step
+#' calc_plume_dilution modifies foot influence by recalculating dilution depth
+#'   using estimated mixing depth based on vertical velocity standard deviations
+#'   (vertical turbulence) and the Lagrangian decorrelation timescale
 #' @author Ben Fasoli
-#' 
+#'
 #' @param p particle data frame including named dens, tlgr, sigw, and foot
 #'   columns
 #' @param numpar number of particles in simulation
@@ -12,19 +12,19 @@
 #' @import dplyr
 #' @export
 
-gauss_dilute_plume <- function(p, numpar, r_zagl, veght) {
-  
+calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
+
   require(dplyr)
-  
+
   p %>%
     mutate(sigma = samt * sqrt(2) * sigw *
              sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr)-1),
            pbl_mixing = veght * mlht) %>%
     arrange(-time) %>%
     group_by(indx) %>%
-    mutate(gauss_plume = r_zagl + cumsum(sigma),
-           foot = ifelse(gauss_plume < pbl_mixing,
-                         0.02884 / (gauss_plume * dens) * samt*60,
+    mutate(plume = r_zagl + cumsum(sigma),
+           foot = ifelse(plume < pbl_mixing,
+                         0.02897 / (plume * dens) * samt*60,
                          foot)) %>%
     ungroup() %>%
     return()
