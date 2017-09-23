@@ -89,13 +89,18 @@ message('Estimated footprint grid RAM allocation: ', ram)
 
 # Source dependencies ----------------------------------------------------------
 setwd(stilt_wd)
-source(file.path(stilt_wd,'r/dependencies.r'))
+source('r/dependencies.r')
 
 
 # Structure out directory ------------------------------------------------------
 # Outputs are organized in three formats. by-id contains simulation files by
 # unique simulation identifier. particles and footprints contain symbolic links
 # to the particle trajectory and footprint files in by-id
+system('rm -r out/footprints', ignore.stderr = T)
+if (run_trajec) {
+  system('rm -r out/by-id', ignore.stderr = T)
+  system('rm -r out/particles', ignore.stderr = T)
+}
 for (d in c('by-id', 'particles', 'footprints')) {
   d <- file.path('out', d)
   if (!file.exists(d))
