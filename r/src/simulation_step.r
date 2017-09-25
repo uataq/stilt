@@ -129,11 +129,6 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
 
       # Convert PARTICLE.DAT data into compressed .rds data_frame
       particle <- read_particle(file = pf, varsiwant = varsiwant)
-
-      # Calculate near-field dilution height based on gaussian plume width
-      # approximation and recalculate footprint sensitivity for cases when the
-      # plume height is less than the PBL height scaled by veght
-      particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
       output$particle <- particle
       saveRDS(output, output$file)
 
@@ -152,7 +147,11 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
       particle <- readRDS(output$file)$particle
     }
-
+    
+    # Calculate near-field dilution height based on gaussian plume width
+    # approximation and recalculate footprint sensitivity for cases when the
+    # plume height is less than the PBL height scaled by veght
+    particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
 
     # Produce footprint ----------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
