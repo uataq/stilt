@@ -170,6 +170,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       link(foot_file,
            file.path(stilt_wd, 'out', 'footprints', basename(foot_file)))
     }
+    invisible(gc())
     return(foot)
   })
 }
