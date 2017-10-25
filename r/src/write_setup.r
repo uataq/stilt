@@ -60,11 +60,11 @@
 #'
 #' @export
 
-write_setup <- function(numpar = 100, delt = 0, tratio = 0.9, isot = 0,
-                        tlfrac = 0.1, ndump = 0, random = 1, outdt = 0,
-                        nturb = 0, veght = 0.5, outfrac = 0.9, iconvect = 0,
-                        winderrtf = 0, zicontroltf = 0, mgmin = 2000,
-                        varsiwant = c('time', 'indx', 'lati', 'long', 'zagl'),
+write_setup <- function(varsiwant, delt = 0, iconvect = 0, isot = 0,
+                        khmax = 9999, kmix0 = 250, kmixd = 3, krnd = 6,
+                        mgmin = 2000, ndump = 0, numpar = 100, nturb = 0, outdt = 0,
+                        outfrac = 0.9, random = 1, tlfrac = 0.1, tratio = 0.9,
+                        veght = 0.5, winderrtf = 0, zicontroltf = 0,
                         file = 'exe/SETUP.CFG') {
 
   if (basename(file) != 'SETUP.CFG')
@@ -86,10 +86,10 @@ write_setup <- function(numpar = 100, delt = 0, tratio = 0.9, isot = 0,
            'INITD=0',
            eq('ISOT', isot),
            eq('IVMAX', ivmax),
-           'KHMAX=9999',
-           'KMIX0=250',
-           'KMIXD=3',
-           'KRND=6',
+           eq('KHMAX', khmax),
+           eq('KMIX0', kmix0),
+           eq('KMIXD', kmixd),
+           eq('KRND', krnd),
            eq('MGMIN', mgmin),
            eq('NDUMP', ndump),
            eq('NTURB', nturb),

@@ -56,6 +56,10 @@ varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
 # Transport and dispersion settings
 iconvect    <- 0
 isot        <- 0
+khmax       <- 9999
+kmix0       <- 250
+kmixd       <- 3
+krnd        <- 6
 mgmin       <- 2000
 ndump       <- 0
 nturb       <- 0
@@ -129,6 +133,7 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       slurm = slurm, slurm_options = slurm_options,
                       n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
                       delt = delt, iconvect = iconvect, isot = isot,
+                      khmax = khmax, kmix0 = kmix0, kmixd = kmixd, krnd = krnd,
                       lib.loc = lib.loc, met_file_format = met_file_format,
                       met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
                       n_met_min = n_met_min, ndump = ndump, nturb = nturb,
