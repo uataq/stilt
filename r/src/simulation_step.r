@@ -5,7 +5,8 @@
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                             met_file_format, met_loc, delt = 0,
-                            iconvect = 0, isot = 0, mgmin = 2000, n_hours = -72,
+                            iconvect = 0, isot = 0, khmax = 9999, kmix0 = 250,
+                            kmixd = 3, krnd = 6, mgmin = 2000, n_hours = -72,
                             n_met_min = 1, ndump = 0, nturb = 0, numpar = 100,
                             outdt = 0, outfrac = 0.9, run_trajec = T, random = 1,
                             r_run_time, r_lati, r_long, r_zagl,
@@ -81,6 +82,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       write_setup(numpar, delt, tratio, isot, tlfrac, ndump, random, outdt, nturb,
                   veght, outfrac, iconvect, winderrtf, zicontroltf, mgmin,
                   varsiwant, file.path(rundir, 'SETUP.CFG'))
+      write_setup(varsiwant, delt, iconvect, isot, khmax, kmix0, kmixd, krnd,
+                  mgmin, ndump, numpar, nturb, outdt, outfrac, random, tlfrac,
+                  tratio, veght, winderrtf, zicontroltf,
+                  file.path(rundir, 'SETUP.CFG'))
       write_control(output$receptor, n_hours, w_option, z_top, met_files,
                     file.path(rundir, 'CONTROL'))
       sh <- write_runhymodelc(file.path(rundir, 'runhymodelc.sh'))
@@ -145,7 +150,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
       particle <- readRDS(output$file)$particle
     }
-    
+
     # Calculate near-field dilution height based on gaussian plume width
     # approximation and recalculate footprint sensitivity for cases when the
     # plume height is less than the PBL height scaled by veght
