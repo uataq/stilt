@@ -79,9 +79,6 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
 
       # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
-      write_setup(numpar, delt, tratio, isot, tlfrac, ndump, random, outdt, nturb,
-                  veght, outfrac, iconvect, winderrtf, zicontroltf, mgmin,
-                  varsiwant, file.path(rundir, 'SETUP.CFG'))
       write_setup(varsiwant, delt, iconvect, isot, khmax, kmix0, kmixd, krnd,
                   mgmin, ndump, numpar, nturb, outdt, outfrac, random, tlfrac,
                   tratio, veght, winderrtf, zicontroltf,
