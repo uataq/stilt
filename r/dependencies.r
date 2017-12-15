@@ -1,5 +1,5 @@
 # STILT Dependency Loader
-# For documentation, see https://github.com/benfasoli/stilt
+# For documentation, see https://github.com/uataq/stilt
 # Ben Fasoli
 
 if (!'stilt_wd' %in% ls())
