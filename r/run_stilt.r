@@ -7,10 +7,9 @@ project <- '{{project}}'
 stilt_wd <- file.path('{{wd}}', project)
 lib.loc <- .libPaths()[1]
 
-rm_dat  <- T
-n_nodes <- 1
+# Parallel simulation settings
 n_cores <- 1
-
+n_nodes <- 1
 slurm   <- F
 slurm_options <- list(
   time = '300:00:00',
@@ -47,6 +46,7 @@ convect    <- F
 delt       <- 0
 numpar     <- 200
 outdt      <- 0
+rm_dat     <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas',
@@ -87,7 +87,7 @@ time_integrate <- F
 # Startup messages -------------------------------------------------------------
 message('Initializing STILT')
 grd <- array(dim = c((xmx - xmn) / xres, (ymx - ymn) / yres, abs(n_hours) * 60))
-ram <- format(object.size(grd) * 1.2, units = 'MB', standard = 'SI')
+ram <- format(object.size(grd) * 2.0, units = 'MB', standard = 'SI')
 message('Estimated footprint grid RAM allocation: ', ram)
 
 

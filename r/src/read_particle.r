@@ -8,8 +8,9 @@
 #' @export
 
 read_particle <- function(file, varsiwant) {
-  
+
   require(dplyr)
+  require(readr)
 
   n_lines <- uataq::count_lines(file)
 
