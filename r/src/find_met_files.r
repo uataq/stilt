@@ -34,5 +34,5 @@ find_met_files <- function(t_start, met_file_format, n_hours, met_loc) {
   if (any(idx < 1))
     return()
 
-  return(available[idx])
+  available[idx]
 }

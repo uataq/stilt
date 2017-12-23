@@ -14,7 +14,7 @@ validate_varsiwant <- function(varsiwant) {
              'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout',
              'mlht', 'rain', 'crai')
   invalid <- setdiff(varsiwant, valid)
-  
+
   if (length(invalid) > 0)
     stop('validate_varsiwant(): varsiwant argument can only include:\n',
          paste(collapse = '\n', valid))

@@ -1,5 +1,8 @@
 #' write_control writes out a namelist file to control the model behavior
 #' @author Ben Fasoli
+#' 
+#' CONTROL file contains input data for the model, including receptor x,y,z,t
+#' coordinates as well as meteorological data files to drive simulations.
 #'
 #' @param receptor data frame containing columns for \code{run_times} as a
 #'   POSIXct formatted timestamp, \code{lati} (degrees), \code{long} (degrees),
@@ -14,18 +17,15 @@
 #' @param met_files full paths to meteorological data files in .arl format
 #' @param file path and name for output file
 #'
-#' @import dplyr
 #' @export
 
-write_control <- function(receptor, n_hour, w_option = 0,
-                          z_top = 25000, met_files, file = 'exe/CONTROL') {
-  require(dplyr)
+write_control <- function(receptor, n_hour, w_option = 0, z_top = 25000,
+                          met_files, file = 'CONTROL') {
 
   if (!'CONTROL' %in% basename(file))
     stop('write_control(): file argument must end with CONTROL')
 
-  receptor <- mutate(receptor,
-                     print = paste(lati, long, zagl))
+  receptor$print <- with(receptor, paste(lati, long, zagl))
   n_loc <- nrow(receptor)
 
   txt = c(
@@ -62,5 +62,5 @@ write_control <- function(receptor, n_hour, w_option = 0,
   )
 
   write(txt, file)
-  return(file)
+  file
 }
