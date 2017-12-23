@@ -58,10 +58,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     output <- list()
     output$runtime <- r_run_time
     output$file <- file.path(rundir, paste0(basename(rundir), '_traj.rds'))
-    output$receptor <- data_frame(run_time = r_run_time,
-                                  lati = r_lati,
-                                  long = r_long,
-                                  zagl = r_zagl)
+    output$receptor <- list(run_time = r_run_time,
+                            lati = r_lati,
+                            long = r_long,
+                            zagl = r_zagl)
     
     if (run_trajec) {
       # Ensure necessary files and directory structure are established in the
@@ -111,12 +111,12 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                           z_top, rundir)
         if (is.null(particle_error)) return()
         output$particle_error_params <- list(siguverr = siguverr,
-                                                   tluverr = tluverr,
-                                                   zcoruverr = zcoruverr,
-                                                   horcoruverr = horcoruverr,
-                                                   sigzierr = sigzierr,
-                                                   tlzierr = tlzierr,
-                                                   horcorzierr = horcorzierr)
+                                             tluverr = tluverr,
+                                             zcoruverr = zcoruverr,
+                                             horcoruverr = horcoruverr,
+                                             sigzierr = sigzierr,
+                                             tlzierr = tlzierr,
+                                             horcorzierr = horcorzierr)
         output$particle_error <- particle_error
       }
       
