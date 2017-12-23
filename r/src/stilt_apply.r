@@ -51,5 +51,5 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
   }
 
   message('Parallelization disabled. Executing simulations sequentially...')
-  return(lapply(X, FUN, ...))
+  lapply(X, FUN, ...)
 }

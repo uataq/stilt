@@ -1,9 +1,9 @@
 #' Recalculate influence in HNF by modifying dilution depth
 #' @author Ben Fasoli
 #'
-#' \code{calc_plume_dilution} modifies foot influence by recalculating dilution
-#' depth using estimated mixing depth based on vertical velocity standard
-#' deviations (vertical turbulence) and the Lagrangian decorrelation timescale
+#' Modifies foot influence by recalculating dilution depth using estimated
+#' mixing depth based on vertical velocity standard deviations (vertical
+#' turbulence) and the Lagrangian decorrelation timescale.
 #'
 #' @param p particle data frame including named dens, tlgr, sigw, and foot
 #'   columns
@@ -28,6 +28,5 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
            foot = ifelse(plume < pbl_mixing,
                          0.02897 / (plume * dens) * samt*60,
                          foot)) %>%
-    ungroup() %>%
-    return()
+    ungroup()
 }

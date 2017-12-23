@@ -10,21 +10,21 @@ lib.loc <- .libPaths()[1]
 # Parallel simulation settings
 n_cores <- 1
 n_nodes <- 1
-slurm   <- F
+slurm   <- n_nodes > 1
 slurm_options <- list(
-  time = '300:00:00',
-  account = 'lin-kp',
+  time      = '300:00:00',
+  account   = 'lin-kp',
   partition = 'lin-kp'
 )
 
-# Simulation timing, yyyy-mm-dd HH:MM:SS
+# Simulation timing, yyyy-mm-dd HH:MM:SS (UTC)
 t_start <- '2015-06-18 22:00:00'
 t_end   <- '2015-06-18 22:00:00'
-run_times <- seq(from = as.POSIXct(t_start, tz='UTC'),
-                 to   = as.POSIXct(t_end, tz='UTC'),
+run_times <- seq(from = as.POSIXct(t_start, tz = 'UTC'),
+                 to   = as.POSIXct(t_end, tz = 'UTC'),
                  by   = 'hour')
 
-# Receptor locations
+# Receptor location(s)
 lati <- 40.782561
 long <- -111.980323
 zagl <- 5
@@ -35,7 +35,7 @@ receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
                          zagl = zagl, KEEP.OUT.ATTRS = F, stringsAsFactors = F)
 
 # Meteorological data input
-met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/wasatch'
+met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
 n_met_min       <- 5
 
@@ -49,9 +49,20 @@ outdt      <- 0
 rm_dat     <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
-                'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas',
-                'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout',
-                'mlht', 'rain', 'crai')
+                'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
+                'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout', 'mlht',
+                'rain', 'crai')
+
+# Footprint grid settings
+xmn <- -114.5
+xmx <- -109
+ymn <- 37
+ymx <- 42
+xres <- 0.01
+yres <- xres
+hnf_plume <- T
+smooth_factor <- 1
+time_integrate <- F
 
 # Transport and dispersion settings
 iconvect    <- 0
@@ -69,19 +80,17 @@ tlfrac      <- 0.1
 tratio      <- 0.9
 veght       <- 0.5
 w_option    <- 0
-winderrtf   <- F
-z_top       <- 25000
 zicontroltf <- 0
+z_top       <- 25000
 
-# Footprint grid settings
-xmn <- -114.5
-xmx <- -109
-ymn <- 37
-ymx <- 42
-xres <- 0.01
-yres <- xres
-smooth_factor <- 1
-time_integrate <- F
+# Transport error settings
+siguverr <- NULL
+tluverr <- NULL
+zcoruverr <- NULL
+horcoruverr <- NULL
+sigzierr <- NULL
+tlzierr <- NULL
+horcorzierr <- NULL
 
 
 # Startup messages -------------------------------------------------------------
@@ -118,7 +127,7 @@ for (d in c('by-id', 'particles', 'footprints')) {
 # that all meteorological data is found in the same directory.
 if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
   met_loc <- file.path(path.expand('~'), paste0('m', project))
-  link(met_directory, met_loc)
+  if (!file.exists(met_loc)) invisible(file.symlink(met_directory, met_loc))
 } else met_loc <- met_directory
 
 
@@ -132,20 +141,20 @@ if (!is.null(varsiwant[1]))
 output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       slurm = slurm, slurm_options = slurm_options,
                       n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                      delt = delt, iconvect = iconvect, isot = isot,
-                      khmax = khmax, kmix0 = kmix0, kmixd = kmixd, krnd = krnd,
-                      lib.loc = lib.loc, met_file_format = met_file_format,
-                      met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
-                      n_met_min = n_met_min, ndump = ndump, nturb = nturb,
-                      numpar = numpar, outdt = outdt, outfrac = outfrac,
-                      run_trajec = run_trajec, r_run_time = receptors$run_time,
-                      r_lati = receptors$lati, r_long = receptors$long,
-                      r_zagl = receptors$zagl, random = random, smooth_factor,
-                      stilt_wd = stilt_wd, time_integrate = time_integrate,
-                      timeout = timeout, tlfrac = tlfrac, tratio = tratio,
-                      varsiwant = varsiwant, veght = veght, w_option = w_option,
-                      winderrtf = winderrtf, zicontroltf = zicontroltf,
-                      z_top = z_top, xmn = xmn, xmx = xmx, xres = xres,
-                      ymn = ymn, ymx = ymx, yres = yres)
+                      delt = delt, hnf_plume = hnf_plume, iconvect = iconvect,
+                      isot = isot, khmax = khmax, kmix0 = kmix0, kmixd = kmixd,
+                      krnd = krnd, lib.loc = lib.loc,
+                      met_file_format = met_file_format, met_loc = met_loc,
+                      mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
+                      ndump = ndump, nturb = nturb, numpar = numpar,
+                      outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
+                      r_run_time = receptors$run_time, r_lati = receptors$lati,
+                      r_long = receptors$long, r_zagl = receptors$zagl,
+                      random = random, smooth_factor, stilt_wd = stilt_wd,
+                      time_integrate = time_integrate, timeout = timeout,
+                      tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
+                      veght = veght, w_option = w_option, 
+                      zicontroltf = zicontroltf, z_top = z_top, xmn = xmn,
+                      xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres)
 
 q('no')

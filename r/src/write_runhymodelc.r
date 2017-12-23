@@ -15,5 +15,5 @@ write_runhymodelc <- function(file) {
             './hymodelc &> ./hymodelc.out 2>&1 & echo $!')
 
   write(txt, file)
-  return(file)
+  file
 }

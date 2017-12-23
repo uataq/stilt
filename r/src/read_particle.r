@@ -1,5 +1,7 @@
 #' read_particle parses the hymodelc PARTICLE.DAT output file
 #' @author Ben Fasoli
+#' 
+#' Reads PARTICLE.DAT hymodelc output file into data frame
 #'
 #' @param file location of PARTICLE.DAT file
 #' @param varsiwant character vector of 4-letter hymodelc variables
@@ -21,6 +23,5 @@ read_particle <- function(file, varsiwant) {
 
   read.table(file, header = F, skip = 1,
              colClasses = 'numeric', col.names = varsiwant) %>%
-    as_data_frame() %>%
-    return()
+    as_data_frame()
 }

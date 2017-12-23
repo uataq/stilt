@@ -228,15 +228,14 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     attributes = list(crs = '+proj=longlat +ellpsWGS84',
                       crs_format = 'PROJ.4',
                       Conventions = 'CF-1.4',
-                      Documentation = 'benfasoli.github.io/stilt')
+                      Documentation = 'uataq.github.io/stilt')
   )
 
   if (!is.null(output) && grepl('\\.csv$', output, ignore.case = T)) {
-    csv <- data_frame(expand.grid(longitude = glong,
-                                  latitude  = glati),
+    csv <- data_frame(expand.grid(longitude = glong, latitude  = glati),
                       c(foot)) %>%
       filter(foot > 0)
-    write('STILT Footprint. For documentation, see benfasoli.github.io/stilt',
+    write('STILT Footprint. For documentation, see uataq.github.io/stilt',
           file = output)
     write('latitude/longitude positions indicate lower left corner of cell',
           file = output, append = T)
@@ -249,5 +248,5 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     return(output)
   }
 
-  return(out_custom)
+  out_custom
 }

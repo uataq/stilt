@@ -1,7 +1,8 @@
 #' write_setup writes a SETUP.CFG namelist file to control the model behavior
 #' @author Ben Fasoli
+#' 
+#' SETUP.CFG contains namelist for controlling transport and dispersion behavior
 #'
-#' Variable descriptions from "STILT How To v8", John C. Lin
 #' @param delt integration timestep [min]; if set to 0.0, then timestep is
 #'   dynamically determined
 #' @param iconvect flag for convection. If set to 1, then runs excessive
@@ -64,7 +65,7 @@ write_setup <- function(varsiwant, delt = 0, iconvect = 0, isot = 0,
                         mgmin = 2000, ndump = 0, numpar = 100, nturb = 0, outdt = 0,
                         outfrac = 0.9, random = 1, tlfrac = 0.1, tratio = 0.9,
                         veght = 0.5, winderrtf = 0, zicontroltf = 0,
-                        file = 'exe/SETUP.CFG') {
+                        file = 'SETUP.CFG') {
 
   if (basename(file) != 'SETUP.CFG')
     stop('write_setup(): file argument must end with SETUP.CFG')
@@ -106,5 +107,5 @@ write_setup <- function(varsiwant, delt = 0, iconvect = 0, isot = 0,
            '$END')
 
   write(txt, file)
-  return(file)
+  file
 }
