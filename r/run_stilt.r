@@ -84,12 +84,12 @@ zicontroltf <- 0
 z_top       <- 25000
 
 # Transport error settings
-siguverr <- NULL
-tluverr <- NULL
-zcoruverr <- NULL
+siguverr    <- NULL
+tluverr     <- NULL
+zcoruverr   <- NULL
 horcoruverr <- NULL
-sigzierr <- NULL
-tlzierr <- NULL
+sigzierr    <- NULL
+tlzierr     <- NULL
 horcorzierr <- NULL
 
 
