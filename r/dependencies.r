@@ -12,7 +12,7 @@ invisible(lapply(rsc, source))
 # Load external libraries
 if (!'lib.loc' %in% ls())
   lib.loc <- NULL
-load_libs('dplyr', 'ncdf4', 'parallel', 'raster', 'rslurm', 'uataq',
+load_libs('dplyr', 'ncdf4', 'parallel', 'raster', 'readr', 'rslurm', 'uataq',
           lib.loc = lib.loc)
 
 # Load permute fortran dll for footprint matrix permutation
