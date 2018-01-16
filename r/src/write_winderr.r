@@ -11,19 +11,19 @@
 #'
 #' @export
 
-write_winderr <- function(siguverr = NULL, tluverr = NULL, zcoruverr = NULL,
-                          horcoruverr = NULL, file = 'WINDERR') {
+write_winderr <- function(siguverr = NA, tluverr = NA, zcoruverr = NA,
+                          horcoruverr = NA, file = 'WINDERR') {
 
   txt <- c(siguverr,
            tluverr,
            zcoruverr,
            horcoruverr)
 
-  if (any(is.null(txt))) {
-    if (all(is.null(txt)))
+  if (any(is.na(txt))) {
+    if (all(is.na(txt)))
       return()
     stop('write_winderr(): Incorrect specification for ',
-         paste(input[is.null(input)], sep = ','))
+         paste(input[is.na(input)], sep = ','))
   }
 
   write(as.character(txt), file)

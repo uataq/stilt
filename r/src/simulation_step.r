@@ -9,18 +9,20 @@
 #' @export
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            delt = 0, hnf_plume = T, iconvect = 0, isot = 0,
+                            delt = 0, hnf_plume = T, horcoruverr = NA,
+                            horcorzierr = NA, iconvect = 0, isot = 0,
                             khmax = 9999, kmix0 = 250, kmixd = 3, krnd = 6,
                             met_file_format, met_loc, mgmin = 2000,
-                            n_hours = -72, n_met_min = 1, ndump = 0, nturb = 0,
-                            numpar = 100, outdt = 0, outfrac = 0.9, random = 1,
+                            n_hours = -24, n_met_min = 1, ndump = 0, nturb = 0,
+                            numpar = 200, outdt = 0, outfrac = 0.9, random = 1,
                             run_trajec = T, r_run_time, r_lati, r_long, r_zagl,
-                            smooth_factor = 1, time_integrate = F,
-                            timeout = 3600, tlfrac = 0.1, tratio = 0.9,
+                            siguverr = NA, sigzierr = NA, smooth_factor = 1,
+                            time_integrate = F, timeout = 3600, tlfrac = 0.1,
+                            tluverr = NA, tlzierr = NA, tratio = 0.9,
                             varsiwant = NULL, veght = 0.5, w_option = 0,
-                            zicontroltf = 0, z_top = 25000, xmn = -180,
-                            xmx = 180, xres = 0.1, ymn = -90, ymx = 90,
-                            yres = xres) {
+                            xmn = -180, xmx = 180, xres = 0.1, ymn = -90,
+                            ymx = 90, yres = xres, zicontroltf = 0,
+                            z_top = 25000,  zcoruverr = NA) {
   try({
     # If using lapply or parLapply, receptors are passed as vectors and need to
     # be subsetted for the specific simulation index
