@@ -84,22 +84,19 @@ zicontroltf <- 0
 z_top       <- 25000
 
 # Transport error settings
-siguverr    <- NULL
-tluverr     <- NULL
-zcoruverr   <- NULL
-horcoruverr <- NULL
-sigzierr    <- NULL
-tlzierr     <- NULL
-horcorzierr <- NULL
+siguverr    <- NA
+tluverr     <- NA
+zcoruverr   <- NA
+horcoruverr <- NA
+sigzierr    <- NA
+tlzierr     <- NA
+horcorzierr <- NA
 
 
 # Startup messages -------------------------------------------------------------
 message('Initializing STILT')
 message('Number of receptors: ', nrow(receptors))
-
-n_threads = n_nodes * n_cores
-if (n_threads > 1)
-  message('Number of parallel threads: ', n_threads)
+message('Number of parallel threads: ', n_nodes * n_cores)
 
 grd <- array(dim = c((xmx - xmn) / xres, (ymx - ymn) / yres, abs(n_hours) * 60))
 ram <- format(object.size(grd) * 2.0, units = 'MB', standard = 'SI')
@@ -144,23 +141,26 @@ validate_varsiwant(varsiwant)
 if (!is.null(varsiwant[1]))
   varsiwant <- paste(varsiwant, collapse = '/')
 
-output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
-                      slurm = slurm, slurm_options = slurm_options,
-                      n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                      delt = delt, hnf_plume = hnf_plume, iconvect = iconvect,
-                      isot = isot, khmax = khmax, kmix0 = kmix0, kmixd = kmixd,
-                      krnd = krnd, lib.loc = lib.loc,
-                      met_file_format = met_file_format, met_loc = met_loc,
-                      mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
-                      ndump = ndump, nturb = nturb, numpar = numpar,
-                      outdt = outdt, outfrac = outfrac, run_trajec = run_trajec,
-                      r_run_time = receptors$run_time, r_lati = receptors$lati,
-                      r_long = receptors$long, r_zagl = receptors$zagl,
-                      random = random, smooth_factor, stilt_wd = stilt_wd,
-                      time_integrate = time_integrate, timeout = timeout,
-                      tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
-                      veght = veght, w_option = w_option,
-                      zicontroltf = zicontroltf, z_top = z_top, xmn = xmn,
-                      xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres)
-
+  output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
+                        slurm = slurm, slurm_options = slurm_options,
+                        n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
+                        delt = delt, hnf_plume = hnf_plume,
+                        horcoruverr = horcoruverr, horcorzierr = horcorzierr,
+                        iconvect = iconvect, isot = isot, khmax = khmax,
+                        kmix0 = kmix0, kmixd = kmixd, krnd = krnd,
+                        lib.loc = lib.loc, met_file_format = met_file_format,
+                        met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
+                        n_met_min = n_met_min, ndump = ndump, nturb = nturb,
+                        numpar = numpar, outdt = outdt, outfrac = outfrac,
+                        run_trajec = run_trajec, r_run_time = receptors$run_time,
+                        r_lati = receptors$lati, r_long = receptors$long,
+                        r_zagl = receptors$zagl, random = random,
+                        siguverr = siguverr, sigzierr = sigzierr, smooth_factor,
+                        stilt_wd = stilt_wd, time_integrate = time_integrate,
+                        timeout = timeout, tlfrac = tlfrac, tluverr = tluverr,
+                        tlzierr = tlzierr, tratio = tratio, varsiwant = varsiwant,
+                        veght = veght, w_option = w_option, xmn = xmn, xmx = xmx,
+                        xres = xres, ymn = ymn, ymx = ymx, yres = yres,
+                        zicontroltf = zicontroltf, z_top = z_top,
+                        zcoruverr = zcoruverr)
 q('no')

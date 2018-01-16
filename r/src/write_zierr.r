@@ -11,18 +11,18 @@
 #'
 #' @export
 
-write_zierr <- function(sigzierr = NULL, tlzierr = NULL, horcorzierr = NULL,
+write_zierr <- function(sigzierr = NA, tlzierr = NA, horcorzierr = NA,
                         file = 'ZIERR') {
 
   txt <- c(sigzierr,
            tlzierr,
            horcorzierr)
 
-  if (any(is.null(txt))) {
-    if (all(is.null(txt)))
+  if (any(is.na(txt))) {
+    if (all(is.na(txt)))
       return()
     stop('write_zierr(): Incorrect specification for ',
-         paste(input[is.null(input)], sep = ','))
+         paste(input[is.na(input)], sep = ','))
   }
 
   write(as.character(txt), file)
