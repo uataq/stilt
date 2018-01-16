@@ -95,6 +95,12 @@ horcorzierr <- NULL
 
 # Startup messages -------------------------------------------------------------
 message('Initializing STILT')
+message('Number of receptors: ', nrow(receptors))
+
+n_threads = n_nodes * n_cores
+if (n_threads > 1)
+  message('Number of parallel threads: ', n_threads)
+
 grd <- array(dim = c((xmx - xmn) / xres, (ymx - ymn) / yres, abs(n_hours) * 60))
 ram <- format(object.size(grd) * 2.0, units = 'MB', standard = 'SI')
 message('Estimated footprint grid RAM allocation: ', ram)
@@ -153,7 +159,7 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       random = random, smooth_factor, stilt_wd = stilt_wd,
                       time_integrate = time_integrate, timeout = timeout,
                       tlfrac = tlfrac, tratio = tratio, varsiwant = varsiwant,
-                      veght = veght, w_option = w_option, 
+                      veght = veght, w_option = w_option,
                       zicontroltf = zicontroltf, z_top = z_top, xmn = xmn,
                       xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres)
 
