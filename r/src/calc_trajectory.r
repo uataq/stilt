@@ -14,12 +14,12 @@
 
 calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
                             kmix0, kmixd, krnd, met_files, mgmin, ndump, numpar,
-                            nturb, n_hours, outdt, outfrac, output, random, 
-                            rm_dat, tlfrac, tratio, veght, winderrtf, w_option,
-                            zicontroltf, z_top, rundir) {
-  
+                            nturb, n_hours, outdt, outfrac, output, random,
+                            rm_dat, timeout, tlfrac, tratio, veght, winderrtf,
+                            w_option, zicontroltf, z_top, rundir) {
+
   require(uataq)
-  
+
   # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
   write_setup(varsiwant, delt, iconvect, isot, khmax, kmix0, kmixd, krnd,
               mgmin, ndump, numpar, nturb, outdt, outfrac, random, tlfrac,
@@ -28,7 +28,7 @@ calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
   write_control(output$receptor, n_hours, w_option, z_top, met_files,
                 file.path(rundir, 'CONTROL'))
   sh <- write_runhymodelc(file.path(rundir, 'runhymodelc.sh'))
-  
+
   # Simulation timeout ---------------------------------------------------------
   # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hymodelc and moves on to next simulation
@@ -50,7 +50,7 @@ calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
     }
     Sys.sleep(1)
   }
-  
+
   # Error check hymodelc output
   pf <- file.path(rundir, 'PARTICLE.DAT')
   if (!file.exists(pf)) {
@@ -59,7 +59,7 @@ calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
         file = file.path(rundir, 'ERROR'))
     return()
   }
-  
+
   n_lines <- uataq::count_lines(pf)
   if (n_lines < 2) {
     warning('No trajectory data found in ', pf)
@@ -67,7 +67,7 @@ calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
         'in hymodelc.out\n', file = file.path(rundir, 'ERROR'))
     return()
   }
-  
+
   # Read particle file, optionally remove PARTICLE.DAT in favor of compressed
   # .rds file, and return particle data frame
   p <- read_particle(file = pf, varsiwant = varsiwant)
