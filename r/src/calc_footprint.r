@@ -190,45 +190,50 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
 
   if (!is.null(output) && grepl('\\.nc$', output, ignore.case = T) &&
       'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
-    xdim <- ncdim_def('longitude_center', 'degrees_east', glong + xres/2)
-    ydim <- ncdim_def('latitude_center', 'degrees_north', glati + yres/2)
-    tdim <- ncdim_def('time', 'seconds since 1970-01-01',
+    xdim <- ncdim_def('lon', 'degrees_east', glong + xres/2)
+    ydim <- ncdim_def('lat', 'degrees_north', glati + yres/2)
+    tdim <- ncdim_def('time', 'seconds since 1970-01-01 00:00:00',
                       as.numeric(time_out))
-    fvar <- ncvar_def('Footprint', 'ppm (umol-1 m2 s)',
+    fvar <- ncvar_def('foot', 'ppm (umol-1 m2 s)',
                       list(xdim, ydim, tdim), -1)
 
     nc <- nc_create(output, fvar)
     ncvar_put(nc, fvar, foot)
-    ncatt_put(nc, 'longitude_center', 'position', 'cell_center')
-    ncatt_put(nc, 'latitude_center', 'position', 'cell_center')
+
+    ncatt_put(nc, 'lon', 'standard_name', 'longitude')
+    ncatt_put(nc, 'lon', 'long_name', 'cell center longitude')
+    ncatt_put(nc, 'lat', 'standard_name', 'latitude')
+    ncatt_put(nc, 'lat', 'long_name', 'cell center latitude')
+    ncatt_put(nc, 'time', 'standard_name', 'time')
+    ncatt_put(nc, 'time', 'long_name', 'time')
+    ncatt_put(nc, 'time', 'calendar', 'standard')
     ncatt_put(nc, 'time', 'timezone', 'UTC')
+    ncatt_put(nc, 'foot', 'standard_name', 'footprint')
+    ncatt_put(nc, 'foot', 'long_name', 'footprint')
     ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
     ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
-    ncatt_put(nc, 0, 'Conventions', 'CF-1.4')
-    ncatt_put(nc, 0, 'Title', 'STILT Footprint Output')
-    ncatt_put(nc, 0, 'Compatibility', 'raster::raster() and raster::brick()')
-    ncatt_put(nc, 0, 'Documentation', 'github.com/uataq/stilt')
-    ncatt_put(nc, 0, 'Author', 'Ben Fasoli')
+    ncatt_put(nc, 0, 'conventions', 'CF-1.4')
+    ncatt_put(nc, 0, 'documentation', 'github.com/uataq/stilt')
+    ncatt_put(nc, 0, 'title', 'STILT Footprint Output')
     return(output)
   }
 
   out_custom <- list(
-    longitude = list(unit = 'degrees_east',
-                     position = 'cell_center',
+    lon = list(unit = 'degrees_east',
                      values = glong),
-    latitude = list(unit = 'degrees_north',
-                    position = 'cell_center',
+    lat = list(unit = 'degrees_north',
                     values = glati),
-    time = list(unit = 'seconds since 1970-01-01',
+    time = list(unit = 'seconds since 1970-01-01 00:00:00',
                 position = 'beginning of hour',
                 values = as.numeric(time_out)),
-    Footprint = list(unit = 'ppm (umol-1 m2 s)',
+    footprint = list(unit = 'ppm (umol-1 m2 s)',
                      dimensions = c('longitude', 'latitude', 'time'),
                      values = foot),
     attributes = list(crs = '+proj=longlat +ellpsWGS84',
                       crs_format = 'PROJ.4',
-                      Conventions = 'CF-1.4',
-                      Documentation = 'uataq.github.io/stilt')
+                      conventions = 'CF-1.4',
+                      documentation = 'uataq.github.io/stilt',
+                      title = 'STILT Footprint Output')
   )
 
   if (!is.null(output) && grepl('\\.csv$', output, ignore.case = T)) {
@@ -237,7 +242,7 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
       filter(foot > 0)
     write('STILT Footprint. For documentation, see uataq.github.io/stilt',
           file = output)
-    write('latitude/longitude positions indicate lower left corner of cell',
+    write('latitude and longitude positions indicate cell center',
           file = output, append = T)
     write.table(csv, append = T, quote = F, sep = ',', row.names = F)
     return(output)
@@ -248,5 +253,5 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     return(output)
   }
 
-  out_custom
+  invisible(out_custom)
 }
