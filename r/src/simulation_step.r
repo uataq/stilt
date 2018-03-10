@@ -73,9 +73,6 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                       'LANDUSE.ASC', 'ROUGLEN.ASC')
       file.symlink(file.path(file.path(stilt_wd, 'exe'), link_files), rundir)
 
-      # Save workspace to recreate simulation in settings.RData
-      save.image(file = file.path(rundir, 'settings.RData'))
-
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
       if (length(met_files) < n_met_min) {
