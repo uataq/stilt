@@ -37,7 +37,7 @@ receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
 # Meteorological data input
 met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
-n_met_min       <- 5
+n_met_min       <- 1
 
 # Model control
 run_trajec <- T
