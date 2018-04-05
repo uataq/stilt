@@ -51,7 +51,7 @@ timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
                 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout', 'mlht',
-                'rain', 'crai')
+                'rain', 'crai', 'grdht', 'pres')
 
 # Footprint grid settings
 xmn <- -114.5
