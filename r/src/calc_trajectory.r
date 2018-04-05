@@ -38,7 +38,7 @@ calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
   on.exit(tools::pskill(pid))
   repeat {
     elapsed <- as.double.difftime(Sys.time() - eval_start, units = 'secs')
-    if (file.exists(of) && length(readLines(of)) > 0) {
+    if (!pid_is_active(pid)) {
       on.exit()
       break
     } else if (elapsed > timeout) {
