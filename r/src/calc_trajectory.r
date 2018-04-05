@@ -33,7 +33,6 @@ calc_trajectory <- function(varsiwant, delt, iconvect, isot, khmax,
   # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hymodelc and moves on to next simulation
   of <- file.path(rundir, 'hymodelc.out')
-  elapsed <- 0
   eval_start <- Sys.time()
   pid <- system(paste('bash', sh), intern = T)
   on.exit(tools::pskill(pid))
