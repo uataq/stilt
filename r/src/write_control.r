@@ -1,6 +1,6 @@
 #' write_control writes out a namelist file to control the model behavior
 #' @author Ben Fasoli
-#' 
+#'
 #' CONTROL file contains input data for the model, including receptor x,y,z,t
 #' coordinates as well as meteorological data files to drive simulations.
 #'
@@ -8,6 +8,8 @@
 #'   POSIXct formatted timestamp, \code{lati} (degrees), \code{long} (degrees),
 #'   and \code{zagl} (meters above ground level) as numeric specifications of
 #'   the receptor location
+#' @param emisshrs duration of time to release particles over at the start of
+#'   simulation, in hours; defaults to 0.01
 #' @param n_hour number of hours to run each simulation; negative indicates
 #'   backward in time
 #' @param w_option vertical motion calculation method. 0: use vertical velocity
@@ -19,8 +21,8 @@
 #'
 #' @export
 
-write_control <- function(receptor, n_hour, w_option = 0, z_top = 25000,
-                          met_files, file = 'CONTROL') {
+write_control <- function(receptor, emisshrs, n_hour, w_option = 0,
+                          z_top = 25000, met_files, file = 'CONTROL') {
 
   if (!'CONTROL' %in% basename(file))
     stop('write_control(): file argument must end with CONTROL')
@@ -39,7 +41,7 @@ write_control <- function(receptor, n_hour, w_option = 0, z_top = 25000,
     '1',
     'test',
     '1',
-    '0.01',
+    emisshrs,
     '00 00 00 00 00',
     '1',
     '0.0 0.0',

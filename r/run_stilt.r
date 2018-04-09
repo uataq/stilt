@@ -65,6 +65,7 @@ smooth_factor <- 1
 time_integrate <- F
 
 # Transport and dispersion settings
+emisshrs    <- 0.01
 iconvect    <- 0
 isot        <- 0
 khmax       <- 9999
@@ -144,7 +145,7 @@ if (!is.null(varsiwant[1]))
   output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                         slurm = slurm, slurm_options = slurm_options,
                         n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                        delt = delt, hnf_plume = hnf_plume,
+                        delt = delt, emisshrs = emisshrs, hnf_plume = hnf_plume,
                         horcoruverr = horcoruverr, horcorzierr = horcorzierr,
                         iconvect = iconvect, isot = isot, khmax = khmax,
                         kmix0 = kmix0, kmixd = kmixd, krnd = krnd,
