@@ -9,10 +9,10 @@
 #' @export
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            delt = 0, hnf_plume = T, horcoruverr = NA,
-                            horcorzierr = NA, iconvect = 0, isot = 0,
-                            khmax = 9999, kmix0 = 250, kmixd = 3, krnd = 6,
-                            met_file_format, met_loc, mgmin = 2000,
+                            delt = 0, emisshrs = 0.01, hnf_plume = T,
+                            horcoruverr = NA, horcorzierr = NA, iconvect = 0,
+                            isot = 0, khmax = 9999, kmix0 = 250, kmixd = 3,
+                            krnd = 6, met_file_format, met_loc, mgmin = 2000,
                             n_hours = -24, n_met_min = 1, ndump = 0, nturb = 0,
                             numpar = 200, outdt = 0, outfrac = 0.9, random = 1,
                             run_trajec = T, r_run_time, r_lati, r_long, r_zagl,
@@ -84,9 +84,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
 
       # Execute particle trajectory simulation, and read results into data frame
-      particle <- calc_trajectory(varsiwant, delt, iconvect, isot, khmax,
-                                  kmix0, kmixd, krnd, met_files, mgmin, ndump,
-                                  numpar, nturb, n_hours, outdt, outfrac,
+      particle <- calc_trajectory(varsiwant, delt, emisshrs, iconvect, isot,
+                                  khmax, kmix0, kmixd, krnd, met_files, mgmin,
+                                  ndump, numpar, nturb, n_hours, outdt, outfrac,
                                   output, random, rm_dat, timeout, tlfrac,
                                   tratio, veght, 0, w_option, zicontroltf,
                                   z_top, rundir)
@@ -101,13 +101,13 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                           file = file.path(rundir, 'ZIERR'))
       winderrtf <- (!is.null(xyerr)) + 2 * !is.null(zerr)
       if (winderrtf > 0) {
-        particle_error <- calc_trajectory(varsiwant, delt, iconvect, isot,
-                                          khmax, kmix0, kmixd, krnd, met_files,
-                                          mgmin, ndump, numpar, nturb, n_hours,
-                                          outdt, outfrac, output, random,
-                                          rm_dat, tlfrac,  tratio, veght,
-                                          winderrtf, w_option, zicontroltf,
-                                          z_top, rundir)
+        particle_error <- calc_trajectory(varsiwant, delt, emisshrs, iconvect,
+                                          isot, khmax, kmix0, kmixd, krnd,
+                                          met_files, mgmin, ndump, numpar,
+                                          nturb, n_hours, outdt, outfrac,
+                                          output, random, rm_dat, tlfrac,
+                                          tratio, veght, winderrtf, w_option,
+                                          zicontroltf, z_top, rundir)
         if (is.null(particle_error)) return()
         output$particle_error_params <- list(siguverr = siguverr,
                                              tluverr = tluverr,
