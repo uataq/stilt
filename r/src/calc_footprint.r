@@ -102,7 +102,9 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     p <- xyFromCell(r, 1:ncell(r))^2
     m <- 1/(2 * pi * sigma^2) * exp(-(p[, 1] + p[, 2])/(2 * sigma^2))
     m <- matrix(m, ncol = nx, nrow = ny, byrow = TRUE)
-    m/sum(m)
+    w <- m/sum(m)
+    w[is.na(w)] <- 1
+    w
   }
 
   # Determine maximum kernel size
