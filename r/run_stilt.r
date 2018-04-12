@@ -54,6 +54,7 @@ varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'rain', 'crai', 'pres')
 
 # Footprint grid settings
+projection <- '+proj=longlat'
 xmn <- -114.5
 xmx <- -109
 ymn <- 37
@@ -153,15 +154,16 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       met_loc = met_loc, mgmin = mgmin, n_hours = n_hours,
                       n_met_min = n_met_min, ndump = ndump, nturb = nturb,
                       numpar = numpar, outdt = outdt, outfrac = outfrac,
-                      run_trajec = run_trajec, r_run_time = receptors$run_time,
-                      r_lati = receptors$lati, r_long = receptors$long,
-                      r_zagl = receptors$zagl, random = random,
-                      siguverr = siguverr, sigzierr = sigzierr, smooth_factor,
-                      stilt_wd = stilt_wd, time_integrate = time_integrate,
-                      timeout = timeout, tlfrac = tlfrac, tluverr = tluverr,
-                      tlzierr = tlzierr, tratio = tratio, varsiwant = varsiwant,
-                      veght = veght, w_option = w_option, xmn = xmn, xmx = xmx,
-                      xres = xres, ymn = ymn, ymx = ymx, yres = yres,
+                      projection = projection, run_trajec = run_trajec, 
+                      r_run_time = receptors$run_time, r_lati = receptors$lati, 
+                      r_long = receptors$long, r_zagl = receptors$zagl, 
+                      random = random, siguverr = siguverr, sigzierr = sigzierr,
+                      smooth_factor, stilt_wd = stilt_wd, 
+                      time_integrate = time_integrate, timeout = timeout, 
+                      tlfrac = tlfrac, tluverr = tluverr, tlzierr = tlzierr, 
+                      tratio = tratio, varsiwant = varsiwant, veght = veght,
+                      w_option = w_option, xmn = xmn, xmx = xmx, xres = xres, 
+                      ymn = ymn, ymx = ymx, yres = yres, 
                       zicontroltf = zicontroltf, z_top = z_top,
                       zcoruverr = zcoruverr)
 q('no')
