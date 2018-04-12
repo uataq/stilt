@@ -19,6 +19,7 @@
 #'   require any additional libraries and have better compression
 #' @param r_run_time receptor run time as a POSIXct object. Can be NULL
 #'   resulting in NULL timestamp outputs
+#' @param projection 
 #' @param time_integrate logical indicating whether to integrate footprint over
 #'   time or retain discrete time steps
 #' @param smooth_factor factor by which to linearly scale footprint smoothing;
@@ -30,11 +31,12 @@
 #' @param ymx sets grid end latitude
 #' @param yres resolution for latitude grid
 #'
-#' @import dplyr, raster, uataq
+#' @import dplyr, proj4, raster, uataq
 #' @export
 
-calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
-                           smooth_factor = 1,
+calc_footprint <- function(p, output = NULL, r_run_time,
+                           projection = '+proj=longlat',
+                           smooth_factor = 1, time_integrate = F,
                            xmn, xmx, xres, ymn, ymx, yres = xres) {
 
   require(dplyr)
@@ -42,9 +44,6 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   require(uataq)
 
   np <- max(p$indx, na.rm = T)
-
-  glong <- head(seq(xmn, xmx, by = xres), -1)
-  glati <- head(seq(ymn, ymx, by = yres), -1)
 
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
@@ -75,6 +74,16 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
   mp <- p$time < -20 & p$time >= -100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
 
+  # Translate x, y coordinates into desired map projection
+  is_longlat <- grepl('+proj=longlat', projection, fixed = T)
+  if (!is_longlat) {
+    require(proj4)
+    i[, c('long', 'lati')] <- project(i[, c('long', 'lati')], projection)
+  }
+  
+  # Set footprint grid
+  glong <- head(seq(xmn, xmx, by = xres), -1)
+  glati <- head(seq(ymn, ymx, by = yres), -1)
 
   # Gaussian kernel bandwidth scaling
   kernel <- i %>%
@@ -84,7 +93,8 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     na.omit()
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$time/1440)^(1/2)
-  w <- smooth_factor * 0.06 * di * ti / (cos(kernel$lati * pi/180))
+  grid_conv <- ifelse(is_longlat, cos(kernel$lati * pi/180), 1)
+  w <- smooth_factor * 0.06 * di * ti / grid_conv
 
 
   # Gaussian kernel weighting calculation
@@ -184,76 +194,8 @@ calc_footprint <- function(p, output = NULL, r_run_time, time_integrate = F,
     })
     time_out <- as.numeric(r_run_time + unique(hid) * 3600)
   }
-
-
-  # Save footprint fo file
-  if (!is.null(output) && file.exists(output))
-    system(paste('rm', output))
-
-  if (!is.null(output) && grepl('\\.nc$', output, ignore.case = T) &&
-      'ncdf4' %in% names(sessionInfo()$otherPkgs)) {
-    xdim <- ncdim_def('lon', 'degrees_east', glong + xres/2)
-    ydim <- ncdim_def('lat', 'degrees_north', glati + yres/2)
-    tdim <- ncdim_def('time', 'seconds since 1970-01-01 00:00:00',
-                      as.numeric(time_out))
-    fvar <- ncvar_def('foot', 'ppm (umol-1 m2 s)',
-                      list(xdim, ydim, tdim), -1)
-
-    nc <- nc_create(output, fvar)
-    ncvar_put(nc, fvar, foot)
-
-    ncatt_put(nc, 'lon', 'standard_name', 'longitude')
-    ncatt_put(nc, 'lon', 'long_name', 'cell center longitude')
-    ncatt_put(nc, 'lat', 'standard_name', 'latitude')
-    ncatt_put(nc, 'lat', 'long_name', 'cell center latitude')
-    ncatt_put(nc, 'time', 'standard_name', 'time')
-    ncatt_put(nc, 'time', 'long_name', 'time')
-    ncatt_put(nc, 'time', 'calendar', 'standard')
-    ncatt_put(nc, 'time', 'timezone', 'UTC')
-    ncatt_put(nc, 'foot', 'standard_name', 'footprint')
-    ncatt_put(nc, 'foot', 'long_name', 'footprint')
-    ncatt_put(nc, 0, 'crs', '+proj=longlat +ellpsWGS84')
-    ncatt_put(nc, 0, 'crs_format', 'PROJ.4')
-    ncatt_put(nc, 0, 'conventions', 'CF-1.4')
-    ncatt_put(nc, 0, 'documentation', 'github.com/uataq/stilt')
-    ncatt_put(nc, 0, 'title', 'STILT Footprint Output')
-    return(output)
-  }
-
-  out_custom <- list(
-    lon = list(unit = 'degrees_east',
-                     values = glong),
-    lat = list(unit = 'degrees_north',
-                    values = glati),
-    time = list(unit = 'seconds since 1970-01-01 00:00:00',
-                position = 'beginning of hour',
-                values = as.numeric(time_out)),
-    footprint = list(unit = 'ppm (umol-1 m2 s)',
-                     dimensions = c('longitude', 'latitude', 'time'),
-                     values = foot),
-    attributes = list(crs = '+proj=longlat +ellpsWGS84',
-                      crs_format = 'PROJ.4',
-                      conventions = 'CF-1.4',
-                      documentation = 'uataq.github.io/stilt',
-                      title = 'STILT Footprint Output')
-  )
-
-  if (!is.null(output) && grepl('\\.csv$', output, ignore.case = T)) {
-    csv <- data_frame(expand.grid(longitude = glong, latitude  = glati),
-                      c(foot)) %>%
-      filter(foot > 0)
-    write('STILT Footprint. For documentation, see uataq.github.io/stilt',
-          file = output)
-    write('latitude and longitude positions indicate cell center',
-          file = output, append = T)
-    write.table(csv, append = T, quote = F, sep = ',', row.names = F)
-    return(output)
-  }
-
-  if (!is.null(output) && grepl('\\.rds$', output, ignore.case = T)) {
-    saveRDS(out_custom, output)
-    return(output)
-  }
-
-  invisible(out_custom)
+  
+  # Set footprint metadata and write to file
+  write_footprint(foot, output = output, glong = glong, glati = glati, 
+                  xres = xres, yres = yres, time_out = time_out)
 }
