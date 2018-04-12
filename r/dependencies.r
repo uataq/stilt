@@ -20,3 +20,7 @@ permute_exe <- file.path(stilt_wd, 'r/src/permute.so')
 if (!file.exists(permute_exe))
   stop('calc_footprint(): failed to find permute.so in r/src/')
 dyn.load(permute_exe)
+
+# Load projection dependencies if necessary
+if ('projection' %in% ls())
+  validate_projection(projection)
