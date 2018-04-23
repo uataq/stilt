@@ -47,7 +47,7 @@ SUBROUTINE ADVRKM(U,V,W,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,DT,BACK,  &
   REAL,    INTENT(IN)    :: zmdl            ! vertical model domain top (m)
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! global boundaries           
 
   REAL,    INTENT(INOUT) :: xx,yy,zz        ! old (t) and new (t+dt) position 
@@ -83,7 +83,7 @@ SUBROUTINE ADVRKM(U,V,W,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,DT,BACK,  &
   REAL,      INTENT(IN)    :: xt,yt         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
   END SUBROUTINE advrnt
   END INTERFACE

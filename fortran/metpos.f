@@ -143,7 +143,9 @@
 
 !       particle must be within the spatial domain of one of the files
 !       within a 2 grid cell external band
-        IF(.NOT.GRID(KG,KT)%GBLDAT)THEN
+!tk(20160317)
+!        IF(.NOT.GRID(KG,KT)%GBLDAT)THEN
+        IF(GRID(KG,KT)%GBLDAT .EQ. "no")THEN
            max_offset = 2
 !       For WRF input, stay away from one additional row/column of grid edge
 !       (because rows/columns for non-staggered field are padded)
@@ -152,6 +154,24 @@
            if (GRID(KG,kt)%MODEL_ID(1:2) .eq. 'EC') max_offset = max_offset+1
            IF(II .LT. 2 .OR. II .GE. GRID(KG,KT)%NX-max_offset .OR.             &
               JJ .LT. 2 .OR. JJ .GE. GRID(KG,KT)%NY-max_offset)    CYCLE tloop
+        END IF
+        IF(GRID(KG,KT)%GBLDAT .EQ. "nh")THEN
+           max_offset = 2
+!       For WRF input, stay away from one additional row/column of grid edge
+!       (because rows/columns for non-staggered field are padded)
+           if (GRID(KG,kt)%MODEL_ID(2:4) .eq. 'WRF') max_offset = max_offset+1
+!cg(20100804) same for ECMWF fields
+           if (GRID(KG,kt)%MODEL_ID(1:2) .eq. 'EC') max_offset = max_offset+1
+           IF(JJ .LT. 2 )    CYCLE tloop
+        END IF
+        IF(GRID(KG,KT)%GBLDAT .EQ. "sh")THEN
+           max_offset = 2
+!       For WRF input, stay away from one additional row/column of grid edge
+!       (because rows/columns for non-staggered field are padded)
+           if (GRID(KG,kt)%MODEL_ID(2:4) .eq. 'WRF') max_offset = max_offset+1
+!cg(20100804) same for ECMWF fields
+           if (GRID(KG,kt)%MODEL_ID(1:2) .eq. 'EC') max_offset = max_offset+1
+           IF( JJ .GE. GRID(KG,KT)%NY-max_offset)    CYCLE tloop
         END IF
         OFFG=.FALSE.
 

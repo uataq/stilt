@@ -78,7 +78,7 @@ SUBROUTINE ADVIEC(U,V,W,d,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   REAL,    INTENT(IN)    :: tratio          ! time step stability criterion
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! global boundaries           
 
   REAL,    INTENT(INOUT) :: xx,yy,zz        ! old (t) and new (t+dt) position 
@@ -124,7 +124,7 @@ SUBROUTINE ADVIEC(U,V,W,d,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
        REAL,      INTENT(IN)    :: xt,yt         ! position of interpolated value
        REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
        REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-       LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+       CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
        INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
      END SUBROUTINE adv3nt
 
@@ -134,7 +134,7 @@ SUBROUTINE ADVIEC(U,V,W,d,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
        REAL,      INTENT(IN)    :: x1,y1         ! position of interpolated value
        REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
        REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-       LOGICAL,   INTENT(IN)    :: global        ! cyclic boundary condition flag
+       CHARACTER(2),   INTENT(IN)    :: global        ! cyclic boundary condition flag
        INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
        real,      intent(in)    :: zagl,zagl1
      end subroutine adv3ntwind
@@ -330,12 +330,36 @@ SUBROUTINE ADVIEC(U,V,W,d,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
            ! neither rams nor awrf:
 
            ! check if off grid since sometimes OFFG is not set
-           IF (XT < 1.  .OR.  YT < 1.  .OR.  CEILING(XT) > NXS  .OR.  CEILING(YT) > NYS) THEN
-              write (*,*) 'subroutine adviec: xt and/or yt exceeds allowable limit:', &
-                   & XT,YT,NXS,NYS
-              dead = .TRUE.
-              RETURN
+      !     IF(.NOT.GLOBAL)THEN
+ !tk(20160317)
+            IF(GLOBAL.EQ."no") THEN
+              IF (XT < 1.  .OR.  YT < 1.  .OR.  CEILING(XT) > NXS  .OR.  CEILING(YT) > NYS) THEN
+                 write (*,*) 'subroutine adviec: xt and/or yt exceeds allowable limit:', &
+                       & XT,YT,NXS,NYS
+                 dead = .TRUE.
+                 RETURN
+              END IF
            END IF
+ !tk(20160317)
+            IF(GLOBAL.EQ."nh") THEN
+              IF ( YT < 1) THEN
+                 write (*,*) 'subroutine adviec: xt and/or yt exceeds allowable limit:', &
+                       & XT,YT,NXS,NYS
+                 dead = .TRUE.
+                 RETURN
+              END IF
+           END IF
+ !tk(20160317)
+            IF(GLOBAL.EQ."sh") THEN
+              IF (CEILING(YT) > NYS) THEN
+                 write (*,*) 'subroutine adviec: xt and/or yt exceeds allowable limit:', &
+                       & XT,YT,NXS,NYS
+                 dead = .TRUE.
+                 RETURN
+              END IF
+           END IF
+
+
            !dwen(20090810)            CALL ADVINTWIND (ZAGL,ZAGL1,U1,NXS,NYS,NZM,XT,YT,ZX,GLOBAL,NXP,NYP,UU1)
            CALL ADV3NTWIND (ZAGL,ZAGL1,U(:,:,:,K1),XT,YT,ZX,UU1,GLOBAL,NXP,NYP)
            !dwen(20090810)            CALL ADVINTWIND (ZAGL,ZAGL1,V1,NXS,NYS,NZM,XT,YT,ZX,GLOBAL,NXP,NYP,VV1)
@@ -384,8 +408,33 @@ SUBROUTINE ADVIEC(U,V,W,d,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
 
            !       off grid test for particles that may approach the limits of the subgrid
            !       most are terminated outside of this routine if within 2 grid pts of edge
-           IF(STEP.AND..NOT.GLOBAL)THEN
+ 
+!tk(20160317)
+!          IF(STEP.AND..NOT.GLOBAL)THEN
+           IF(STEP.AND.GLOBAL.EQ."no")THEN
               IF(XT.LT.1.0.OR.XT.GT.FLOAT(NXS).OR.YT.LT.1.0.OR.YT.GT.FLOAT(NYS))THEN
+                 !             advect distance for remaining time and then terminate
+                 XT=XX+UU*(DT-TSUM)
+                 YT=YY+VV*(DT-TSUM)
+                 ZT=ZZ+WW*(DT-TSUM)
+                 RETURN
+              END IF
+           END IF
+
+ !tk(20160317)
+           IF(STEP.AND. GLOBAL.EQ."nh") THEN
+              IF(YT.LT.1.0)THEN
+                 !             advect distance for remaining time and then terminate
+                 XT=XX+UU*(DT-TSUM)
+                 YT=YY+VV*(DT-TSUM)
+                 ZT=ZZ+WW*(DT-TSUM)
+                 RETURN
+              END IF
+           END IF
+
+ !tk(20160317)
+           IF(STEP.AND. GLOBAL.EQ."sh") THEN
+              IF(YT.GT.FLOAT(NYS))THEN
                  !             advect distance for remaining time and then terminate
                  XT=XX+UU*(DT-TSUM)
                  YT=YY+VV*(DT-TSUM)

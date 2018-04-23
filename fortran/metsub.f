@@ -73,7 +73,10 @@
 ! start default assumption that advection point is on the grid
   OFFG=.FALSE.
   KRET=0
-  IF(GRID(KG,KT)%GLOBAL) RETURN 
+
+ !tk(20160317)
+!  IF(GRID(KG,KT)%GLOBAL) RETURN 
+ IF(GRID(KG,KT)%GLOBAL .EQ. "gl") RETURN 
 
 ! convert position to index units
   II=INT(XP)
@@ -94,6 +97,8 @@
   if (GRID(KG,kt)%MODEL_ID(2:4) .eq. 'WRF') max_offset = max_offset+1
 !cg(20100804) same for ECMWF fields
   if (GRID(KG,kt)%MODEL_ID(1:2) .eq. 'EC') max_offset = max_offset+1
+!cg(20140828) same for ECMWF fields
+  if (GRID(KG,kt)%MODEL_ID(1:4) .eq. 'GDAS') max_offset = max_offset+1
   
   IF(II .LT. LX1+2 .OR. II .GE. (LX1+LXR-max_offset) .OR. &
        & JJ .LT. LY1+2 .OR. JJ .GE. (LY1+LYR-max_offset)) THEN
@@ -102,10 +107,26 @@
 
      IF(LX1.EQ.1.AND.LY1.EQ.1.AND.LXR.GE.GRID(KG,KT)%NX       &
                              .AND.LYR.GE.GRID(KG,KT)%NY) THEN
-        IF(GRID(KG,KT)%GBLDAT)THEN
+!tk(20160317)
+ !       IF(GRID(KG,KT)%GBLDAT)THEN
+        IF(GRID(KG,KT)%GBLDAT.EQ."gl")THEN
            OFFG=.TRUE.
-           GRID(KG,:)%GLOBAL=.TRUE.  
+          ! GRID(KG,:)%GLOBAL=.TRUE.
+           GRID(KG,:)%GLOBAL="gl"
            WRITE(KF21,*)' NOTICE metsub: switch to global grid'
+        END IF
+
+        IF(GRID(KG,KT)%GBLDAT.EQ."nh")THEN
+           OFFG=.TRUE.
+          ! GRID(KG,:)%GLOBAL=.TRUE.
+            GRID(KG,:)%GLOBAL="nh"
+           WRITE(KF21,*)' NOTICE^ metsub: switch to a nothern hemisphere grid'
+        END IF
+
+        IF(GRID(KG,KT)%GBLDAT.EQ."sh")THEN
+           OFFG=.TRUE.
+           GRID(KG,:)%GLOBAL="sh"
+           WRITE(KF21,*)' NOTICE metsub: switch to a sothern hemisphere grid'
         END IF
 !       KRET=1 (termination not required, particles terminate from metpos)
         RETURN
@@ -118,7 +139,8 @@
 	
      IF(((II .LT. 3 .OR. II .GE. GRID(KG,KT)%NX-max_offset) .AND. &
           & (JJ .LT. 3 .OR. JJ .GE. GRID(KG,KT)%NY-max_offset)) &
-        .AND. .NOT. GRID(KG,KT)%GBLDAT) RETURN	
+!        .AND. .NOT. GRID(KG,KT)%GBLDAT) RETURN	
+        .AND. GRID(KG,KT)%GBLDAT.EQ."no") RETURN	
 
 !    When the data load flag is false (set with each entry to advrng), then
 !    meteorological data have not been reloaded since the last call to advrng,
@@ -214,7 +236,9 @@
      END IF
 
 !    if global data available and subgrid bounds on edge then switch to global
-     IF(GRID(KG,KT)%GBLDAT)THEN
+ !tk(20160317)
+!     IF(GRID(KG,KT)%GBLDAT)THEN
+     IF(GRID(KG,KT)%GBLDAT.EQ."gl".OR.GRID(KG,KT)%GBLDAT.EQ."nh".OR.GRID(KG,KT)%GBLDAT.EQ."sh")THEN
         IF(LX1.EQ.1.OR.LY1.EQ.1.OR.       &
            LX1+LXR.GE.GRID(KG,KT)%NX.OR.  &
            LY1+LYR.GE.GRID(KG,KT)%NY)  THEN   
@@ -223,10 +247,13 @@
            LY1=1
            LXR=GRID(KG,KT)%NX
            LYR=GRID(KG,KT)%NY
-           GRID(KG,:)%GLOBAL=.TRUE.  
-           WRITE(KF21,*)' NOTICE metsub: switch to global grid'
+          ! GRID(KG,:)%GLOBAL=.TRUE.  
+           GRID(KG,:)%GLOBAL=GRID(KG,KT)%GBLDAT 
+!           WRITE(KF21,*)' NOTICE metsub: switch to global grid'
+           WRITE(KF21,*)' NOTICE metsub: switch to global/nh/sh grid'
         END IF
      END IF
+
 !    set flag   
      OFFG=.TRUE.
   END IF

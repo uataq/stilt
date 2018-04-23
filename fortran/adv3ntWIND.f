@@ -47,7 +47,7 @@
   REAL,      INTENT(IN)    :: x1,y1         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! cyclic boundary condition flag
+  CHARACTER(2), INTENT(IN)    :: global        ! cyclic boundary condition flag
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
 
 !dwen(20090810) *************
@@ -83,9 +83,9 @@
 !dwen(20090810)  ZF=ZX
   ZF = ZNEW 
 
-
 ! cyclic boundary conditions
-  IF(GLOBAL)THEN
+!  IF(GLOBAL)THEN   ----------tk 20160316
+  IF(GLOBAL .EQ. 'gl')THEN
      IF(I1.GT.NXP)THEN
         I1=1
         XF=XF-NXP
@@ -108,22 +108,70 @@
      END IF
   END IF
  
+!----------tk 20160316
+  IF(GLOBAL .EQ. 'nh')THEN
+! northern hemisphere
+     IF(I1.GT.NXP)THEN
+        I1=1
+        XF=XF-NXP
+     END IF
+     IF(I1.LT.1)THEN
+        I1=NXP
+        XF=NXP+XF
+     END IF
+  !   IF(J1.LT.1)THEN
+  !      J1=1
+  !      YF=2.0-YF
+  !   END IF
+     IF(J1.EQ.NYP)THEN
+        YF=2*NYP-YF
+        J1=INT(YF)
+        IF(J1.EQ.NYP)THEN
+           J1=J1-1
+           YF=FLOAT(NYP)
+        END IF
+     END IF
+  END IF
+
+!----------tk 20160316
+  IF(GLOBAL .EQ. 'sh')THEN
+! southern hemisphere
+     IF(I1.GT.NXP)THEN
+        I1=1
+        XF=XF-NXP
+     END IF
+     IF(I1.LT.1)THEN
+        I1=NXP
+        XF=NXP+XF
+     END IF
+     IF(J1.LT.1)THEN
+        J1=1
+        YF=2.0-YF
+     END IF
+!     IF(J1.EQ.NYP)THEN
+!        YF=2*NYP-YF
+!        J1=INT(YF)
+!        IF(J1.EQ.NYP)THEN
+!           J1=J1-1
+!           YF=FLOAT(NYP)
+!        END IF
+!     END IF
+  END IF
+
 ! set upper index
-  
   I1P=I1+1
   J1P=J1+1
-  
-  !I1P=min(I1+1,size(s,1))
-  !J1P=min(J1+1,size(s,2))
 
 ! cyclic boundary conditions
-  IF(GLOBAL.AND.I1P.GT.NXP)I1P=1
+!  IF(GLOBAL.AND.I1P.GT.NXP)I1P=1
+  IF(GLOBAL.EQ.'gl'.AND.I1P.GT.NXP)I1P=1
+  IF((GLOBAL.EQ.'nh' .or. GLOBAL.EQ.'sh').AND.I1P.GT.NXP)I1P=1
 
   if (i1p > size(s,1) .or. j1p > size(s,2)) then
      write (*,*) 'subroutine adv3ntWIND: i1p and/or j1p exceeds allowable limit:', &
           & i1p, j1p, size(s,1), size(s,2)
-    !!I1P=min(I1+1,size(s,1))
-    !!J1P=min(J1+1,size(s,2))
+!!$     I1P=min(I1+1,size(s,1))
+!!$     J1P=min(J1+1,size(s,2))
   end if
 
 ! fractional interpolation factors to x1,y1,zx

@@ -33,7 +33,7 @@ INTERFACE
   real,      intent(in)    :: eflxup1(:,:,:),eflxup2(:,:,:)
   real,      intent(in)    :: eflxdn1(:,:,:),tkeg(:,:,:)
   integer,   intent(in)    :: nlvl,nxp,nyp 
-  logical,   intent(in)    :: global
+  character(2),   intent(in)    :: global
 
    end  SUBROUTINE ADVMETGRELL
 
@@ -169,7 +169,7 @@ INTERFACE
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   REAL,    INTENT(OUT)   :: zx              ! last estimate of vertical index
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! grid dimensions for global  
   END SUBROUTINE advrkm
 !-------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ INTERFACE
   REAL,    INTENT(IN)    :: tratio          ! time step stability criterion
   REAL,    INTENT(OUT)   :: zx              ! last estimate of vertical index
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! grid dimensions for global  
 !dwen(20090810) *******************
   real,    intent(in)    :: d(:,:,:,:)      !air density
@@ -222,7 +222,7 @@ INTERFACE
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   REAL,    INTENT(IN)    :: tratio          ! time step stability criterion
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! global boundaries
   REAL,    INTENT(INOUT) :: xx,yy,zz        ! old (t) and new (t+dt) position
   REAL,    INTENT(OUT)   :: zx              ! last estimate of vertical index
@@ -240,7 +240,7 @@ INTERFACE
   INTEGER, INTENT(IN)    :: jet             ! current elapsed time (minutes)
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! global boundaries
   REAL,    INTENT(INOUT) :: xx,yy           ! old (t) and new (t+dt) position
   END SUBROUTINE advsfc
@@ -276,7 +276,7 @@ INTERFACE
   REAL,      INTENT(IN)    :: uf(:,:,:),  vf(:,:,:),  sf(:,:,:)
   REAL,      INTENT(IN)    :: zi(:,:,:),  rt(:,:,:),  ds(:,:,:)
   LOGICAL,   INTENT(IN)    :: dswf       ! downward shortwave flag 
-  LOGICAL,   INTENT(IN)    :: global     ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global     ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp    ! grid dimensions for global  
 !dwen(20090811) ******************
  logical,    intent(in)    :: cflg,tclf,lclf,radf,slmf

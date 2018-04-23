@@ -35,7 +35,7 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
   REAL,      INTENT(IN)    :: x1,y1         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! cyclic boundary condition flag
+  CHARACTER(2),   INTENT(IN)    :: global        ! cyclic boundary condition flag
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
 
 !-------------------------------------------------------------------------------
@@ -56,8 +56,17 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
 
 ! find value at X1 for all J about Y1
   DO J=J1-1,J1+2
-     IF(GLOBAL)THEN
+!     IF(GLOBAL)THEN
+ !tk(20160317)
+    IF(GLOBAL .EQ. "gl")THEN
         IF(J.GT.NYP)JJ=2*NYP-J
+        IF(J.LT.1  )JJ=1-J
+ !tk(20160317)
+     ELSE IF (GLOBAL .EQ. "nh")THEN
+        IF(J.GT.NYP)JJ=2*NYP-J
+      !  IF(J.LT.1  )JJ=1-J
+     ELSE IF (GLOBAL .EQ. "sh")THEN
+      !  IF(J.GT.NYP)JJ=2*NYP-J
         IF(J.LT.1  )JJ=1-J
      ELSE
         JJ=J
@@ -65,10 +74,13 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
 
      CALL POLYNT(0,XF,YF,B0,B1,B2)
      DO I=I1-1,I1+2
-        IF(GLOBAL)THEN
+  !      IF(GLOBAL)THEN
+ !tk(20160317)
+      IF(GLOBAL.EQ."gl" .OR. GLOBAL.EQ."nh" .OR. GLOBAL.EQ."sh")THEN
            IF(I.GT.NXP)II=I-NXP
            IF(I.LT.1  )II=NXP+I
         ELSE
+ !tk(20160317)
            II=I
         END IF
         CALL POLYNT(1,FLOAT(II),S(II,JJ,K1),B0,B1,B2)
@@ -81,8 +93,16 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
 ! find value at Y1 from previous X1 values along J
   CALL POLYNT(0,XF,YF,B0,B1,B2)
   DO J=J1-1,J1+2
-     IF(GLOBAL)THEN
+ !    IF(GLOBAL)THEN
+ !tk(20160317)
+      IF(GLOBAL .EQ. "gl")THEN
         IF(J.GT.NYP)JJ=2*NYP-J
+        IF(J.LT.1  )JJ=1-J
+      ELSE IF (GLOBAL .EQ. "nh")THEN
+        IF(J.GT.NYP)JJ=2*NYP-J
+       ! IF(J.LT.1  )JJ=1-J
+      ELSE IF (GLOBAL .EQ. "sh")THEN
+       ! IF(J.GT.NYP)JJ=2*NYP-J
         IF(J.LT.1  )JJ=1-J
      ELSE
         JJ=J
@@ -98,8 +118,16 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
 
 ! find value at X1 for all J about Y1
   DO J=J1-1,J1+2
-     IF(GLOBAL)THEN
+ !    IF(GLOBAL)THEN
+ !tk(20160317)
+      IF(GLOBAL .EQ. "gl")THEN
         IF(J.GT.NYP)JJ=2*NYP-J
+        IF(J.LT.1  )JJ=1-J
+     ELSE IF (GLOBAL .EQ. "nh")THEN
+        IF(J.GT.NYP)JJ=2*NYP-J
+       ! IF(J.LT.1  )JJ=1-J
+     ELSE IF (GLOBAL .EQ. "sh")THEN
+       ! IF(J.GT.NYP)JJ=2*NYP-J
         IF(J.LT.1  )JJ=1-J
      ELSE
         JJ=J
@@ -107,7 +135,10 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
 
      CALL POLYNT(0,XF,YF,B0,B1,B2)
      DO I=I1-1,I1+2
-        IF(GLOBAL)THEN
+   !     IF(GLOBAL)THEN
+  !tk(20160317)
+ !tk(20160317)
+      IF(GLOBAL.EQ."gl" .OR. GLOBAL.EQ."nh" .OR. GLOBAL.EQ."sh")THEN
            IF(I.GT.NXP)II=I-NXP
            IF(I.LT.1  )II=NXP+I
         ELSE
@@ -123,8 +154,16 @@ SUBROUTINE ADVRNT(S,X1,Y1,ZX,SS,GLOBAL,NXP,NYP)
 ! find value at Y1 from previous X1 values along J
   CALL POLYNT(0,XF,YF,B0,B1,B2)
   DO J=J1-1,J1+2
-     IF(GLOBAL)THEN
+   !  IF(GLOBAL)THEN
+ !tk(20160317)
+      IF(GLOBAL .EQ. "gl")THEN
         IF(J.GT.NYP)JJ=2*NYP-J
+        IF(J.LT.1  )JJ=1-J
+      ELSE IF (GLOBAL .EQ. "nh")THEN
+        IF(J.GT.NYP)JJ=2*NYP-J
+       ! IF(J.LT.1  )JJ=1-J
+      ELSE IF (GLOBAL .EQ. "sh")THEN
+       ! IF(J.GT.NYP)JJ=2*NYP-J
         IF(J.LT.1  )JJ=1-J
      ELSE
         JJ=J

@@ -9,7 +9,7 @@
 !-------------------------------------------------------------------------------
 ! packed data set array limits set here           
 
-  INTEGER,  PARAMETER :: mlvl  =   75      ! number of vertical levels
+  INTEGER,  PARAMETER :: mlvl  =   90      ! number of vertical levels
   INTEGER,  PARAMETER :: mvar  =   35      ! number of different variables 
   INTEGER,  PARAMETER :: mlen  = 3072      ! maximum length of header record
   INTEGER,  PARAMETER :: mgrd  =    3      ! number of simultaneous grids

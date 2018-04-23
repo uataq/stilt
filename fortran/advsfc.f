@@ -44,7 +44,7 @@ SUBROUTINE ADVSFC(U,V,K1,K2,NLVL,MTIME,JET,XX,YY,DT,BACK,GLOBAL,NXP,NYP)
   INTEGER, INTENT(IN)    :: jet             ! current elapsed time (minutes)
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! global boundaries           
   REAL,    INTENT(INOUT) :: xx,yy           ! old (t) and new (t+dt) position 
 
@@ -69,7 +69,7 @@ SUBROUTINE ADVSFC(U,V,K1,K2,NLVL,MTIME,JET,XX,YY,DT,BACK,GLOBAL,NXP,NYP)
   REAL,      INTENT(IN)    :: s(:,:)        ! field for interpolation
   REAL,      INTENT(IN)    :: xp,yp         ! position of interpolated value
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
   END SUBROUTINE adv2nt
   END INTERFACE

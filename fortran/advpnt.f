@@ -214,7 +214,7 @@
   REAL,      INTENT(IN)    :: xp,yp         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
   END SUBROUTINE adv3nt
 
@@ -226,7 +226,7 @@
   REAL,      INTENT(IN)    :: x1,y1         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! cyclic boundary condition flag
+  CHARACTER(2),   INTENT(IN)    :: global        ! cyclic boundary condition flag
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
 
   end subroutine adv3ntzml
@@ -239,7 +239,7 @@
   REAL,      INTENT(IN)    :: x1,y1         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! cyclic boundary condition flag
+  CHARACTER(2),   INTENT(IN)    :: global        ! cyclic boundary condition flag
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
 
  end subroutine adv3ntzloc
@@ -252,7 +252,7 @@
   REAL,      INTENT(IN)    :: s(:,:)        ! field for interpolation
   REAL,      INTENT(IN)    :: x1,y1         ! position of interpolated value
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries  
 
  end subroutine adv2nt
@@ -747,7 +747,7 @@ awrfflg = GRID(kg,kt)%model_id(2:4) .eq. 'WRF'
 ! JCL(03/27/03): add arrays to store grids of TL & SIGW from RAMS
 ! CHG(09/23/03) add RAMS convective fluxes CFU1 CFU2 CFD1 DFU1 DFU2 EFU1 EFU2 DFD1 EFD1
 ! CHG(09/25/03) add RAMS turb. kin. energy TKEN
-      
+
       CALL METINP(BACK,KG,KT2,KUNIT2,KREC2,LX1(KG),LY1(KG),NXS(KG),NYS(KG),       &
            NZS,FTIME(KG,K2),KEND2,FHOUR(K2,KG),ZT(:,:,KG),DS(:,:,K2,KG),          &
            P0(:,:,K2,KG),T0(:,:,K2,KG),U0(:,:,K2,KG),V0(:,:,K2,KG),               &
@@ -912,6 +912,32 @@ awrfflg = GRID(kg,kt)%model_id(2:4) .eq. 'WRF'
   XX=XP-LX1(KG)+1
   YY=YP-LY1(KG)+1
   ZZ=ZP
+
+! CHG (7/28/2014) added this check to allow for global met fields
+! check for cyclic boundary conditions
+!  IF(GRID(KG,KT1)%GLOBAL)THEN
+!tk(20160317)
+ IF(GRID(KG,KT1)%GLOBAL .EQ. "gl")THEN
+     IF(XX.GE.FLOAT(GRID(KG,KT1)%NX+1)) XX=XX-FLOAT(GRID(KG,KT1)%NX)
+     IF(XX.LT.1.0)                      XX=GRID(KG,KT1)%NX+XX
+     IF(YY.GT.FLOAT(GRID(KG,KT1)%NY))   YY=2.0*GRID(KG,KT1)%NY-YY
+     IF(YY.LT.1.0)                      YY=2.0-YY
+  END IF
+!tk(20160317)
+ IF(GRID(KG,KT1)%GLOBAL .EQ. "nh")THEN
+     IF(XX.GE.FLOAT(GRID(KG,KT1)%NX+1)) XX=XX-FLOAT(GRID(KG,KT1)%NX)
+     IF(XX.LT.1.0)                      XX=GRID(KG,KT1)%NX+XX
+     IF(YY.GT.FLOAT(GRID(KG,KT1)%NY))   YY=2.0*GRID(KG,KT1)%NY-YY
+!     IF(YY.LT.1.0)                      YY=2.0-YY
+  END IF
+!tk(20160317)
+ IF(GRID(KG,KT1)%GLOBAL .EQ. "sh")THEN
+     IF(XX.GE.FLOAT(GRID(KG,KT1)%NX+1)) XX=XX-FLOAT(GRID(KG,KT1)%NX)
+     IF(XX.LT.1.0)                      XX=GRID(KG,KT1)%NX+XX
+!     IF(YY.GT.FLOAT(GRID(KG,KT1)%NY))   YY=2.0*GRID(KG,KT1)%NY-YY
+     IF(YY.LT.1.0)                      YY=2.0-YY
+  END IF
+
 
 !*****************************************************
 !dwen(20090323):adopted from STILT
@@ -1489,10 +1515,23 @@ awrfflg = GRID(kg,kt)%model_id(2:4) .eq. 'WRF'
   UBAR = MAX(ABS(XX-(XP-LX1(KG)+1)),ABS(YY-(YP-LY1(KG)+1)))/ABS(DT)
 
 ! check for cyclic boundary conditions
-  IF(GRID(KG,KT1)%GLOBAL)THEN
+!  IF(GRID(KG,KT1)%GLOBAL)THEN
+  IF(GRID(KG,KT1)%GLOBAL .EQ. "gl")THEN
      IF(XX.GE.FLOAT(GRID(KG,KT1)%NX+1)) XX=XX-FLOAT(GRID(KG,KT1)%NX)
      IF(XX.LT.1.0)                      XX=GRID(KG,KT1)%NX+XX
      IF(YY.GT.FLOAT(GRID(KG,KT1)%NY))   YY=2.0*GRID(KG,KT1)%NY-YY
+     IF(YY.LT.1.0)                      YY=2.0-YY
+!tk(20160317)
+  ELSE IF (GRID(KG,KT1)%GLOBAL .eq. "nh" )THEN
+     IF(XX.GE.FLOAT(GRID(KG,KT1)%NX+1)) XX=XX-FLOAT(GRID(KG,KT1)%NX)
+     IF(XX.LT.1.0)                      XX=GRID(KG,KT1)%NX+XX
+     IF(YY.GT.FLOAT(GRID(KG,KT1)%NY))   YY=2.0*GRID(KG,KT1)%NY-YY
+    ! IF(YY.LT.1.0)                      YY=2.0-YY
+!tk(20160317)
+  ELSE IF (GRID(KG,KT1)%GLOBAL .eq. "sh" )THEN
+     IF(XX.GE.FLOAT(GRID(KG,KT1)%NX+1)) XX=XX-FLOAT(GRID(KG,KT1)%NX)
+     IF(XX.LT.1.0)                      XX=GRID(KG,KT1)%NX+XX
+    ! IF(YY.GT.FLOAT(GRID(KG,KT1)%NY))   YY=2.0*GRID(KG,KT1)%NY-YY
      IF(YY.LT.1.0)                      YY=2.0-YY
   ELSE
 !    This condition should never occur after the advection step because
@@ -1668,7 +1707,7 @@ awrfflg = GRID(kg,kt)%model_id(2:4) .eq. 'WRF'
                  var2,GRID(kg,kt2)%GLOBAL,GRID(kg,kt2)%NX,GRID(kg,kt2)%NY)
          TLK1(KL)=VAR1
          TLK2(KL)=VAR2
-
+         
 ! JCL:   interpolate std dev of vertical velocity to position
 ! JCL:(10/30/02)no longer conduct linear interpolation, since screws up turbulence profiles
 !dwen(20090820) X2,Y2 are used in STILT version, not used in HYSPLIT version. XX here is 
@@ -1821,6 +1860,7 @@ awrfflg = GRID(kg,kt)%model_id(2:4) .eq. 'WRF'
            METz(kk)%SIGW=(SIGWK2(KK2)-SIGWK1(KK1))*TF+SIGWK1(KK1)
            METz(kk)%TL=(TLK2(KK2)-TLK1(KK1))*TF+TLK1(KK1)
          END DO
+
            !do this for RAMS
       ELSE
                      !DNINT for scalars
