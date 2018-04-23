@@ -54,7 +54,7 @@ SUBROUTINE ADVRNG(NGRD,MGMIN,UMAX,KPM,XPOS,YPOS,PGRD)
 
   INTEGER,    INTENT(IN)    :: ngrd     ! minimum subgrid size (from namelist)
 !dwen(20090825)  INTEGER,    INTENT(IN)    :: mgmin    ! minimum subgrid size (from namelist)
-  INTEGER,    INTENT(IN)    :: mgmin    ! minimum subgrid size (from namelist)
+  INTEGER,    INTENT(INout)    :: mgmin    ! minimum subgrid size (from namelist)
   REAL,       INTENT(IN)    :: umax     ! maximum wind speed (km / min)
   INTEGER,    INTENT(IN)    :: kpm      ! number of particles
   REAL,       INTENT(IN)    :: xpos (:) ! particle center positions (grid units)
@@ -65,17 +65,17 @@ SUBROUTINE ADVRNG(NGRD,MGMIN,UMAX,KPM,XPOS,YPOS,PGRD)
 ! internal variables
 !-------------------------------------------------------------------------------
 
-  INTEGER, ALLOCATABLE  :: lymax(:),lymin(:),lxmax(:),lxmin(:),mgmin_save(:)
+  INTEGER, ALLOCATABLE  :: lymax(:),lymin(:),lxmax(:),lxmin(:)
 
   INTEGER               :: kt = 1          ! analysis the same for all times
                                            ! such that the spatial extent of 
                                            ! all grids under kt index identical
 
-  INTEGER               :: k2,kg,kp,kret
+  INTEGER               :: k2,kg,kp,kret,nxmin,nymin
   REAL                  :: xpt,ypt,dist,tlat,tlon
 
 !-------------------------------------------------------------------------------
-  SAVE lymax,lymin,lxmax,lxmin,mgmin_save
+  SAVE lymax,lymin,lxmax,lxmin
 !-------------------------------------------------------------------------------
 
 ! check for sufficient number
@@ -86,29 +86,24 @@ SUBROUTINE ADVRNG(NGRD,MGMIN,UMAX,KPM,XPOS,YPOS,PGRD)
      ALLOCATE(lymin(ngrd), STAT=kret)
      ALLOCATE(lxmax(ngrd), STAT=kret)
      ALLOCATE(lxmin(ngrd), STAT=kret)
-     ALLOCATE(mgmin_save(ngrd), STAT=kret)
 
 !    initialize grid domain range
-     GRID%LXR=0
+     GRID%LXR=0 
      GRID%LYR=0
-!dwen(20090815) *************************
-! CHG&JCL (03/10/2004) change minimum subgrid dimension from 10
-!     a value depending on grid size
-!     at 40 km and larger still keep 10, at smaller grid sizes keep
-!     physical dimension constant
-!dwen(20090825)      MGMIN=MAX(MGMIN,IDNINT(MGMIN*40.0/GRID(KG)%SIZE))
-     do kg=1,ngrd
-        MGMIN_save(kg)=MAX(MGMIN,NINT(MGMIN*40.0/GRID(KG,kt)%SIZE))
-     end do
-     
   END IF
 
+  NXMIN=GRID(1,1)%NX
+  NYMIN=GRID(1,1)%NY
 ! set maximimum and minimum limits for each grid
   DO KG=1,NGRD
      LXMAX(KG)=1
      LXMIN(KG)=GRID(KG,KT)%NX
      LYMAX(KG)=1
      LYMIN(KG)=GRID(KG,KT)%NY
+
+!    maximum subgrid size is the minimum full grid size
+     NXMIN=MIN(NXMIN,GRID(KG,KT)%NX)
+     NYMIN=MIN(NYMIN,GRID(KG,KT)%NY)
   END DO
 
 ! For all positions deterime max/min limits, but for multiple grids       
@@ -169,13 +164,19 @@ SUBROUTINE ADVRNG(NGRD,MGMIN,UMAX,KPM,XPOS,YPOS,PGRD)
 !    determined from the advection distance plus particle distribution. 
 !    Subgrid is not permitted to shrink during a simulation
 
-
+!dwen(20090815) *************************
+! CHG&JCL (03/10/2004) change minimum subgrid dimension from 10
+!     a value depending on grid size
+!     at 40 km and larger still keep 10, at smaller grid sizes keep
+!     physical dimension constant
+!dwen(20090825)      MGMIN=MAX(MGMIN,IDNINT(MGMIN*40.0/GRID(KG)%SIZE))
+      MGMIN=MAX(MGMIN,NINT(MGMIN*40.0/GRID(KG,kt)%SIZE))
 !****************************************
 
-     GRID(KG,:)%LXR=MAX(MGMIN_save(kg),(NINT(2.0*DIST)+LXMAX(KG)-LXMIN(KG)+3),&
-                     GRID(KG,KT)%LXR)
-     GRID(KG,:)%LYR=MAX(MGMIN_save(kg),(NINT(2.0*DIST)+LYMAX(KG)-LYMIN(KG)+3),&
-                     GRID(KG,KT)%LYR)
+     GRID(KG,:)%LXR=MIN(MAX(MGMIN,(NINT(2.0*DIST)+LXMAX(KG)-LXMIN(KG)+3),&
+                     GRID(KG,KT)%LXR),NXMIN)
+     GRID(KG,:)%LYR=MIN(MAX(MGMIN,(NINT(2.0*DIST)+LYMAX(KG)-LYMIN(KG)+3),&
+                     GRID(KG,KT)%LYR),NYMIN)
  
 !    when subgrid in either direction reaches 75% of the full grid dimension
 !    then set limits to maximum or previously set subgrid to global
@@ -221,7 +222,7 @@ SUBROUTINE ADVRNG(NGRD,MGMIN,UMAX,KPM,XPOS,YPOS,PGRD)
      GRID(KG,:)%DATLOAD=.FALSE.
 
 !    optional diagnostic message
-     WRITE(KF21,*)' NOTICE advrng: (kg , mgmin, xyr,xy1) - ',KG, mgmin_save(kg), &
+     WRITE(KF21,*)' NOTICE advrng: (kg ,xyr,xy1) - ',KG,  &
           GRID(KG,KT)%LXR,GRID(KG,KT)%LYR,GRID(KG,KT)%LX1,GRID(KG,KT)%LY1 
 
   END DO

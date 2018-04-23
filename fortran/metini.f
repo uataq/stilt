@@ -447,7 +447,8 @@ SUBROUTINE METINI(KDEF,KZMIX,TVMIX,KBLS,KBLT,NGRD,NTIM,OLAT,IBYR,    &
         if (GRID(KG,kt)%pole_lat .le. vmissle .and. GRID(KG,kt)%pole_lon .le. vmissle &
              .and. GRID(KG,kt)%ref_lat .le. vmissle) then
            GRID(KG,kt)%LATLON = .FALSE.
-           GRID(KG,kt)%GLOBAL = .FALSE.
+ !          GRID(KG,kt)%GLOBAL = .FALSE.
+           GRID(KG,kt)%GLOBAL = 'no' ! default
            ! using WPS geolocation routines
            dxm = GRID(KG,kt)%size*1000.
            true1 = GRID(KG,kt)%tang_lat

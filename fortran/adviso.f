@@ -61,7 +61,7 @@ SUBROUTINE ADVISO(U,V,P,ZSG,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
   REAL,    INTENT(IN)    :: dt              ! integration step (minutes)
   REAL,    INTENT(IN)    :: tratio          ! time step stability criterion
   LOGICAL, INTENT(IN)    :: back            ! flag to indicate direction
-  LOGICAL, INTENT(IN)    :: global          ! global cyclic boundary conditions
+  CHARACTER(2), INTENT(IN)    :: global          ! global cyclic boundary conditions
   INTEGER, INTENT(IN)    :: nxp,nyp         ! global boundaries           
 
   REAL,    INTENT(INOUT) :: xx,yy,zz        ! old (t) and new (t+dt) position 
@@ -99,7 +99,7 @@ SUBROUTINE ADVISO(U,V,P,ZSG,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
   REAL,      INTENT(IN)    :: s(:,:)        ! field for interpolation
   REAL,      INTENT(IN)    :: xp,yp         ! position of interpolated value
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
   END SUBROUTINE adv2nt
 !-------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ SUBROUTINE ADVISO(U,V,P,ZSG,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
   REAL,      INTENT(IN)    :: xt,yt         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundaries
   END SUBROUTINE adv3nt
   END INTERFACE
@@ -251,8 +251,32 @@ SUBROUTINE ADVISO(U,V,P,ZSG,K1,K2,NLVL,MTIME,JET,ZMDL,XX,YY,ZZ,ZX,   &
 
 !       off grid test for particles that may approach the limits of the subgrid
 !       most are terminated outside of this routine if within 2 grid pts of edge
-        IF(STEP.AND..NOT.GLOBAL)THEN
+ 
+ !       IF(STEP.AND..NOT.GLOBAL)THEN
+!tk(20160317)
+        IF(STEP.AND.GLOBAL.EQ."no")THEN
            IF(XT.LT.1.0.OR.XT.GT.FLOAT(NXS).OR.YT.LT.1.0.OR.YT.GT.FLOAT(NYS))THEN
+!             advect distance for remaining time and then terminate
+              XX=XX+UU*(DT-TSUM)
+              YY=YY+VV*(DT-TSUM)
+              ZZ=0.5*(ZT+ZS)
+              RETURN
+           END IF
+        END IF
+
+!tk(20160317)
+        IF(STEP.AND.GLOBAL.EQ."nh")THEN
+           IF(YT.LT.1.0)THEN
+!             advect distance for remaining time and then terminate
+              XX=XX+UU*(DT-TSUM)
+              YY=YY+VV*(DT-TSUM)
+              ZZ=0.5*(ZT+ZS)
+              RETURN
+           END IF
+        END IF
+!tk(20160317)
+        IF(STEP.AND.GLOBAL.EQ."sh")THEN
+           IF(YT.GT.FLOAT(NYS))THEN
 !             advect distance for remaining time and then terminate
               XX=XX+UU*(DT-TSUM)
               YY=YY+VV*(DT-TSUM)

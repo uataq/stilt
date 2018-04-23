@@ -41,8 +41,10 @@ SUBROUTINE GBLSET(KG,KT)
 
 
   GRID(KG,KT)%LATLON=.FALSE.
-  GRID(KG,KT)%GLOBAL=.FALSE.
-  GRID(KG,KT)%GBLDAT=.FALSE.
+ ! GRID(KG,KT)%GLOBAL=.FALSE.
+  GRID(KG,KT)%GLOBAL='no' ! default
+!  GRID(KG,KT)%GBLDAT=.FALSE.
+   GRID(KG,KT)%GBLDAT="no"
   GRID(KG,KT)%PRIME =.FALSE.
 
 ! determine if this is a lat-lon grid
@@ -62,12 +64,27 @@ SUBROUTINE GBLSET(KG,KT)
 
 ! grid spacing
   DLON=GRID(KG,KT)%REF_LON
+  write(*,*)CLAT1,CLAT2,CLON1,CLON2,DLON
 
 ! determine if the grid is global
-  IF((CLON2+DLON-CLON1.EQ.360.0).OR.   &
-     (CLON2+DLON-CLON1.EQ.  0.0).AND.  &
+  IF( ( (CLON2+DLON-CLON1.EQ.360.0).OR.   &
+     (CLON2+DLON-CLON1.EQ.  0.0) ) .AND.  &
       CLAT2-CLAT1.EQ.180.0)            & 
-      GRID(KG,KT)%GBLDAT=.TRUE.  
+   !   GRID(KG,KT)%GBLDAT=.TRUE.  
+       GRID(KG,KT)%GBLDAT="gl" 
+
+ !tk(20160317)
+  IF( ( (CLON2+DLON-CLON1.EQ.360.0).OR.   &
+     (CLON2+DLON-CLON1.EQ.  0.0) ) .AND.  &
+      CLAT2+DLON.EQ.90.0)            & 
+   !   GRID(KG,KT)%GBLDAT=.TRUE.  
+       GRID(KG,KT)%GBLDAT="nh"
+ !tk(20160317)
+  IF( ( (CLON2+DLON-CLON1.EQ.360.0).OR.   &
+     (CLON2+DLON-CLON1.EQ.  0.0) ) .AND.  &
+      CLAT1.EQ. -90.0)            & 
+   !   GRID(KG,KT)%GBLDAT=.TRUE.  
+       GRID(KG,KT)%GBLDAT="sh"
 
 ! determine if a non-global grid is about the prime 
   IF(CLON2.GE.0.0.AND.CLON1.LT.0.0) GRID(KG,KT)%PRIME=.TRUE.  

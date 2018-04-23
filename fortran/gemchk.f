@@ -85,7 +85,8 @@ SUBROUTINE gemchk (ngrd,ntyp)
 ! find the first global meteorology grid
   KGRD=0
   loop1 : DO N=1,NGRD
-     IF(GRID(N,1)%GBLDAT)THEN
+!     IF(GRID(N,1)%GBLDAT)THEN
+     IF(GRID(N,1)%GBLDAT.EQ."gl")THEN
         KGRD=N
         EXIT loop1
      END IF

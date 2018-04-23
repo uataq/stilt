@@ -55,7 +55,7 @@
   real,      intent(in)    :: eflxup1(:,:,:),eflxup2(:,:,:)
   real,      intent(in)    :: eflxdn1(:,:,:),tkeg(:,:,:)
   integer,   intent(in)    :: nlvl,nxp,nyp 
-  logical,   intent(in)    :: global
+  character(2),   intent(in)    :: global
 !--------------------------------------------
 !   internal variables
 !-------------------------------------------
@@ -70,7 +70,7 @@
   REAL,      INTENT(IN)    :: xp,yp         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
   END SUBROUTINE adv3nt
 

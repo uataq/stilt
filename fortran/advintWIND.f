@@ -40,7 +40,7 @@
 
       IMPLICIT REAL*8 (A-H,O-Z)
 
-      LOGICAL GLOBAL
+      CHARACTER(2) GLOBAL
 
 ! JCL:(6/6/2000)
       REAL*8   SS
@@ -67,7 +67,9 @@
       I1P = I1+1
       J1P = J1+1
 !     cyclic boundary conditons
-      IF (GLOBAL) THEN
+!tk(20160317
+!      IF (GLOBAL) THEN
+      IF (GLOBAL.EQ."gl".OR.GLOBAL.EQ."nh") THEN
         IF (I1P > NXP) I1P = 1
         IF (J1P > NYP) J1P = NYP
 ! JCL:(07/26/2004) occasionally even I1 or J1 exceeds the limit
@@ -80,7 +82,19 @@
            J1P = NYP-1
         END IF
       END IF
-
+      IF (GLOBAL.EQ."sh") THEN
+        IF (I1P > NXP) I1P = 1
+!        IF (J1P > NYP) J1P = NYP
+! JCL:(07/26/2004) occasionally even I1 or J1 exceeds the limit
+        IF (I1 > NXP) THEN
+           I1 = 1
+           I1P = 2
+        END IF
+!        IF (J1 > NYP) THEN
+!           J1 = NYP
+!           J1P = NYP-1
+!        END IF
+      END IF
 
       !--- index range checks in x and y
 

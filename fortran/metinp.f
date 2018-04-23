@@ -651,6 +651,11 @@ subroutine metinp(BACK,KG,KT,KUNIT,KREC,LX1,LY1,NXS,NYS,NZS,MC,KEND,     &
         ENDIF
         mu = mu + mupert
      ENDIF !awrfflg
+     IF(ECMFLG) THEN
+           cfu2(:,:,:) = 0.
+           dfu2(:,:,:) = 0.
+           efu2(:,:,:) = 0.
+     ENDIF !ECMFLG
      !dwen ******************************
 
      !-------------------------------------------------------------------------------

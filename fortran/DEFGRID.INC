@@ -32,7 +32,7 @@
   real, parameter :: vmiss=-999.99, vmissle=-999.
 
 
-  INTEGER,  PARAMETER  :: mlvl     = 75    ! maximum levels  
+  INTEGER,  PARAMETER  :: mlvl     = 90    ! maximum levels  
   INTEGER,  PARAMETER  :: mvar     = 35    ! maximum variables
   INTEGER,  PARAMETER  :: mgrd     = 40    ! maximum grids
   INTEGER,  PARAMETER  :: mtim     = 40    ! maximum time periods
@@ -64,8 +64,8 @@
      INTEGER        :: nz          ! number of levels 
      LOGICAL        :: latlon      ! flag if input grid is latlon
      LOGICAL        :: prime       ! lat/lon grid crosses the prime meridian
-     LOGICAL        :: gbldat      ! flag if latlon input grid is global
-     LOGICAL        :: global      ! flag if latlon subgrid is global
+     CHARACTER(2)   :: gbldat      ! flag if latlon input grid is global
+     CHARACTER(2)   :: global      ! flag if latlon subgrid is global
      LOGICAL        :: datload     ! flag to load data into subgrid
      INTEGER        :: lx1,ly1     ! potential sub-grid corner position
      INTEGER        :: lxr,lyr     ! potential sub-grid size or range

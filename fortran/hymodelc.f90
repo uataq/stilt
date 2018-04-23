@@ -597,7 +597,7 @@ PROGRAM HYMODELC
   KPUFF=0      ! linear (0) or square root (1) horizontal puff dispersion
   KHMAX=9999   ! maximum duration in hours of any particle/puff
   NUMPAR=2500  ! number of puffs in simulation or particles to release
-  MAXPAR=100000! maximum number of particles carried in simulation
+  MAXPAR=10000 ! maximum number of particles carried in simulation
   MAXDIM=1     ! maximum number of pollutants to carry on one mass particle
   QCYCLE=0.0   ! optional cycling of emissions (hours) anatex=60
 
@@ -1212,7 +1212,22 @@ PROGRAM HYMODELC
 
         IF(SPOT(N)%XP.LT.2.0.OR.SPOT(N)%XP.GT.FLOAT(GRID(KG,KT)%NX)-1.0.OR.    &
              SPOT(N)%YP.LT.2.0.OR.SPOT(N)%YP.GT.FLOAT(GRID(KG,KT)%NY)-1.0)THEN
-           IF(GRID(KG,KT)%GBLDAT)THEN
+!           IF(GRID(KG,KT)%GBLDAT)THEN
+           IF(GRID(KG,KT)%GBLDAT.EQ."gl")THEN
+              MGMIN=MAX(GRID(KG,KT)%NX,GRID(KG,KT)%NY)
+              SPOT(N)%ZP=(ZMDL-SPOT(N)%OLVL)/ZMDL
+              SPOT(N)%KG=KG
+              EXIT newkg
+           ELSE IF(GRID(KG,KT)%GBLDAT.EQ."nh" .AND. &
+           (SPOT(N)%XP.LT.2.0.OR.SPOT(N)%XP.GT.FLOAT(GRID(KG,KT)%NX)-1.0.OR.    &
+             SPOT(N)%YP.GT.FLOAT(GRID(KG,KT)%NY)-1.0) )THEN
+              MGMIN=MAX(GRID(KG,KT)%NX,GRID(KG,KT)%NY)
+              SPOT(N)%ZP=(ZMDL-SPOT(N)%OLVL)/ZMDL
+              SPOT(N)%KG=KG
+              EXIT newkg
+           ELSE IF(GRID(KG,KT)%GBLDAT.EQ."sh" .AND. &
+           (SPOT(N)%XP.LT.2.0.OR.SPOT(N)%XP.GT.FLOAT(GRID(KG,KT)%NX)-1.0.OR.    &
+             SPOT(N)%YP.LT.2.0) )THEN
               MGMIN=MAX(GRID(KG,KT)%NX,GRID(KG,KT)%NY)
               SPOT(N)%ZP=(ZMDL-SPOT(N)%OLVL)/ZMDL
               SPOT(N)%KG=KG
@@ -1248,6 +1263,7 @@ PROGRAM HYMODELC
   END DO
 
   IF(K.EQ.0)THEN     
+     WRITE(*,*)GRID(1,1)%GBLDAT
      WRITE(*,*)'*ERROR* main: all source points off all meteo grids!'
      STOP 900
   END IF
@@ -2091,7 +2107,24 @@ PROGRAM HYMODELC
         LAGS(N)%KG=KG  ! initial meteorological grid
         IF(LAGS(N)%XP.LT.1.0.OR.LAGS(N)%XP.GT.FLOAT(GRID(KG,KT)%NX).OR.     &
              LAGS(N)%YP.LT.1.0.OR.LAGS(N)%YP.GT.FLOAT(GRID(KG,KT)%NY))THEN
-           IF(.NOT.GRID(KG,KT)%GBLDAT)THEN
+!           IF(.NOT.GRID(KG,KT)%GBLDAT)THEN
+           IF(GRID(KG,KT)%GBLDAT.EQ."no")THEN
+              WRITE(KF21,*)'WARNING main: lagrangian release point off grid'
+              WRITE(KF21,*)'Position:',LAGS(N)%RLAT,LAGS(N)%RLON
+              WRITE(KF21,*)'Grid Loc:',LAGS(N)%XP,  LAGS(N)%YP
+              LAGS(N)%RACM=0  ! turn off release for this location
+           END IF
+           IF(GRID(KG,KT)%GBLDAT.EQ."nh".AND.     &
+           (LAGS(N)%XP.LT.1.0.OR.LAGS(N)%XP.GT.FLOAT(GRID(KG,KT)%NX).OR.     &
+             LAGS(N)%YP.GT.FLOAT(GRID(KG,KT)%NY)) )THEN
+              WRITE(KF21,*)'WARNING main: lagrangian release point off grid'
+              WRITE(KF21,*)'Position:',LAGS(N)%RLAT,LAGS(N)%RLON
+              WRITE(KF21,*)'Grid Loc:',LAGS(N)%XP,  LAGS(N)%YP
+              LAGS(N)%RACM=0  ! turn off release for this location
+           END IF
+           IF(GRID(KG,KT)%GBLDAT.EQ."sh".AND.     &
+           (LAGS(N)%XP.LT.1.0.OR.LAGS(N)%XP.GT.FLOAT(GRID(KG,KT)%NX).OR.     &
+             LAGS(N)%YP.LT.1.0) )THEN
               WRITE(KF21,*)'WARNING main: lagrangian release point off grid'
               WRITE(KF21,*)'Position:',LAGS(N)%RLAT,LAGS(N)%RLON
               WRITE(KF21,*)'Grid Loc:',LAGS(N)%XP,  LAGS(N)%YP
@@ -2222,6 +2255,10 @@ PROGRAM HYMODELC
         DT=DT-1.0
      END DO
 
+     !    avoid too small time steps near poles for SH or NH domains
+     IF(GRID(KGRID,KTIME)%GBLDAT.EQ."sh".or.GRID(KGRID,KTIME)%GBLDAT.EQ."nh") THEN 
+        DT=max(DT,6.0)
+     END IF	
      !    namelist over-ride for fixed time step when delt<>0
      IF(DELT.NE.0.0)DT=ABS(DELT)
 
@@ -3732,9 +3769,6 @@ PROGRAM HYMODELC
 
   ! JCL:close 'PARTICLE.DAT'
   CLOSE(KFPARDAT)
-
-  ! JCL:(11/03/03)
-  IF(WINDERRTF.EQ.1)DEALLOCATE(UVERR)
 
   !***********************************************************
 

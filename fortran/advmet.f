@@ -115,7 +115,7 @@
   REAL,      INTENT(IN)    :: uf(:,:,:),  vf(:,:,:),  sf(:,:,:)
   REAL,      INTENT(IN)    :: zi(:,:,:),  rt(:,:,:),  ds(:,:,:)
   LOGICAL,   INTENT(IN)    :: dswf          ! downward shortwave flag 
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
 
 !dwen(20090811) ******************
@@ -155,7 +155,7 @@
   REAL,      INTENT(IN)    :: s(:,:)        ! field for interpolation
   REAL,      INTENT(IN)    :: xp,yp         ! position of interpolated value
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
   END SUBROUTINE adv2nt
 !-------------------------------------------------------------------------------
@@ -165,7 +165,7 @@
   REAL,      INTENT(IN)    :: xp,yp         ! position of interpolated value
   REAL,      INTENT(IN)    :: zx            ! vertical interpolation fraction
   REAL,      INTENT(OUT)   :: ss            ! value of S at x1,y1,z1
-  LOGICAL,   INTENT(IN)    :: global        ! global cyclic boundary conditions
+  CHARACTER(2),   INTENT(IN)    :: global        ! global cyclic boundary conditions
   INTEGER,   INTENT(IN)    :: nxp,nyp       ! global boundary values
   END SUBROUTINE adv3nt
 !-------------------------------------------------------------------------------
@@ -227,10 +227,26 @@
   ZX = aMIN1(aMAX1(1.0,ZX),float(NLVL))
 
 ! cyclic boundary conditions
-  IF(GLOBAL)THEN
+ ! IF(GLOBAL)THEN
+ !tk(20160317)
+  IF(GLOBAL .EQ. 'gl')THEN  !----------tk 20160316
      IF(II.GT.NXP)II=1
      IF(II.LT.1)  II=NXP
      IF(JJ.GT.NYP)JJ=NYP
+     IF(JJ.LT.1)  JJ=1
+  END IF
+
+  IF(GLOBAL .EQ. 'nh')THEN  !----------tk 20160316
+     IF(II.GT.NXP)II=1
+     IF(II.LT.1)  II=NXP
+     IF(JJ.GT.NYP)JJ=NYP
+    ! IF(JJ.LT.1)  JJ=1
+  END IF
+
+  IF(GLOBAL .EQ. 'sh')THEN  !----------tk 20160316
+     IF(II.GT.NXP)II=1
+     IF(II.LT.1)  II=NXP
+    ! IF(JJ.GT.NYP)JJ=NYP
      IF(JJ.LT.1)  JJ=1
   END IF
 

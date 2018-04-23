@@ -59,7 +59,7 @@ SUBROUTINE METSET(KG,KT,KFOR)
 ! internal variables
 !-------------------------------------------------------------------------------
 
-  INTEGER,  PARAMETER   :: mlenh  = 10000  ! maximum length of header
+  INTEGER,  PARAMETER   :: mlenh  = 10999  ! maximum length of header
   CHARACTER(mlenh)      :: header         ! extended index record header
 
   CHARACTER(2)   :: cgrid
@@ -157,6 +157,11 @@ SUBROUTINE METSET(KG,KT,KFOR)
        GRID(KG,KT)%SYNC_LAT, GRID(KG,KT)%SYNC_LON,  GRID(KG,KT)%DUMMY,       &
        GRID(KG,KT)%NX,       GRID(KG,KT)%NY,        GRID(KG,KT)%NZ,          &
        DREC(KG,KT)%Z_FLAG,   LENH
+
+  ! automatic detect values for lenh > 9999;  these values are stored as negative numbers
+  if (lenh < 0) then
+    lenh=-lenh + 10000
+  endif
 
 ! check number of levels against structure dimension
   IF((GRID(KG,KT)%NZ).GT.MLVL)THEN
@@ -325,7 +330,7 @@ SUBROUTINE METSET(KG,KT,KFOR)
           WRITE(*,*)'*ERROR* metset: meteorological data time interval varies' 
           WRITE(*,*)' Changed from ',DREC(KG,KT)%DELTA,' min to ',(N-K),' min'
           WRITE(*,*)' At day/hr ',FILE(KG,KT)%LAST%DA,FILE(KG,KT)%LAST%HR
-          STOP 900          
+!##       STOP 900          
        ELSE
           K=N
        END IF
