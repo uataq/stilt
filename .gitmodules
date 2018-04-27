@@ -1,0 +1,3 @@
+[submodule "fortran"]
+	path = fortran
+	url = https://github.com/uataq/stilt-fortran.git
