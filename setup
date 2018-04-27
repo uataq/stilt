@@ -1,9 +1,9 @@
 #!/bin/bash
 
+git submodule update --init
+R CMD SHLIB r/src/permute.f90
 cd fortran
-R CMD SHLIB permute.f90
-mv permute.so ../r/src/permute.so
 make
-mv hymodelc ../exe/hymodelc
+chmod +x hymodelc
 cd ..
-chmod +x exe/hymodelc
+mv fortran/hymodelc exe/hymodelc
