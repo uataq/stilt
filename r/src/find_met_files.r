@@ -21,6 +21,7 @@ find_met_files <- function(t_start, met_file_format, n_hours, met_loc) {
   request <- c(t_start %>% as.POSIXct(tz='UTC')) %>%
     c(. + n_hours * c(3600, 3601)) %>%
     range() %>%
+    round('hours') %>%
     (function(x) seq(x[1], x[2], by = 'hour')) %>%
     strftime(tz = 'UTC', format = met_file_format)
   
