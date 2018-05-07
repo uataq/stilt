@@ -68,7 +68,7 @@ time_integrate <- F
 frmr        <- 0
 emisshrs    <- 0.01
 iconvect    <- 0
-initd       <- 4
+initd       <- 0
 isot        <- 0
 khmax       <- 9999
 kmix0       <- 250
