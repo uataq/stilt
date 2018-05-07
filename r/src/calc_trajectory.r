@@ -12,17 +12,18 @@
 #' @import uataq
 #' @export
 
-calc_trajectory <- function(varsiwant, delt, emisshrs, iconvect, isot, khmax,
-                            kmix0, kmixd, krnd, met_files, mgmin, ndump, numpar,
-                            nturb, n_hours, outdt, outfrac, output, random,
-                            rm_dat, timeout, tlfrac, tratio, veght, winderrtf,
-                            w_option, zicontroltf, z_top, rundir) {
+calc_trajectory <- function(varsiwant, delt, emisshrs, frmr, iconvect, initd,
+                            isot, khmax, kmix0, kmixd, krnd, met_files, mgmin,
+                            ndump, numpar, nturb, n_hours, outdt, outfrac,
+                            output, random, rm_dat, timeout, tlfrac, tratio,
+                            veght, winderrtf, w_option, zicontroltf, z_top,
+                            rundir) {
 
   require(uataq)
 
   # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
-  write_setup(varsiwant, delt, iconvect, isot, khmax, kmix0, kmixd, krnd,
-              mgmin, ndump, numpar, nturb, outdt, outfrac, random, tlfrac,
+  write_setup(varsiwant, delt, frmr, iconvect, initd, isot, khmax, kmix0, kmixd,
+              krnd, mgmin, ndump, numpar, nturb, outdt, outfrac, random, tlfrac,
               tratio, veght, winderrtf, zicontroltf,
               file.path(rundir, 'SETUP.CFG'))
   write_control(output$receptor, emisshrs, n_hours, w_option, z_top, met_files,

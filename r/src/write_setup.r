@@ -1,14 +1,23 @@
 #' write_setup writes a SETUP.CFG namelist file to control the model behavior
 #' @author Ben Fasoli
-#' 
+#'
 #' SETUP.CFG contains namelist for controlling transport and dispersion behavior
 #'
 #' @param delt integration timestep [min]; if set to 0.0, then timestep is
 #'   dynamically determined
+#' @param frmr the fraction of the mass that is permitted to be removed at krnd
+#'   intervals. For certain simulations, such as when a pollutant has a high
+#'   ambient background relative, a small removal rate will significantly reduce
+#'   the number of puffs on the grid at no loss in accuracy; defaults to 0
 #' @param iconvect flag for convection. If set to 1, then runs excessive
 #'   convection as described in Gerbig et al., 2003. For specialized RAMS output,
 #'   the particles will be vertically redistributed according to the output
 #'   convective mass fluxes; defaults to 0
+#' @param initd determines model configuration as a particle or puff model. 0 -
+#'   horizontal and vertical particle. 1 - horizontal gaussian puff, vertical top
+#'   hat puff. 2 - horizontal and vertical top hat puff. 3 - horizontal gaussian
+#'   puff, vertical particle. 4 - horizontal top-hat puff, vertical particle
+#'   (HYSPLIT default). Defaults to 0 (horizontal and vertical particle)
 #' @param isot flag used to set the isotropic turbulence option; defaults to 0 to
 #'   compute horizontal turbulence from wind field deformation. Setting to 1
 #'   results in the horizontal turbulence to be the same in both the u and v
@@ -60,12 +69,12 @@
 #'
 #' @export
 
-write_setup <- function(varsiwant, delt = 0, iconvect = 0, isot = 0,
-                        khmax = 9999, kmix0 = 250, kmixd = 3, krnd = 6,
-                        mgmin = 2000, ndump = 0, numpar = 100, nturb = 0, outdt = 0,
-                        outfrac = 0.9, random = 1, tlfrac = 0.1, tratio = 0.9,
-                        veght = 0.5, winderrtf = 0, zicontroltf = 0,
-                        file = 'SETUP.CFG') {
+write_setup <- function(varsiwant, delt = 0, frmr = 0, iconvect = 0, initd = 0,
+                        isot = 0, khmax = 9999, kmix0 = 250, kmixd = 3, krnd = 6,
+                        mgmin = 2000, ndump = 0, numpar = 100, nturb = 0,
+                        outdt = 0, outfrac = 0.9, random = 1, tlfrac = 0.1,
+                        tratio = 0.9, veght = 0.5, winderrtf = 0,
+                        zicontroltf = 0, file = 'SETUP.CFG') {
 
   if (basename(file) != 'SETUP.CFG')
     stop('write_setup(): file argument must end with SETUP.CFG')
@@ -81,9 +90,9 @@ write_setup <- function(varsiwant, delt = 0, iconvect = 0, isot = 0,
 
   txt <- c('$SETUP',
            eq('DELT', delt),
-           'FRMR=0.0',
+           eq('FRMR', frmr),
            eq('ICONVECT', iconvect),
-           'INITD=0',
+           eq('INITD', initd),
            eq('ISOT', isot),
            eq('IVMAX', ivmax),
            eq('KHMAX', khmax),
