@@ -1,9 +1,61 @@
 #!/bin/bash
+#
+# Ben Fasoli
+#
+# Convenience script to ensure code is fetched from different sources and 
+# fortran binaries and DLLs are compiled and moved to the correct location
 
-cd fortran
-R CMD SHLIB permute.f90
-mv permute.so ../r/src/permute.so
-make
-mv hymodelc ../exe/hymodelc
-cd ..
+# Check if ./setup is run from the top level of the project
+dircnt=$(ls -d */ | grep -x -e exe/ -e out/ -e r/ -e fortran/ | wc -l)
+if [ $dircnt -lt 4 ]; then
+  echo "./setup must be run from the top level directory of the STILT project"
+  exit 1
+fi
+
+# Prompt user for jena SVN username
+echo "
+STILT is built on top of the HYSPLIT model. Registration is required to access
+the fortran trajectory calculations.
+
+Registration: https://mail.bgc-jena.mpg.de/mailman/listinfo/stilt_user
+Username is email prefix: user@email.com -> user
+Password is sent to your email address after registration
+"
+echo -n "Username: "
+read username
+
+if [ -z $username ]; then
+  echo "No username input. Exiting."
+  exit 1
+fi
+
+# Checkout merged_stilt_hysplit contents into fortran/
+# Compilers prioritize fortran/makefile over fortran/Makefile
+svn --username $username checkout \
+  https://projects.bgc-jena.mpg.de/STILT/svn/trunk/merged_stilt_hysplit/ \
+  fortran/
+
+# Compile STILT trajectory calculation binary
+echo "Compiling STILT trajectory calculation binary (hymodelc)..."
+(cd fortran && make)
+
+if [ ! -f fortran/hymodelc ]; then
+  echo "Problem compiling fortran/hymodelc."
+  echo "You may need to edit settings in fortran/makefile to compile manually."
+  exit 1
+fi
+
+mv fortran/hymodelc exe/hymodelc
 chmod +x exe/hymodelc
+
+# Compile permute DLL for footprint kernel aggregation
+echo "Compiling footprint kernel aggregation subroutine..."
+R CMD SHLIB r/src/permute.f90
+if [ ! -f r/src/permute.so ]; then
+  echo "Problem compiling r/src/permute.so."
+  exit 1
+fi
+
+echo "
+Fortran compilation successful.
+"
