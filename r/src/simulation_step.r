@@ -9,20 +9,20 @@
 #' @export
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            delt = 0, emisshrs = 0.01, hnf_plume = T,
+                            delt = 0, emisshrs = 0.01, frmr = 0, hnf_plume = T,
                             horcoruverr = NA, horcorzierr = NA, iconvect = 0,
-                            isot = 0, khmax = 9999, kmix0 = 250, kmixd = 3,
-                            krnd = 6, met_file_format, met_loc, mgmin = 2000,
-                            n_hours = -24, n_met_min = 1, ndump = 0, nturb = 0,
-                            numpar = 200, outdt = 0, outfrac = 0.9, random = 1,
-                            run_trajec = T, r_run_time, r_lati, r_long, r_zagl,
-                            siguverr = NA, sigzierr = NA, smooth_factor = 1,
-                            time_integrate = F, timeout = 3600, tlfrac = 0.1,
-                            tluverr = NA, tlzierr = NA, tratio = 0.9,
-                            varsiwant = NULL, veght = 0.5, w_option = 0,
-                            xmn = -180, xmx = 180, xres = 0.1, ymn = -90,
-                            ymx = 90, yres = xres, zicontroltf = 0,
-                            z_top = 25000,  zcoruverr = NA) {
+                            initd = 0, isot = 0, khmax = 9999, kmix0 = 250,
+                            kmixd = 3, krnd = 6, met_file_format, met_loc,
+                            mgmin = 2000, n_hours = -24, n_met_min = 1,
+                            ndump = 0, nturb = 0, numpar = 200, outdt = 0,
+                            outfrac = 0.9, random = 1, run_trajec = T,
+                            r_run_time, r_lati, r_long, r_zagl, siguverr = NA,
+                            sigzierr = NA, smooth_factor = 1, time_integrate = F,
+                            timeout = 3600, tlfrac = 0.1, tluverr = NA,
+                            tlzierr = NA, tratio = 0.9, varsiwant = NULL,
+                            veght = 0.5, w_option = 0, xmn = -180, xmx = 180,
+                            xres = 0.1, ymn = -90, ymx = 90, yres = xres,
+                            zicontroltf = 0, z_top = 25000,  zcoruverr = NA) {
   try({
     # If using lapply or parLapply, receptors are passed as vectors and need to
     # be subsetted for the specific simulation index
@@ -84,12 +84,12 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
 
       # Execute particle trajectory simulation, and read results into data frame
-      particle <- calc_trajectory(varsiwant, delt, emisshrs, iconvect, isot,
-                                  khmax, kmix0, kmixd, krnd, met_files, mgmin,
-                                  ndump, numpar, nturb, n_hours, outdt, outfrac,
-                                  output, random, rm_dat, timeout, tlfrac,
-                                  tratio, veght, 0, w_option, zicontroltf,
-                                  z_top, rundir)
+      particle <- calc_trajectory(varsiwant, delt, emisshrs, frmr, iconvect,
+                                  initd, isot, khmax, kmix0, kmixd, krnd,
+                                  met_files, mgmin, ndump, numpar, nturb,
+                                  n_hours, outdt, outfrac, output, random,
+                                  rm_dat, timeout, tlfrac, tratio, veght, 0,
+                                  w_option, zicontroltf, z_top, rundir)
       if (is.null(particle)) return()
       output$particle <- particle
 
