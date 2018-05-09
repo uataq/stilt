@@ -81,11 +81,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     require(proj4)
     i[, c('long', 'lati')] <- project(i[, c('long', 'lati')], projection)
     grid_lims <- project(list(c(xmn, xmx), c(ymn, ymx)), projection)
-    # ur <- project(c(xmx, ymx), projection)
-    # xmn <- ll[1]
-    # ymn <- ll[2]
-    # xmx <- ur[1]
-    # ymx <- ur[2]
     xmn <- min(grid_lims$x)
     xmx <- max(grid_lims$x)
     ymn <- min(grid_lims$y)
