@@ -19,7 +19,8 @@
 #'   require any additional libraries and have better compression
 #' @param r_run_time receptor run time as a POSIXct object. Can be NULL
 #'   resulting in NULL timestamp outputs
-#' @param projection 
+#' @param projection proj4 string defining the map projection of the footprint
+#'   netCDF output
 #' @param time_integrate logical indicating whether to integrate footprint over
 #'   time or retain discrete time steps
 #' @param smooth_factor factor by which to linearly scale footprint smoothing;
@@ -79,8 +80,18 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   if (!is_longlat) {
     require(proj4)
     i[, c('long', 'lati')] <- project(i[, c('long', 'lati')], projection)
+    grid_lims <- project(list(c(xmn, xmx), c(ymn, ymx)), projection)
+    # ur <- project(c(xmx, ymx), projection)
+    # xmn <- ll[1]
+    # ymn <- ll[2]
+    # xmx <- ur[1]
+    # ymx <- ur[2]
+    xmn <- min(grid_lims$x)
+    xmx <- max(grid_lims$x)
+    ymn <- min(grid_lims$y)
+    ymx <- max(grid_lims$y)
   }
-  
+
   # Set footprint grid
   glong <- head(seq(xmn, xmx, by = xres), -1)
   glati <- head(seq(ymn, ymx, by = yres), -1)
@@ -194,8 +205,9 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     })
     time_out <- as.numeric(r_run_time + unique(hid) * 3600)
   }
-  
+
   # Set footprint metadata and write to file
-  write_footprint(foot, output = output, glong = glong, glati = glati, 
-                  xres = xres, yres = yres, time_out = time_out)
+  write_footprint(foot, output = output, glong = glong, glati = glati,
+                  projection = projection, xres = xres, yres = yres,
+                  time_out = time_out)
 }
