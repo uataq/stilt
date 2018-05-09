@@ -18,4 +18,5 @@ validate_varsiwant <- function(varsiwant) {
   if (length(invalid) > 0)
     stop('validate_varsiwant(): varsiwant argument can only include:\n',
          paste(collapse = '\n', valid))
+  return(invisible(T))
 }
