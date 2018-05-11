@@ -48,7 +48,7 @@ if [[ $install -eq 1 ]]; then
   # Compile STILT trajectory calculation binary
   echo "Compiling STILT trajectory calculation binary (hymodelc)..."
   (cd fortran && make)
-  if [ ! -f fortran/hymodelc ]; then
+  if [ ! -s fortran/hymodelc ]; then
     echo "Problem compiling fortran/hymodelc."
     echo "You may need to edit settings in fortran/makefile to compile manually."
     exit 1
@@ -56,19 +56,19 @@ if [[ $install -eq 1 ]]; then
 
 # Fetch binary from GitHub release
 elif [[ $install -eq 2 ]]; then
-  wget --directory-prefix=fortran/ --quiet --show-progress \
+  wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-centos-7.4.zip
   unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 3 ]]; then
-  wget --directory-prefix=fortran/ --quiet --show-progress \
+  wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-16.04.zip
   unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 4 ]]; then
-  wget --directory-prefix=fortran/ --quiet --show-progress \
+  wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-14.04.zip
   unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 5 ]]; then
-  wget --directory-prefix=fortran/ --quiet --show-progress \
+  wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-macos-10.13.zip
   unzip -p fortran/hymodelc-macos-10.13.zip hymodelc > fortran/hymodelc
 else
@@ -77,7 +77,7 @@ else
 fi
 
 # Check that hymodelc was created from methods above
-if [ ! -f fortran/hymodelc ]; then
+if [ ! -s fortran/hymodelc ]; then
   echo "Problem creating fortran/hymodelc."
   exit 1
 fi
@@ -90,7 +90,7 @@ chmod +x exe/hymodelc
 # Compile permute DLL for footprint kernel aggregation
 echo "Compiling footprint kernel aggregation subroutine..."
 R CMD SHLIB r/src/permute.f90
-if [ ! -f r/src/permute.so ]; then
+if [ ! -s r/src/permute.so ]; then
   echo "Problem compiling r/src/permute.so."
   exit 1
 fi
