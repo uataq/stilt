@@ -43,9 +43,7 @@ n_met_min       <- 1
 run_trajec <- T
 n_hours    <- -24
 convect    <- F
-delt       <- 0
 numpar     <- 200
-outdt      <- 0
 rm_dat     <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
@@ -66,23 +64,52 @@ smooth_factor <- 1
 time_integrate <- F
 
 # Transport and dispersion settings
-frmr        <- 0
+conage      <- 48
+cpack       <- 1
+delt        <- 0
 emisshrs    <- 0.01
+frhmax      <- 3
+frhs        <- 1
+frme        <- 0.1
+frmr        <- 0
+frts        <- 0.1
+frvs        <- 0.1
+hscale      <- 10800
+ichem       <- 0
 iconvect    <- 0
 initd       <- 0
 isot        <- 0
+kbls        <- 1
+kblt        <- 1
+kdef        <- 1
 khmax       <- 9999
 kmix0       <- 250
 kmixd       <- 3
+kmsl        <- 0
+kpuff       <- 0
 krnd        <- 6
+kspl        <- 1
+kzmix       <- 1
+maxdim      <- 1
+maxpar      <- min(10000, numpar)
 mgmin       <- 2000
+ncycl       <- 0
 ndump       <- 0
+ninit       <- 1
 nturb       <- 0
+outdt       <- 0
 outfrac     <- 0.9
+p10f        <- 1
+qcycle      <- 0
 random      <- 1
+splitf      <- 1
+tkerd       <- 0.18
+tkern       <- 0.18
 tlfrac      <- 0.1
 tratio      <- 0.9
+tvmix       <- 1
 veght       <- 0.5
+vscale      <- 200
 w_option    <- 0
 zicontroltf <- 0
 z_top       <- 25000
@@ -148,25 +175,33 @@ if (!is.null(varsiwant[1]))
 output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       slurm = slurm, slurm_options = slurm_options,
                       n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                      delt = delt, emisshrs = emisshrs, frmr = frmr,
+                      conage = conage, cpack = cpack, delt = delt,
+                      emisshrs = emisshrs, frhmax = frhmax, frhs = frhs,
+                      frme = frme, frmr = frmr, frts = frts, frvs = frvs,
                       hnf_plume = hnf_plume, horcoruverr = horcoruverr,
-                      horcorzierr = horcorzierr, iconvect = iconvect,
-                      initd = initd, isot = isot, khmax = khmax, kmix0 = kmix0,
-                      kmixd = kmixd, krnd = krnd, lib.loc = lib.loc,
+                      horcorzierr = horcorzierr, ichem = ichem,
+                      iconvect = iconvect, initd = initd, isot = isot,
+                      kbls = kbls, kblt = kblt, kdef = kdef, khmax = khmax,
+                      kmix0 = kmix0, kmixd = kmixd, kmsl = kmsl, kpuff = kpuff,
+                      krnd = krnd, kspl = kspl, kzmix = kzmix, maxdim = maxdim,
+                      maxpar = maxpar, lib.loc = lib.loc,
                       met_file_format = met_file_format, met_loc = met_loc,
                       mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
-                      ndump = ndump, nturb = nturb, numpar = numpar,
-                      outdt = outdt, outfrac = outfrac, projection = projection,
-                      run_trajec = run_trajec, r_run_time = receptors$run_time,
+                      ncycl = ncycl, ndump = ndump, ninit = ninit,
+                      nturb = nturb, numpar = numpar, outdt = outdt,
+                      outfrac = outfrac, p10f = p10f, projection = projection,
+                      qcycle = qcycle, r_run_time = receptors$run_time,
                       r_lati = receptors$lati, r_long = receptors$long,
                       r_zagl = receptors$zagl, random = random,
-                      siguverr = siguverr, sigzierr = sigzierr,
-                      smooth_factor = smooth_factor, stilt_wd = stilt_wd,
+                      run_trajec = run_trajec, siguverr = siguverr,
+                      sigzierr = sigzierr, smooth_factor = smooth_factor,
+                      splitf = splitf, stilt_wd = stilt_wd,
                       time_integrate = time_integrate, timeout = timeout,
-                      tlfrac = tlfrac, tluverr = tluverr, tlzierr = tlzierr,
-                      tratio = tratio, varsiwant = varsiwant, veght = veght,
-                      w_option = w_option, xmn = xmn, xmx = xmx, xres = xres,
-                      ymn = ymn, ymx = ymx, yres = yres,
+                      tkerd = tkerd, tkern = tkern, tlfrac = tlfrac,
+                      tluverr = tluverr, tlzierr = tlzierr, tratio = tratio,
+                      tvmix = tvmix, varsiwant = varsiwant, veght = veght,
+                      vscale = vscale, w_option = w_option, xmn = xmn,
+                      xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres,
                       zicontroltf = zicontroltf, z_top = z_top,
                       zcoruverr = zcoruverr)
 q('no')
