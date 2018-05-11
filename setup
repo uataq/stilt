@@ -97,4 +97,7 @@ fi
 
 echo "
 STILT installation successful.
+We strongly suggest you subscribe to the mailing list at
+https://uataq.github.io/stilt/
+to be notified of critical code updates.
 "
