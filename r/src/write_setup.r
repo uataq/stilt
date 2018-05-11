@@ -129,17 +129,18 @@
 #'
 #' @export
 
-write_setup <- function(varsiwant, conage = 48, cpack = 1, delt = 0, frhmax = 3,
-                        frhs = 1, frme = 0.1, frmr = 0, frts = 0.1, frvs = 0.1,
-                        hscale = 10800, ichem = 0, iconvect = 0, initd = 0,
-                        isot = 0, kbls = 1, kblt = 1, kdef = 1, khmax = 9999,
-                        kmix0 = 250, kmixd = 3, kmsl = 0, kpuff = 0, krnd = 6,
-                        kspl = 1, kzmix = 1, maxdim = 1, maxpar = 10000,
-                        mgmin = 2000, ncycl = 0, ndump = 0, ninit = 1,
-                        numpar = 100, nturb = 0, outdt = 0, outfrac = 0.9,
-                        p10f = 1, qcycle = 0, random = 1, splitf = 1,
-                        tkerd = 0.18, tkern = 0.18, tlfrac = 0.1, tratio = 0.9,
-                        tvmix = 1, veght = 0.5, vscale = 200, winderrtf = 0,
+write_setup <- function(varsiwant, conage = 48, cpack = 1, delt = 0, dxf = 1, 
+                        dyf = 1, dzf = 0.01, frhmax = 3, frhs = 1, frme = 0.1,
+                        frmr = 0, frts = 0.1, frvs = 0.1, hscale = 10800,
+                        ichem = 0, iconvect = 0, initd = 0, isot = 0, kbls = 1,
+                        kblt = 1, kdef = 1, khmax = 9999, kmix0 = 250, 
+                        kmixd = 3, kmsl = 0, kpuff = 0, krnd = 6, kspl = 1, 
+                        kzmix = 1, maxdim = 1, maxpar = 10000, mgmin = 2000, 
+                        ncycl = 0, ndump = 0, ninit = 1, numpar = 100, 
+                        nturb = 0, outdt = 0, outfrac = 0.9, p10f = 1, 
+                        qcycle = 0, random = 1, splitf = 1, tkerd = 0.18, 
+                        tkern = 0.18, tlfrac = 0.1, tratio = 0.9, tvmix = 1, 
+                        veght = 0.5, vscale = 200, winderrtf = 0,
                         zicontroltf = 0, file = 'SETUP.CFG') {
 
   if (basename(file) != 'SETUP.CFG')

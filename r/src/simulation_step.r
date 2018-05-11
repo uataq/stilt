@@ -9,9 +9,9 @@
 #' @export
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            conage = 48, cpack = 1, delt = 0, emisshrs = 0.01,
-                            frhmax = 3, frhs = 1, frme = 0.1, frmr = 0,
-                            frts = 0.1, frvs = 0.1, hnf_plume = T,
+                            conage = 48, cpack = 1, delt = 0, dxf = 1, dyf = 1, 
+                            dzf = 0.01, emisshrs = 0.01, frhmax = 3, frhs = 1, 
+                            frme = 0.1, frmr = 0, frts = 0.1, frvs = 0.1, hnf_plume = T,
                             hscale = 10800, horcoruverr = NA, horcorzierr = NA,
                             ichem = 0, iconvect = 0, initd = 0, isot = 0,
                             kbls = 1, kblt = 1, kdef = 1, khmax = 9999,

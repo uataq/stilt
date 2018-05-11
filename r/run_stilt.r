@@ -3,8 +3,8 @@
 # Ben Fasoli
 
 # User inputs ------------------------------------------------------------------
-project <- '{{project}}'
-stilt_wd <- file.path('{{wd}}', project)
+project <- 'dev'
+stilt_wd <- file.path('/uufs/chpc.utah.edu/common/home/lin-group6/btf/stilt-sims', project)
 lib.loc <- .libPaths()[1]
 
 # Parallel simulation settings
@@ -52,21 +52,25 @@ varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'rain', 'crai', 'pres')
 
 # Footprint grid settings
+hnf_plume <- T
 projection <- '+proj=longlat'
+smooth_factor <- 1
+time_integrate <- F
 xmn <- -114.5
 xmx <- -109
 ymn <- 37
 ymx <- 42
 xres <- 0.01
 yres <- xres
-hnf_plume <- T
-smooth_factor <- 1
-time_integrate <- F
+
 
 # Transport and dispersion settings
 conage      <- 48
 cpack       <- 1
 delt        <- 0
+dxf         <- 1
+dyf         <- 1
+dzf         <- 0.1
 emisshrs    <- 0.01
 frhmax      <- 3
 frhs        <- 1
@@ -115,13 +119,14 @@ zicontroltf <- 0
 z_top       <- 25000
 
 # Transport error settings
+horcoruverr <- NA
 siguverr    <- NA
 tluverr     <- NA
 zcoruverr   <- NA
-horcoruverr <- NA
+
+horcorzierr <- NA
 sigzierr    <- NA
 tlzierr     <- NA
-horcorzierr <- NA
 
 
 # Startup messages -------------------------------------------------------------
