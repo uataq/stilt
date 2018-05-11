@@ -2,7 +2,7 @@
 #
 # Ben Fasoli
 #
-# Convenience script to ensure code is fetched from different sources and 
+# Convenience script to ensure code is fetched from different sources and
 # fortran binaries and DLLs are compiled and moved to the correct location
 
 # Check if ./setup is run from the top level of the project
@@ -12,41 +12,80 @@ if [ $dircnt -lt 4 ]; then
   exit 1
 fi
 
-# Prompt user for jena SVN username
+# Prompt user for binary/compile installation
 echo "
-STILT is built on top of the HYSPLIT model. Registration is required to access
-the fortran trajectory calculations.
-
-Registration: https://mail.bgc-jena.mpg.de/mailman/listinfo/stilt_user
-Username is email prefix: user@email.com -> user
-Password is sent to your email address after registration
+STILT hymodelc installation options:
+1 - Compile hymodelc from source
+2 - hymodelc-centos-7.4.zip
+3 - hymodelc-ubuntu-16.04.zip
+4 - hymodelc-ubuntu-14.04.zip
+5 - hymodelc-macos-10.13.zip
 "
-echo -n "Username: "
-read username
+echo -n "Install option (number from above): "
+read -n 1 install
+echo
+if [[ $install -eq 1 ]]; then
+  # Prompt user for jena SVN username
+  echo "
+  STILT is built on top of the HYSPLIT model. Registration is required to access
+  the fortran trajectory calculations.
 
-if [ -z $username ]; then
-  echo "No username input. Exiting."
+  Registration: https://mail.bgc-jena.mpg.de/mailman/listinfo/stilt_user
+  Username is email prefix: user@email.com -> user
+  Password is sent to your email address after registration
+  "
+  echo -n "Username: "
+  read username
+  if [ -z $username ]; then
+    echo "No username input. Exiting."
+    exit 1
+  fi
+  # Checkout merged_stilt_hysplit contents into fortran/
+  # Compilers prioritize fortran/makefile over fortran/Makefile
+  svn --username $username checkout \
+    https://projects.bgc-jena.mpg.de/STILT/svn/trunk/merged_stilt_hysplit/ \
+    fortran/
+  # Compile STILT trajectory calculation binary
+  echo "Compiling STILT trajectory calculation binary (hymodelc)..."
+  (cd fortran && make)
+  if [ ! -f fortran/hymodelc ]; then
+    echo "Problem compiling fortran/hymodelc."
+    echo "You may need to edit settings in fortran/makefile to compile manually."
+    exit 1
+  fi
+
+# Fetch binary from GitHub release
+elif [[ $install -eq 2 ]]; then
+  wget --directory-prefix=fortran/ --quiet --show-progress \
+    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-centos-7.4.zip
+  unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
+elif [[ $install -eq 3 ]]; then
+  wget --directory-prefix=fortran/ --quiet --show-progress \
+    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-16.04.zip
+  unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
+elif [[ $install -eq 4 ]]; then
+  wget --directory-prefix=fortran/ --quiet --show-progress \
+    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-14.04.zip
+  unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
+elif [[ $install -eq 5 ]]; then
+  wget --directory-prefix=fortran/ --quiet --show-progress \
+    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-macos-10.13.zip
+  unzip -p fortran/hymodelc-macos-10.13.zip hymodelc > fortran/hymodelc
+else
+  echo "Invalid install option."
   exit 1
 fi
 
-# Checkout merged_stilt_hysplit contents into fortran/
-# Compilers prioritize fortran/makefile over fortran/Makefile
-svn --username $username checkout \
-  https://projects.bgc-jena.mpg.de/STILT/svn/trunk/merged_stilt_hysplit/ \
-  fortran/
-
-# Compile STILT trajectory calculation binary
-echo "Compiling STILT trajectory calculation binary (hymodelc)..."
-(cd fortran && make)
-
+# Check that hymodelc was created from methods above
 if [ ! -f fortran/hymodelc ]; then
-  echo "Problem compiling fortran/hymodelc."
-  echo "You may need to edit settings in fortran/makefile to compile manually."
+  echo "Problem creating fortran/hymodelc."
   exit 1
 fi
-
+# Move hymodelc to shared exe/ directory
 mv fortran/hymodelc exe/hymodelc
+# Ensure hymodelc is executable
 chmod +x exe/hymodelc
+
 
 # Compile permute DLL for footprint kernel aggregation
 echo "Compiling footprint kernel aggregation subroutine..."
@@ -57,5 +96,5 @@ if [ ! -f r/src/permute.so ]; then
 fi
 
 echo "
-Fortran compilation successful.
+STILT installation successful.
 "
