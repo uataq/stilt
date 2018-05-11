@@ -70,9 +70,8 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       # Ensure necessary files and directory structure are established in the
       # current rundir
       dir.create(rundir)
-      link_files <- c('ASCDATA.CFG', 'CONC.CFG', 'hymodelc',
-                      'LANDUSE.ASC', 'ROUGLEN.ASC')
-      file.symlink(file.path(file.path(stilt_wd, 'exe'), link_files), rundir)
+      link_files <- dir(file.path(stilt_wd, 'exe'))
+      file.symlink(file.path(stilt_wd, 'exe', link_files), rundir)
 
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
