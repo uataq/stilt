@@ -40,11 +40,10 @@ met_file_format <- '%Y%m%d.%Hz.hrrra'
 n_met_min       <- 1
 
 # Model control
-run_trajec <- T
 n_hours    <- -24
-convect    <- F
 numpar     <- 200
 rm_dat     <- T
+run_trajec <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
