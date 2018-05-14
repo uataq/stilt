@@ -131,11 +131,7 @@ tlzierr     <- NA
 # Startup messages -------------------------------------------------------------
 message('Initializing STILT')
 message('Number of receptors: ', nrow(receptors))
-message('Number of parallel threads: ', n_nodes * n_cores)
-
-grd <- array(dim = c((xmx - xmn) / xres, (ymx - ymn) / yres, abs(n_hours) * 60))
-ram <- format(object.size(grd) * 2.0, units = 'MB', standard = 'SI')
-message('Estimated footprint grid RAM allocation: ', ram)
+message('Number of parallel threads: ', n_nodes * n_cores)\
 
 
 # Source dependencies ----------------------------------------------------------
