@@ -39,18 +39,18 @@ calc_footprint <- function(p, output = NULL, r_run_time,
                            projection = '+proj=longlat',
                            smooth_factor = 1, time_integrate = F,
                            xmn, xmx, xres, ymn, ymx, yres = xres) {
-
+  
   require(dplyr)
   require(raster)
   require(uataq)
-
+  
   np <- max(p$indx, na.rm = T)
-
+  
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
              seq(-10.2, -20, by = -0.2),
              seq(-20.5, -100, by = -0.5))
-
+  
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
     full_join(expand.grid(time = times,
@@ -63,7 +63,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     ungroup() %>%
     na.omit() %>%
     mutate(time = round(time, 1))
-
+  
   # Scale interpolated values to retain total field
   mi <- i$time >= -10
   mp <- p$time >= -10
@@ -74,7 +74,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   mi <- i$time < -20 & i$time >= -100
   mp <- p$time < -20 & p$time >= -100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
-
+  
   # Translate x, y coordinates into desired map projection
   is_longlat <- grepl('+proj=longlat', projection, fixed = T)
   if (!is_longlat) {
@@ -86,11 +86,11 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     ymn <- min(grid_lims$y)
     ymx <- max(grid_lims$y)
   }
-
+  
   # Set footprint grid
   glong <- head(seq(xmn, xmx, by = xres), -1)
   glati <- head(seq(ymn, ymx, by = yres), -1)
-
+  
   # Gaussian kernel bandwidth scaling
   kernel <- i %>%
     group_by(time) %>%
@@ -101,10 +101,10 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   ti <- abs(kernel$time/1440)^(1/2)
   grid_conv <- ifelse(is_longlat, cos(kernel$lati * pi/180), 1)
   w <- smooth_factor * 0.06 * di * ti / grid_conv
-
-
+  
+  
   # Gaussian kernel weighting calculation
-  make_gauss_kernel <- function (rs, sigma) {
+  make_gauss_kernel <- function (rs, sigma, projection) {
     # Modified from raster:::.Gauss.weight()
     require(raster)
     d <- 3 * sigma
@@ -114,7 +114,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     xr <- (nx * rs[1])/2
     yr <- (ny * rs[2])/2
     r <- raster(m, xmn = -xr[1], xmx = xr[1], ymn = -yr[1], ymx = yr[1],
-                crs = "+proj=utm +zone=1 +datum=WGS84")
+                crs = projection)
     p <- xyFromCell(r, 1:ncell(r))^2
     m <- 1/(2 * pi * sigma^2) * exp(-(p[, 1] + p[, 2])/(2 * sigma^2))
     m <- matrix(m, ncol = nx, nrow = ny, byrow = TRUE)
@@ -122,18 +122,18 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     w[is.na(w)] <- 1
     w
   }
-
+  
   # Determine maximum kernel size
   xyres <- c(xres, yres)
-  max_k <- make_gauss_kernel(xyres, max(w))
+  max_k <- make_gauss_kernel(xyres, max(w), projection)
   xbuf <- ncol(max_k)
   xbufh <- (xbuf - 1) / 2
   ybuf <- nrow(max_k)
   ybufh <- (ybuf - 1) / 2
-
+  
   max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
   max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
-
+  
   # Remove zero influence particles and positions outside of domain
   xyzt <- i %>%
     filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
@@ -142,7 +142,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   mask <- is.element(kernel$time, xyzt$time)
   kernel <- kernel[mask, ]
   w <- w[mask]
-
+  
   # Pre grid particle locations
   xyzt <- xyzt %>%
     transmute(loi = as.integer(findInterval(long, max_glong)),
@@ -152,55 +152,61 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     group_by(loi, lai, time) %>%
     summarize(foot = sum(foot, na.rm = T)) %>%
     ungroup()
-
+  
   # Dimensions in accordance with CF-1.4 convention (x, y, t)
   grd <- matrix(0, nrow = length(max_glong), ncol = length(max_glati))
-
-  # Build gaussian kernels by time step
-  foot <- sapply(kernel$time, simplify = 'array', function(x) {
-    step <- xyzt %>%
-      filter(time == x)
-
-    if (nrow(step) < 2) {
-      return(grd)
-    }
-
-    # Dispersion kernel
-    idx <- kernel$time == x
-    k <- make_gauss_kernel(xyres, w[idx])
-
-    # Array dimensions
-    len <- nrow(step)
-    nkx <- ncol(k)
-    nky <- nrow(k)
-    nax <- ncol(grd)
-    nay <- nrow(grd)
-
-    # Call permute fortran subroutine to build and aggregate kernels
-    out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
-                    k = k, nkx = nkx, nky = nky,
-                    len = len, lai = step$lai, loi = step$loi, foot = step$foot)
-
-    return(out$ans)
+  
+  # Split particle data by hour
+  xyzt$hid <- floor(xyzt$time / 60)
+  uhid <- sort(unique(xyzt$hid))
+  
+  # Calculate hourly footprints
+  foot <- sapply(uhid, simplify = 'array', function(y) {
+    step_hour <- xyzt %>%
+      filter(hid == y)
+    # Calculate minute-level kernel-summed arrays
+    foot_hour <- sapply(sort(unique(step_hour$time)), simplify = 'array', function(x) {
+      step <- step_hour %>%
+        filter(time == x)
+      
+      if (nrow(step) < 2) {
+        return(grd)
+      }
+      
+      # Dispersion kernel
+      idx <- kernel$time == x
+      k <- make_gauss_kernel(xyres, w[idx], projection)
+      
+      # Array dimensions
+      len <- nrow(step)
+      nkx <- ncol(k)
+      nky <- nrow(k)
+      nax <- ncol(grd)
+      nay <- nrow(grd)
+      
+      # Call permute fortran subroutine to build and aggregate kernels
+      out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
+                      k = k, nkx = nkx, nky = nky,
+                      len = len, lai = step$lai, loi = step$loi, foot = step$foot)
+      
+      out$ans
+    })
+    # Sum minute-level fields
+    apply(foot_hour, c(1, 2), sum)
   })
-
-
+  
   # Remove added buffer around requested domain
   size <- dim(foot)
   foot <- foot[(xbuf+1):(size[1]-xbuf), (ybuf+1):(size[2]-ybuf), ] / np
-
-  # Time integrate footprint by aggregating across 3rd dimension
+  
+  # Optionally time integrate footprint by aggregating across 3rd dimension
   if (time_integrate) {
     foot <- apply(foot, c(1, 2), sum)
     time_out <- as.numeric(r_run_time)
   } else {
-    hid <- floor(kernel$time / 60)
-    foot <- sapply(unique(hid), simplify = 'array', function(hour) {
-      apply(foot[ , ,hid == hour], c(1, 2), sum)
-    })
-    time_out <- as.numeric(r_run_time + unique(hid) * 3600)
+    time_out <- as.numeric(r_run_time + uhid * 3600)
   }
-
+  
   # Set footprint metadata and write to file
   write_footprint(foot, output = output, glong = glong, glati = glati,
                   projection = projection, xres = xres, yres = yres,
