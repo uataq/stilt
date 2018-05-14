@@ -3,8 +3,8 @@
 # Ben Fasoli
 
 # User inputs ------------------------------------------------------------------
-project <- 'dev'
-stilt_wd <- file.path('/uufs/chpc.utah.edu/common/home/lin-group6/btf/stilt-sims', project)
+project <- '{{project}}'
+stilt_wd <- file.path('{{wd}}', project)
 lib.loc <- .libPaths()[1]
 
 # Parallel simulation settings
