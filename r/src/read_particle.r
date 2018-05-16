@@ -1,6 +1,6 @@
 #' read_particle parses the hymodelc PARTICLE.DAT output file
 #' @author Ben Fasoli
-#' 
+#'
 #' Reads PARTICLE.DAT hymodelc output file into data frame
 #'
 #' @param file location of PARTICLE.DAT file
@@ -12,7 +12,6 @@
 read_particle <- function(file, varsiwant) {
 
   require(dplyr)
-  require(readr)
 
   n_lines <- uataq::count_lines(file)
 
