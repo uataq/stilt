@@ -18,7 +18,7 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                             kblt, kdef, khmax, kmix0, kmixd, kmsl, kpuff, krnd,
                             kspl, kzmix, maxdim, maxpar, met_files, mgmin, ncycl,
                             ndump, ninit, numpar, nturb, n_hours, outdt, outfrac,
-                            p10f, qcycle, output, random, splitf, tkerd, tkern,
+                            output, p10f, qcycle, random, splitf, tkerd, tkern,
                             rm_dat, timeout, tlfrac, tratio, tvmix, veght,
                             vscale, winderrtf, w_option, zicontroltf, z_top,
                             rundir) {
@@ -26,7 +26,7 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
   require(uataq)
 
   # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
-  write_setup(varsiwant, conage, cpack, delt, dxf, dyf, dzf, frhmax, frhs, frme, 
+  write_setup(varsiwant, conage, cpack, delt, dxf, dyf, dzf, frhmax, frhs, frme,
               frmr, frts, frvs, hscale, ichem, iconvect, initd, isot, kbls, kblt, kdef,
               khmax, kmix0, kmixd, kmsl, kpuff, krnd, kspl, kzmix, maxdim,
               maxpar, mgmin, ncycl, ndump, ninit, numpar, nturb, outdt, outfrac,

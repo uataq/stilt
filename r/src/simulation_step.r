@@ -9,8 +9,8 @@
 #' @export
 
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            conage = 48, cpack = 1, delt = 0, dxf = 1, dyf = 1, 
-                            dzf = 0.01, emisshrs = 0.01, frhmax = 3, frhs = 1, 
+                            conage = 48, cpack = 1, delt = 0, dxf = 1, dyf = 1,
+                            dzf = 0.01, emisshrs = 0.01, frhmax = 3, frhs = 1,
                             frme = 0.1, frmr = 0, frts = 0.1, frvs = 0.1, hnf_plume = T,
                             hscale = 10800, horcoruverr = NA, horcorzierr = NA,
                             ichem = 0, iconvect = 0, initd = 0, isot = 0,
@@ -66,12 +66,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     # run_trajec determines whether to try using existing trajectory files or to
     # recycle existing files
     output <- list()
-    output$runtime <- r_run_time
     output$file <- file.path(rundir, paste0(basename(rundir), '_traj.rds'))
-    output$receptor <- list(run_time = r_run_time,
-                            lati = r_lati,
-                            long = r_long,
-                            zagl = r_zagl)
 
     if (run_trajec) {
       # Ensure necessary files and directory structure are established in the
@@ -91,18 +86,25 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
 
       # Execute particle trajectory simulation, and read results into data frame
+      output$receptor <- list(run_time = r_run_time,
+                              lati = r_lati,
+                              long = r_long,
+                              zagl = r_zagl)
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
                                   hscale, ichem, iconvect, initd, isot, ivmax,
                                   kbls, kblt, kdef, khmax, kmix0, kmixd, kmsl,
                                   kpuff, krnd, kspl, kzmix, maxdim, maxpar,
                                   met_files, mgmin, ncycl, ndump, ninit, numpar,
-                                  nturb, n_hours, outdt, outfrac, p10f, qcycle,
-                                  output, random, splitf, tkerd, tkern, rm_dat,
+                                  nturb, n_hours, outdt, outfrac, output, p10f,
+                                  qcycle, random, splitf, tkerd, tkern, rm_dat,
                                   timeout, tlfrac, tratio, tvmix, veght, vscale,
                                   0, w_option, zicontroltf, z_top, rundir)
       if (is.null(particle)) return()
+
+      # Bundle trajectory configuration metadata with trajectory informtation
       output$particle <- particle
+      output$params <- read_config(file = file.path(rundir, 'CONC.CFG'))
 
       # Optionally execute second trajectory simulations to quantify transport
       # error using parameterized correlation length and time scales
@@ -120,12 +122,13 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                           kpuff, krnd, kspl, kzmix, maxdim,
                                           maxpar, met_files, mgmin, ncycl, ndump,
                                           ninit, numpar, nturb, n_hours, outdt,
-                                          outfrac, p10f, qcycle, output, random,
+                                          outfrac, output, p10f, qcycle, random,
                                           splitf, tkerd, tkern, rm_dat, timeout,
                                           tlfrac, tratio, tvmix, veght, vscale,
                                           winderrtf, w_option, zicontroltf,
                                           z_top, rundir)
         if (is.null(particle_error)) return()
+        output$particle_error <- particle_error
         output$particle_error_params <- list(siguverr = siguverr,
                                              tluverr = tluverr,
                                              zcoruverr = zcoruverr,
@@ -133,7 +136,6 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                              sigzierr = sigzierr,
                                              tlzierr = tlzierr,
                                              horcorzierr = horcorzierr)
-        output$particle_error <- particle_error
       }
 
       # Save output object to compressed rds file and symlink to out/particles
