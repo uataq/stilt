@@ -131,7 +131,7 @@ tlzierr     <- NA
 # Startup messages -------------------------------------------------------------
 message('Initializing STILT')
 message('Number of receptors: ', nrow(receptors))
-message('Number of parallel threads: ', n_nodes * n_cores)\
+message('Number of parallel threads: ', n_nodes * n_cores)
 
 
 # Source dependencies ----------------------------------------------------------
