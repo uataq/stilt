@@ -13,17 +13,22 @@ if [ $dircnt -lt 3 ]; then
 fi
 
 # Prompt user for binary/compile installation
-echo "
-STILT hymodelc installation options:
-1 - Compile hymodelc from source
-2 - hymodelc-centos-7.4
-3 - hymodelc-ubuntu-16.04
-4 - hymodelc-ubuntu-14.04
-5 - hymodelc-macos-10.13
-"
-echo -n "Install option (number from above): "
-read -n 1 install
-echo
+if [ -z $1 ]; then
+  echo "
+  STILT hymodelc installation options:
+  1 - Compile hymodelc from source
+  2 - hymodelc-centos-7.4
+  3 - hymodelc-ubuntu-16.04
+  4 - hymodelc-ubuntu-14.04
+  5 - hymodelc-macos-10.13
+  "
+  echo -n "Install option (number from above): "
+  read -n 1 install
+  echo
+else
+  install=$1
+fi
+
 if [[ $install -eq 1 ]]; then
   # Prompt user for jena SVN username
   echo "
