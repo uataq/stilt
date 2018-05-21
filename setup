@@ -6,8 +6,8 @@
 # fortran binaries and DLLs are compiled and moved to the correct location
 
 # Check if ./setup is run from the top level of the project
-dircnt=$(ls -d */ | grep -x -e exe/ -e out/ -e r/ -e fortran/ | wc -l)
-if [ $dircnt -lt 4 ]; then
+dircnt=$(ls -d */ | grep -x -e exe/ -e r/ -e fortran/ | wc -l)
+if [ $dircnt -lt 3 ]; then
   echo "./setup must be run from the top level directory of the STILT project"
   exit 1
 fi

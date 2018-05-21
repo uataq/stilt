@@ -5,6 +5,7 @@
 # User inputs ------------------------------------------------------------------
 project <- '{{project}}'
 stilt_wd <- file.path('{{wd}}', project)
+output_wd <- file.path(stilt_wd, 'out')
 lib.loc <- .libPaths()[1]
 
 # Parallel simulation settings
@@ -143,15 +144,15 @@ source('r/dependencies.r')
 # Outputs are organized in three formats. by-id contains simulation files by
 # unique simulation identifier. particles and footprints contain symbolic links
 # to the particle trajectory and footprint files in by-id
-system('rm -r out/footprints', ignore.stderr = T)
+system(paste0('rm -r ', output_wd, '/footprints'), ignore.stderr = T)
 if (run_trajec) {
-  system('rm -r out/by-id', ignore.stderr = T)
-  system('rm -r out/particles', ignore.stderr = T)
+  system(paste0('rm -r ', output_wd, '/by-id'), ignore.stderr = T)
+  system(paste0('rm -r ', output_wd, '/particles'), ignore.stderr = T)
 }
 for (d in c('by-id', 'particles', 'footprints')) {
-  d <- file.path('out', d)
+  d <- file.path(output_wd, d)
   if (!file.exists(d))
-    dir.create(d)
+    dir.create(d, recursive = T)
 }
 
 
@@ -189,19 +190,19 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
                       ncycl = ncycl, ndump = ndump, ninit = ninit,
                       nturb = nturb, numpar = numpar, outdt = outdt,
-                      outfrac = outfrac, p10f = p10f, projection = projection,
-                      qcycle = qcycle, r_run_time = receptors$run_time,
-                      r_lati = receptors$lati, r_long = receptors$long,
-                      r_zagl = receptors$zagl, random = random,
-                      run_trajec = run_trajec, siguverr = siguverr,
-                      sigzierr = sigzierr, smooth_factor = smooth_factor,
-                      splitf = splitf, stilt_wd = stilt_wd,
-                      time_integrate = time_integrate, timeout = timeout,
-                      tkerd = tkerd, tkern = tkern, tlfrac = tlfrac,
-                      tluverr = tluverr, tlzierr = tlzierr, tratio = tratio,
-                      tvmix = tvmix, varsiwant = varsiwant, veght = veght,
-                      vscale = vscale, w_option = w_option, xmn = xmn,
-                      xmx = xmx, xres = xres, ymn = ymn, ymx = ymx, yres = yres,
-                      zicontroltf = zicontroltf, z_top = z_top,
+                      outfrac = outfrac, output_wd = output_wd, p10f = p10f,
+                      projection = projection, qcycle = qcycle,
+                      r_run_time = receptors$run_time, r_lati = receptors$lati,
+                      r_long = receptors$long, r_zagl = receptors$zagl,
+                      random = random, run_trajec = run_trajec,
+                      siguverr = siguverr, sigzierr = sigzierr,
+                      smooth_factor = smooth_factor, splitf = splitf,
+                      stilt_wd = stilt_wd, time_integrate = time_integrate,
+                      timeout = timeout, tkerd = tkerd, tkern = tkern,
+                      tlfrac = tlfrac, tluverr = tluverr, tlzierr = tlzierr,
+                      tratio = tratio, tvmix = tvmix, varsiwant = varsiwant,
+                      veght = veght, vscale = vscale, w_option = w_option,
+                      xmn = xmn, xmx = xmx, xres = xres, ymn = ymn, ymx = ymx,
+                      yres = yres, zicontroltf = zicontroltf, z_top = z_top,
                       zcoruverr = zcoruverr)
 q('no')
