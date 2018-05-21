@@ -8,7 +8,7 @@ git clone -b master --single-branch https://github.com/uataq/stilt test-project
 cd test-project
 
 # Execute setup script and fetch the hymodelc-centos-7.4 binary (option 2)
-./setup 5
+./setup 3
 
 # Fetch the tutorial data
 git clone https://github.com/uataq/stilt-tutorials
