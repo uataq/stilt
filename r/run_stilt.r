@@ -152,7 +152,7 @@ if (run_trajec) {
 for (d in c('by-id', 'particles', 'footprints')) {
   d <- file.path(output_wd, d)
   if (!file.exists(d))
-    dir.create(d)
+    dir.create(d, recursive = T)
 }
 
 
