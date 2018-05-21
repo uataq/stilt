@@ -55,10 +55,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     # Creates subdirectories in out for each model run time. Each of these
     # subdirectories is populated with symbolic links to the shared datasets
     # below and a run-specific SETUP.CFG and CONTROL
-    rundir  <- file.path(file.path(stilt_wd, 'out', 'by-id'),
-                         strftime(r_run_time, tz = 'UTC',
-                                  format = paste0('%Y%m%d%H_', r_long, '_',
-                                                  r_lati, '_', r_zagl)))
+    rundir_format <- strftime(r_run_time, tz = 'UTC',
+                              format = paste0('%Y%m%d%H_', r_long, '_', r_lati,
+                              '_', r_zagl))
+    rundir  <- file.path(output_wd, 'by-id', rundir_format)
     uataq::br()
     message(paste('Running simulation ID:  ', basename(rundir)))
 
@@ -141,7 +141,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       # Save output object to compressed rds file and symlink to out/particles
       # directory for convenience
       saveRDS(output, output$file)
-      file.symlink(output$file, file.path(stilt_wd, 'out', 'particles',
+      file.symlink(output$file, file.path(output_wd, 'particles',
                                           basename(output$file))) %>%
         invisible()
 
@@ -180,7 +180,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
           file = file.path(rundir, 'ERROR'))
       return()
     } else {
-      file.symlink(foot_file, file.path(stilt_wd, 'out', 'footprints',
+      file.symlink(foot_file, file.path(output_wd, 'footprints',
                                         basename(foot_file))) %>%
         invisible()
     }
