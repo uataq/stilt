@@ -30,7 +30,7 @@ sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(
 
 sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
 
-# Run STILT
+# Execute r/run_stilt.r
 Rscript r/run_stilt.r
 
 # Check output
