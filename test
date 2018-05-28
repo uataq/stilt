@@ -35,7 +35,7 @@ sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
 cat r/run_stilt.r
 
 # Execute r/run_stilt.r
-Rscript r/run_stilt.r
+sudo Rscript r/run_stilt.r
 
 # Check output
 model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5* | wc -l)
