@@ -67,11 +67,11 @@ elif [[ $install -eq 2 ]]; then
 elif [[ $install -eq 3 ]]; then
   wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-16.04.zip
-  unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
+  unzip -p fortran/hymodelc-ubuntu-16.04.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 4 ]]; then
   wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-14.04.zip
-  unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
+  unzip -p fortran/hymodelc-ubuntu-14.04.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 5 ]]; then
   wget --directory-prefix=fortran/ \
     https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-macos-10.13.zip

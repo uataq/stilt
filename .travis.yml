@@ -12,3 +12,7 @@ before_install:
 
 script:
   - bash test
+
+branches:
+  except:
+    gh-pages
