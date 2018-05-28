@@ -16,7 +16,7 @@ git clone https://github.com/uataq/stilt-tutorials
 # Replace {{project}} and {{wd}}
 sed -i 's|{{project}}|test-project|g' r/run_stilt.r
 sed -i "s|file.path('{{wd}}', project)|getwd()|g" r/run_stilt.r
-sed -i "s|.libPaths()|'rpkgs'|g" r/run_stilt.r
+sed -i "s|.libPaths()|file.path(stilt_wd, 'rpkgs')|g" r/run_stilt.r
 
 # Set receptor and footprint information
 sed -i 's|2015-06-18 22:00:00|2015-12-10 00:00:00|g' r/run_stilt.r
