@@ -16,7 +16,6 @@ git clone https://github.com/uataq/stilt-tutorials
 # Replace {{project}} and {{wd}}
 sed -i 's|{{project}}|test-project|g' r/run_stilt.r
 sed -i "s|file.path('{{wd}}', project)|getwd()|g" r/run_stilt.r
-sed -i "s|.libPaths()|file.path(stilt_wd, 'rpkgs')|g" r/run_stilt.r
 
 # Set receptor and footprint information
 sed -i 's|2015-06-18 22:00:00|2015-12-10 00:00:00|g' r/run_stilt.r
@@ -31,11 +30,8 @@ sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(
 
 sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
 
-# Print contents of run_stilt.r for diagnosing log
-cat r/run_stilt.r
-
 # Execute r/run_stilt.r
-sudo Rscript r/run_stilt.r
+Rscript r/run_stilt.r
 
 # Check output
 model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5* | wc -l)
