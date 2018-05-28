@@ -9,9 +9,7 @@ env:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y gcc unzip r-base r-base-dev
-
-install:
-  - Rscript -e "install.packages('devtools')"
+  - sudo chmod 2777 /usr/local/lib/R/site-library
 
 script:
   - bash test
