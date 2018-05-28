@@ -11,7 +11,7 @@ before_install:
   - sudo apt-get install -y gcc unzip r-base r-base-dev
 
 script:
-  - bash test
+  - sudo bash test
 
 branches:
   except:
