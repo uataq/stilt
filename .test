@@ -2,11 +2,6 @@
 # Ben Fasoli
 # Integration testing for STILT R wrapper
 
-# Initialize a test-project
-# rm -rf test-project
-# git clone -b master --single-branch https://github.com/uataq/stilt test-project
-# cd test-project
-
 # Execute setup script and fetch the ubuntu-16.04 binary (option 3)
 ./setup 3
 
@@ -31,21 +26,20 @@ sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(
 # Minimize run duration
 sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
 
-# Execute r/run_stilt.r
-# Rscript r/run_stilt.r
+# Print r/run_stilt.r for diagnostics
 cat r/run_stilt.r
 
+# Execute r/run_stilt.r
+Rscript r/run_stilt.r
+
 # Check output
-model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5 | wc -l)
+model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5* | wc -l)
 if [ $model_output -lt 2 ]; then
   echo "Model output not found."
   exit 1
 fi
 
 # Print contents of output directory
-ls -lh out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5
-
-# Clean test-project
-# rm -rf ../test-project
+ls -lh out/by-id/2015121000_-111.980323_40.782561_5
 
 echo "Model test successful."
