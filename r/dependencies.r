@@ -10,8 +10,7 @@ rsc <- dir(file.path(stilt_wd, 'r', 'src'), pattern = '.*\\.r$', full.names = T)
 invisible(lapply(rsc, source))
 
 # Load external libraries
-if (!'lib.loc' %in% ls())
-  lib.loc <- NULL
+if (!'lib.loc' %in% ls()) lib.loc <- NULL
 load_libs('dplyr', 'ncdf4', 'parallel', 'raster', 'readr', 'rslurm', 'uataq',
           lib.loc = lib.loc)
 

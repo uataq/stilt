@@ -1,0 +1,45 @@
+#!/bin/bash
+# Ben Fasoli
+# Integration testing for STILT R wrapper
+
+# Execute setup script and fetch the ubuntu-16.04 binary (option 3)
+./setup 3
+
+# Fetch the tutorial data
+git clone https://github.com/uataq/stilt-tutorials
+
+# Replace {{project}} and {{wd}}
+sed -i 's|{{project}}|stilt|g' r/run_stilt.r
+sed -i "s|file.path('{{wd}}', project)|getwd()|g" r/run_stilt.r
+
+# Set receptor and footprint information
+sed -i 's|2015-06-18 22:00:00|2015-12-10 00:00:00|g' r/run_stilt.r
+sed -i 's|xmn <- -114.5|xmn <- -112.30|g' r/run_stilt.r
+sed -i 's|xmx <- -109|xmx <- -111.52|g' r/run_stilt.r
+sed -i 's|ymn <- 37|ymn <- 40.39|g' r/run_stilt.r
+sed -i 's|ymx <- 42|ymx <- 40.95|g' r/run_stilt.r
+sed -i 's|xres <- 0.01|xres <- 0.002|g' r/run_stilt.r
+
+# Set met_directory
+sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(stilt_wd, 'stilt-tutorials/01-wbb/met')|g" r/run_stilt.r
+
+# Minimize run duration
+sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
+
+# Print r/run_stilt.r for diagnostics
+cat r/run_stilt.r
+
+# Execute r/run_stilt.r
+Rscript r/run_stilt.r
+
+# Check output
+model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5* | wc -l)
+if [ $model_output -lt 2 ]; then
+  echo "Model output not found."
+  exit 1
+fi
+
+# Print contents of output directory
+ls -lh out/by-id/2015121000_-111.980323_40.782561_5
+
+echo "Model test successful."

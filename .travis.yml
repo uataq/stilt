@@ -1,0 +1,31 @@
+language: bash
+
+warnings_are_errors: true
+
+sudo: required
+
+branches:
+  except:
+    gh-pages
+
+cache:
+  directories:
+    - /usr/local/lib/R/site-library
+
+env:
+ global:
+   - CRAN: http://cran.rstudio.com
+
+before_install:
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+  - sudo add-apt-repository 'deb [arch=amd64,i386] https://cran.rstudio.com/bin/linux/ubuntu trusty/'
+  - sudo apt-get -qq update
+
+install:
+  - sudo apt-get install -y gcc unzip r-base r-base-dev libhdf5-serial-dev netcdf-bin libnetcdf-dev
+
+before_script:
+  - sudo chmod 2777 /usr/local/lib/R/site-library
+
+script:
+  - bash .test

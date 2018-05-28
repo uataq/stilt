@@ -1,4 +1,5 @@
-## Fair Use Policy
+[![Build Status](https://travis-ci.org/uataq/stilt.svg?branch=master)](https://travis-ci.org/uataq/stilt)
 
-STILT is freely available and we encourage others to use it. Kindly keep us informed of how you are using the model and of any publication plans. Please acknowledge the source as a citation. STILT is continuously updated and improved by the development consortium, and in some cases (as when new elements are used for the first time) we may suggest that one or more of the developers be offered participation as authors. If your work directly competes with our analysis, we may ask that we have the opportunity to submit a manuscript before you submit one that uses unpublished features. The software is updated from time to time, and it is your responsibility to ensure that your publication is consistent with the most recent version.
+STILT is an open source Lagrangian particle dispersion model built on top of [hysplit](https://www.ready.noaa.gov/HYSPLIT.php). For more details, visit [https://uataq.github.io/stilt/](https://uataq.github.io/stilt/).
 
+Model [documentation](https://uataq.github.io/stilt/docs/), [tutorials](https://uataq.github.io/stilt/tutorials/), and [methods details](https://www.geosci-model-dev-discuss.net/gmd-2018-20/) are all freely available.
