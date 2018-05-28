@@ -7,7 +7,7 @@ rm -rf test-project
 git clone -b master --single-branch https://github.com/uataq/stilt test-project
 cd test-project
 
-# Execute setup script and fetch the hymodelc-centos-7.4 binary (option 2)
+# Execute setup script and fetch the ubuntu-16.04 binary (option 3)
 ./setup 3
 
 # Fetch the tutorial data
@@ -16,7 +16,7 @@ git clone https://github.com/uataq/stilt-tutorials
 # Replace {{project}} and {{wd}}
 sed -i 's|{{project}}|test-project|g' r/run_stilt.r
 sed -i "s|file.path('{{wd}}', project)|getwd()|g" r/run_stilt.r
-sed -i "s|.libPaths()[1]|'pkg'|g" r/run_stilt.r
+sed -i "s|.libPaths()|'rpkgs'|g" r/run_stilt.r
 
 # Set receptor and footprint information
 sed -i 's|2015-06-18 22:00:00|2015-12-10 00:00:00|g' r/run_stilt.r
@@ -30,6 +30,9 @@ sed -i 's|xres <- 0.01|xres <- 0.002|g' r/run_stilt.r
 sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(stilt_wd, 'stilt-tutorials/01-wbb/met')|g" r/run_stilt.r
 
 sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
+
+# Print contents of run_stilt.r for diagnosing log
+cat r/run_stilt.r
 
 # Execute r/run_stilt.r
 Rscript r/run_stilt.r
