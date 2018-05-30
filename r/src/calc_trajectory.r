@@ -79,5 +79,13 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
   # .rds file, and return particle data frame
   p <- read_particle(file = pf, varsiwant = varsiwant)
   if (rm_dat) system(paste('rm', pf))
+  
+  # For column trajectories, preserve release height as xhgt
+  if (length(output$receptor$zagl) > 1) {
+    x_heights <- output$receptor$zagl
+    px <- data.frame(indx = 1:numpar)
+    px$xhgt <- rep(x_heights, each = length(px$indx) / length(x_heights))
+    p <- merge(p, px, by = 'indx', sort = F)
+  }
   p
 }
