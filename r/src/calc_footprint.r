@@ -153,58 +153,53 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     summarize(foot = sum(foot, na.rm = T)) %>%
     ungroup()
   
-  # Dimensions in accordance with CF-1.4 convention (x, y, t)
-  grd <- matrix(0, nrow = length(max_glong), ncol = length(max_glati))
+  # Dimensions in accordance with CF convention (x, y, t)
+  nx <- length(max_glati)
+  ny <- length(max_glong)
+  grd <- matrix(0, nrow = ny, ncol = nx)
   
-  # Split particle data by hour
-  xyzt$hid <- floor(xyzt$time / 60)
-  uhid <- sort(unique(xyzt$hid))
+  # Split particle data by footprint layer
+  xyzt$layer <- if (time_integrate) 0 else floor(xyzt$time / 60)
+  layers <- sort(unique(xyzt$layer))
+  nlayers <- length(layers)
   
-  # Calculate hourly footprints
-  foot <- sapply(uhid, simplify = 'array', function(y) {
-    step_hour <- xyzt %>%
-      filter(hid == y)
-    # Calculate minute-level kernel-summed arrays
-    foot_hour <- sapply(sort(unique(step_hour$time)), simplify = 'array', function(x) {
-      step <- step_hour %>%
-        filter(time == x)
+  # Preallocate footprint output array
+  foot <- array(grd, dim = c(dim(grd), nlayers))
+  for (i in 1:nlayers) {
+    xyzt_layer <- filter(xyzt, layer == layers[i])
+    
+    times <- unique(xyzt_layer$time)
+    for (j in 1:length(times)) {
+      xyzt_step <- filter(xyzt_layer, time == times[j])
       
-      if (nrow(step) < 2) {
-        return(grd)
-      }
+      # Proceed to next timestep without 2 particles to calculate kernel
+      if (nrow(xyzt_step) < 2) next
       
-      # Dispersion kernel
-      idx <- kernel$time == x
-      k <- make_gauss_kernel(xyres, w[idx], projection)
+      # Create dispersion kernel based on kernel bandwidth w
+      k <- make_gauss_kernel(xyres, w[kernel$time == times[j]], projection)
       
       # Array dimensions
-      len <- nrow(step)
+      len <- nrow(xyzt_step)
       nkx <- ncol(k)
       nky <- nrow(k)
-      nax <- ncol(grd)
-      nay <- nrow(grd)
       
       # Call permute fortran subroutine to build and aggregate kernels
-      out <- .Fortran('permute', ans = grd, nax = nax, nay = nay,
-                      k = k, nkx = nkx, nky = nky,
-                      len = len, lai = step$lai, loi = step$loi, foot = step$foot)
-      
-      out$ans
-    })
-    # Sum minute-level fields
-    apply(foot_hour, c(1, 2), sum)
-  })
+      out <- .Fortran('permute', ans = grd, nax = nx, nay = ny, k = k, 
+                      nkx = nkx, nky = nky, len = len, lai = xyzt_step$lai, 
+                      loi = xyzt_step$loi, foot = xyzt_step$foot)
+      foot[ , , i] <- foot[ , , i] + out$ans
+    }
+  }
   
-  # Remove added buffer around requested domain
+  # Remove spatial buffer around domain used in kernel aggregation
   size <- dim(foot)
   foot <- foot[(xbuf+1):(size[1]-xbuf), (ybuf+1):(size[2]-ybuf), ] / np
   
-  # Optionally time integrate footprint by aggregating across 3rd dimension
+  # Determine timestamp to use in output files
   if (time_integrate) {
-    foot <- apply(foot, c(1, 2), sum)
-    time_out <- as.numeric(r_run_time)
+    time_out <- as.numeric(r_run_time) 
   } else {
-    time_out <- as.numeric(r_run_time + uhid * 3600)
+    time_out <- as.numeric(r_run_time + layers * 3600)
   }
   
   # Set footprint metadata and write to file
