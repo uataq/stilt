@@ -9,7 +9,7 @@
 </h3>
 
 <p align="center">
-  An open source lagrangian dispersion model.
+  An open source Lagrangian particle dispersion model.
 </p>
 
 <p align="center">
