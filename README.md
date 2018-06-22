@@ -19,17 +19,8 @@
   <a href="https://github.com/uataq/stilt/issues">
     <img src="https://img.shields.io/github/issues/uataq/stilt.svg"/>
   </a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/uataq/stilt/commits/master">
-    <img src="https://img.shields.io/github/last-commit/uataq/stilt.svg"/>
-  </a>
   <a href="https://uataq.github.io/stilt/">
     <img src="https://img.shields.io/website-up-down-green-red/http/uataq.github.io.svg?label=website"/>
-  </a>
-  <a href="https://uataq.github.io/stilt/docs/install.html">
-    <img src="https://img.shields.io/github/downloads/uataq/stilt/total.svg"/>
   </a>
 </p>
 
