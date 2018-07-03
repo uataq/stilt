@@ -44,7 +44,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   require(raster)
   require(uataq)
   
-  np <- max(p$indx, na.rm = T)
+  np <- length(unique(p$indx))
   
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
