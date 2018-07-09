@@ -170,7 +170,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
       xyzt_step <- filter(xyzt_layer, time == times[j])
       
       # Create dispersion kernel based using nearest-in-time kernel bandwidth w
-      k <- make_gauss_kernel(xyres, w[kernel$time == times[j]], projection)
+      k <- make_gauss_kernel(xyres, w[find_neighbor(times[j], kernel$time)], projection)
       
       # Array dimensions
       len <- nrow(xyzt_step)
