@@ -44,7 +44,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   require(raster)
   require(uataq)
   
-  np <- max(p$indx, na.rm = T)
+  np <- length(unique(p$indx))
   
   # Interpolate particle locations during initial time steps
   times <- c(seq(0, -10, by = -0.1),
@@ -139,9 +139,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
            lati >= (ymn - ybufh*yres), lati < (ymx + ybufh*yres))
   if (nrow(xyzt) == 0) return(NULL)
-  mask <- is.element(kernel$time, xyzt$time)
-  kernel <- kernel[mask, ]
-  w <- w[mask]
   
   # Pre grid particle locations
   xyzt <- xyzt %>%
@@ -172,11 +169,8 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     for (j in 1:length(times)) {
       xyzt_step <- filter(xyzt_layer, time == times[j])
       
-      # Proceed to next timestep without 2 particles to calculate kernel
-      if (nrow(xyzt_step) < 2) next
-      
-      # Create dispersion kernel based on kernel bandwidth w
-      k <- make_gauss_kernel(xyres, w[kernel$time == times[j]], projection)
+      # Create dispersion kernel based using nearest-in-time kernel bandwidth w
+      k <- make_gauss_kernel(xyres, w[find_neighbor(times[j], kernel$time)], projection)
       
       # Array dimensions
       len <- nrow(xyzt_step)
