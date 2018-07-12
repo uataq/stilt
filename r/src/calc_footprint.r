@@ -136,7 +136,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   
   # Remove zero influence particles and positions outside of domain
   xyzt <- i %>%
-    filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
+    dplyr::filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
            lati >= (ymn - ybufh*yres), lati < (ymx + ybufh*yres))
   if (nrow(xyzt) == 0) return(NULL)
   
@@ -163,11 +163,11 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   # Preallocate footprint output array
   foot <- array(grd, dim = c(dim(grd), nlayers))
   for (i in 1:nlayers) {
-    xyzt_layer <- filter(xyzt, layer == layers[i])
+    xyzt_layer <- dplyr::filter(xyzt, layer == layers[i])
     
     times <- unique(xyzt_layer$time)
     for (j in 1:length(times)) {
-      xyzt_step <- filter(xyzt_layer, time == times[j])
+      xyzt_step <- dplyr::filter(xyzt_layer, time == times[j])
       
       # Create dispersion kernel based using nearest-in-time kernel bandwidth w
       k <- make_gauss_kernel(xyres, w[find_neighbor(times[j], kernel$time)], projection)
