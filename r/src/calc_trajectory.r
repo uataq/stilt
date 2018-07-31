@@ -20,10 +20,15 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                             ndump, ninit, numpar, nturb, n_hours, outdt, outfrac,
                             output, p10f, qcycle, random, splitf, tkerd, tkern,
                             rm_dat, timeout, tlfrac, tratio, tvmix, veght,
-                            vscale, winderrtf, w_option, zicontroltf, z_top,
-                            rundir) {
+                            vscale, winderrtf, w_option, zicontroltf, ziscale, 
+                            z_top, rundir) {
 
   require(uataq)
+
+  # Enable manual rescaling of mixed layer height
+  if (as.logical(zicontroltf)) {
+    write_zicontrol(ziscale, file.path(rundir, 'ZICONTROL'))
+  }
 
   # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
   write_setup(varsiwant, conage, cpack, delt, dxf, dyf, dzf, frhmax, frhs, frme,

@@ -116,6 +116,7 @@ veght       <- 0.5
 vscale      <- 200
 w_option    <- 0
 zicontroltf <- 0
+ziscale     <- rep(list(rep(0.8, 24)), nrow(receptors))
 z_top       <- 25000
 
 # Transport error settings
@@ -203,6 +204,6 @@ output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
                       tratio = tratio, tvmix = tvmix, varsiwant = varsiwant,
                       veght = veght, vscale = vscale, w_option = w_option,
                       xmn = xmn, xmx = xmx, xres = xres, ymn = ymn, ymx = ymx,
-                      yres = yres, zicontroltf = zicontroltf, z_top = z_top,
-                      zcoruverr = zcoruverr)
+                      yres = yres, zicontroltf = zicontroltf, ziscale = ziscale,
+                      z_top = z_top, zcoruverr = zcoruverr)
 q('no')

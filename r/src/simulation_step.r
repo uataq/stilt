@@ -11,26 +11,27 @@
 simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                             conage = 48, cpack = 1, delt = 0, dxf = 1, dyf = 1,
                             dzf = 0.01, emisshrs = 0.01, frhmax = 3, frhs = 1,
-                            frme = 0.1, frmr = 0, frts = 0.1, frvs = 0.1, hnf_plume = T,
-                            hscale = 10800, horcoruverr = NA, horcorzierr = NA,
-                            ichem = 0, iconvect = 0, initd = 0, isot = 0,
-                            kbls = 1, kblt = 1, kdef = 1, khmax = 9999,
-                            kmix0 = 250, kmixd = 3, kmsl = 0, kpuff = 0,
-                            krnd = 6, kspl = 1, kzmix = 1, maxdim = 1,
-                            maxpar = 10000, met_file_format, met_loc,
-                            mgmin = 2000, n_hours = -24, n_met_min = 1,
+                            frme = 0.1, frmr = 0, frts = 0.1, frvs = 0.1, 
+                            hnf_plume = T, hscale = 10800, horcoruverr = NA, 
+                            horcorzierr = NA, ichem = 0, iconvect = 0, 
+                            initd = 0, isot = 0, kbls = 1, kblt = 1, kdef = 1,
+                            khmax = 9999, kmix0 = 250, kmixd = 3, kmsl = 0, 
+                            kpuff = 0, krnd = 6, kspl = 1, kzmix = 1, 
+                            maxdim = 1, maxpar = 10000, met_file_format, 
+                            met_loc, mgmin = 2000, n_hours = -24, n_met_min = 1,
                             ncycl = 0, ndump = 0, ninit = 1, nturb = 0,
                             numpar = 200, outdt = 0, outfrac = 0.9,
                             output_wd = file.path(stilt_wd, 'out'), p10f = 1,
-                            projection = '+proj=longlat', qcycle = 0, r_run_time,
-                            r_lati, r_long, r_zagl, random = 1, run_trajec = T,
-                            siguverr = NA, sigzierr = NA, smooth_factor = 1,
-                            splitf = 1, time_integrate = F, timeout = 3600,
-                            tkerd = 0.18, tkern = 0.18, tlfrac = 0.1,
-                            tluverr = NA, tlzierr = NA, tratio = 0.9, tvmix = 1,
-                            varsiwant = NULL, veght = 0.5, vscale = 200,
-                            w_option = 0, xmn = -180, xmx = 180, xres = 0.1,
-                            ymn = -90, ymx = 90, yres = xres, zicontroltf = 0,
+                            projection = '+proj=longlat', qcycle = 0, 
+                            r_run_time, r_lati, r_long, r_zagl, random = 1, 
+                            run_trajec = T, siguverr = NA, sigzierr = NA, 
+                            smooth_factor = 1, splitf = 1, time_integrate = F,
+                            timeout = 3600, tkerd = 0.18, tkern = 0.18,
+                            tlfrac = 0.1, tluverr = NA, tlzierr = NA, 
+                            tratio = 0.9, tvmix = 1, varsiwant = NULL, 
+                            veght = 0.5, vscale = 200, w_option = 0, xmn = -180,
+                            xmx = 180, xres = 0.1, ymn = -90, ymx = 90, 
+                            yres = xres, zicontroltf = 0, ziscale = 0,
                             z_top = 25000, zcoruverr = NA) {
   try({
     # If using lapply or parLapply, receptors are passed as vectors and need to
@@ -40,11 +41,13 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       r_lati <- r_lati[X]
       r_long <- r_long[X]
       r_zagl <- r_zagl[X]
+      if (is.list(ziscale) && length(ziscale) > 1) ziscale <- ziscale[X]
     }
     
-    # Column trajectories use r_zagl passed as a list of values for lapply and 
-    # parLapply but a vector in slurm_apply
+    # Values passed as a list of values for lapply and parLapply but a vector in
+    # slurm_apply
     r_zagl <- unlist(r_zagl)
+    ziscale <- unlist(ziscale)
     
     # Ensure dependencies are loaded for current node/process
     source(file.path(stilt_wd, 'r/dependencies.r'), local = T)
@@ -105,7 +108,8 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                   nturb, n_hours, outdt, outfrac, output, p10f,
                                   qcycle, random, splitf, tkerd, tkern, rm_dat,
                                   timeout, tlfrac, tratio, tvmix, veght, vscale,
-                                  0, w_option, zicontroltf, z_top, rundir)
+                                  0, w_option, zicontroltf, ziscale, z_top, 
+                                  rundir)
       if (is.null(particle)) return()
       
       # Bundle trajectory configuration metadata with trajectory informtation
@@ -132,7 +136,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                                           splitf, tkerd, tkern, rm_dat, timeout,
                                           tlfrac, tratio, tvmix, veght, vscale,
                                           winderrtf, w_option, zicontroltf,
-                                          z_top, rundir)
+                                          ziscale, z_top, rundir)
         if (is.null(particle_error)) return()
         output$particle_error <- particle_error
         output$particle_error_params <- list(siguverr = siguverr,
