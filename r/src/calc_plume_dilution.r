@@ -24,7 +24,7 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
            pbl_mixing = veght * mlht) %>%
     arrange(-time) %>%
     group_by(indx) %>%
-    mutate(plume = r_zagl + cumsum(sigma),
+    mutate(plume = ifelse('xhgt' %in% names(p), xhgt, r_zagl) + cumsum(sigma),
            foot = ifelse(plume < pbl_mixing,
                          0.02897 / (plume * dens) * samt*60,
                          foot)) %>%

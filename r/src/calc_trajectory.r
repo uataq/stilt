@@ -20,10 +20,15 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                             ndump, ninit, numpar, nturb, n_hours, outdt, outfrac,
                             output, p10f, qcycle, random, splitf, tkerd, tkern,
                             rm_dat, timeout, tlfrac, tratio, tvmix, veght,
-                            vscale, winderrtf, w_option, zicontroltf, z_top,
-                            rundir) {
+                            vscale, winderrtf, w_option, zicontroltf, ziscale, 
+                            z_top, rundir) {
 
   require(uataq)
+
+  # Enable manual rescaling of mixed layer height
+  if (as.logical(zicontroltf)) {
+    write_zicontrol(ziscale, file.path(rundir, 'ZICONTROL'))
+  }
 
   # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
   write_setup(varsiwant, conage, cpack, delt, dxf, dyf, dzf, frhmax, frhs, frme,
@@ -79,5 +84,13 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
   # .rds file, and return particle data frame
   p <- read_particle(file = pf, varsiwant = varsiwant)
   if (rm_dat) system(paste('rm', pf))
+  
+  # For column trajectories, preserve release height as xhgt
+  if (length(output$receptor$zagl) > 1) {
+    x_heights <- output$receptor$zagl
+    px <- data.frame(indx = 1:numpar)
+    px$xhgt <- rep(x_heights, each = length(px$indx) / length(x_heights))
+    p <- merge(p, px, by = 'indx', sort = F)
+  }
   p
 }
