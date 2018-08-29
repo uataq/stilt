@@ -99,7 +99,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     na.omit()
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$time/1440)^(1/2)
-  grid_conv <- ifelse(is_longlat, cos(kernel$lati * pi/180), 1)
+  grid_conv <- if (is_longlat) cos(kernel$lati * pi/180) else 1
   w <- smooth_factor * 0.06 * di * ti / grid_conv
   
   
