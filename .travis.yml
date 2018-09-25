@@ -24,12 +24,29 @@ r_packages:
   - raster
   - readr
   - rslurm
+  - fansi
+  - utf8
+  - bindr
+  - cli
+  - crayon
+  - pillar
+  - purrr
+  - assertthat
+  - glue
+  - magrittr
+  - pkgconfig
+  - R6
+  - Rcpp
+  - rlang
+  - tibble
+  - tidyselect
+  - BH
+  - plotgr
 
 r_github_packages:
   - benfasoli/uataq
 
-install:
-  - ls /home/travis/R/Library
+install: true
 
 script:
   - bash .test
