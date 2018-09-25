@@ -15,7 +15,7 @@ addons:
     sources:
       - r-packages-trusty
     packages:
-      - bash gcc libhdf5-serial-dev libnetcdf-dev netcdf-bin r-base r-base-dev unzip 
+      - bash gcc libhdf5-serial-dev libnetcdf-dev netcdf-bin r-base r-base-dev r-recommended unzip 
 
 script:
   - bash .test
