@@ -15,7 +15,18 @@ addons:
     sources:
       - r-packages-trusty
     packages:
-      - bash gcc libhdf5-serial-dev libnetcdf-dev netcdf-bin r-base r-base-dev r-recommended unzip 
+      - bash gcc libhdf5-serial-dev libnetcdf-dev netcdf-bin unzip 
+
+r_packages:
+  - dplyr
+  - ncdf4
+  - parallel
+  - raster
+  - readr
+  - rslurm
+
+r_github_packages:
+  - benfasoli/uataq
 
 script:
   - bash .test
