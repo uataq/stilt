@@ -17,37 +17,7 @@ addons:
     packages:
       - libhdf5-serial-dev libnetcdf-dev netcdf-bin unzip 
 
-r_packages:
-  - dplyr
-  - ncdf4
-  - parallel
-  - raster
-  - readr
-  - rslurm
-  - fansi
-  - utf8
-  - bindr
-  - cli
-  - crayon
-  - pillar
-  - purrr
-  - assertthat
-  - glue
-  - magrittr
-  - pkgconfig
-  - R6
-  - Rcpp
-  - rlang
-  - tibble
-  - tidyselect
-  - BH
-  - plotgr
-
-r_github_packages:
-  - benfasoli/uataq
-
 install: true
 
 script:
   - bash .test
-  - Rscript -e ".libPaths(); dir(.libPaths())"
