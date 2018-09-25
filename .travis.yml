@@ -46,8 +46,8 @@ r_packages:
 r_github_packages:
   - benfasoli/uataq
 
-install: #true
-  - Rscript -e ".libPaths()"
+install: true
 
 script:
   - bash .test
+  - Rscript -e ".libPaths(); dir(.libPaths())"
