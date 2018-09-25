@@ -80,7 +80,7 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
     if (run_trajec) {
       # Ensure necessary files and directory structure are established in the
       # current rundir
-      dir.create(rundir)
+      if (!dir.exists(rundir)) dir.create(rundir)
       link_files <- dir(file.path(stilt_wd, 'exe'))
       file.symlink(file.path(stilt_wd, 'exe', link_files), rundir)
       
