@@ -30,7 +30,7 @@
 [**STILT webpage**](https://uataq.github.io/stilt/)  
 [Model documentation](https://uataq.github.io/stilt/docs/)  
 [Tutorials](https://uataq.github.io/stilt/tutorials/)  
-[Methods details](https://www.geosci-model-dev-discuss.net/gmd-2018-20/)
+[Methods details](https://www.geosci-model-dev.net/11/2813/2018/)
 
 
 ## About
