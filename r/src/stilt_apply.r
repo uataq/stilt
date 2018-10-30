@@ -30,6 +30,8 @@ stilt_apply <- function(X, FUN, slurm = F, slurm_options = list(),
     message('Multi node parallelization using slurm. Dispatching jobs...')
     load_libs('rslurm')
     Y <- data_frame(X = X, ...)
+    # Shuffle receptor order for load balancing
+    Y <- Y[sample.int(nrow(Y), nrow(Y)), ]
     sjob <- rslurm::slurm_apply(FUN, Y,
                                 jobname = basename(getwd()), pkgs = 'base',
                                 nodes = n_nodes, cpus_per_node = n_cores,
