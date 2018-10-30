@@ -33,5 +33,6 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
            foot = ifelse(plume < pbl_mixing,
                          0.02897 / (plume * dens) * samt*60,
                          foot)) %>%
+    dplyr::select(-sigma, -pbl_mixing, -plume) %>%
     ungroup()
 }
