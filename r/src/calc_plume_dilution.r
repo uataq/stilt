@@ -19,7 +19,7 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
   require(dplyr)
 
   varsineed <- c('dens', 'samt', 'sigw', 'tlgr', 'foot')
-  if (!all(varsineed %in% names(p))
+  if (!all(varsineed %in% names(p)))
     stop('calc_plume_dilution(): varsiwant must include: ',
          paste(collapse = ', ', varsineed))
 
