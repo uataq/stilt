@@ -1,5 +1,6 @@
 # Simulation outputs
 out/*
+_rslurm*
 
 # Distributions of pre-compiled binaries
 fortran/*.zip
