@@ -153,6 +153,6 @@ calc_trajectory <- function(varsiwant,
   # approximation and recalculate footprint sensitivity for cases when the
   # plume height is less than the PBL height scaled by veght
   if (hnf_plume) 
-    particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
+    p <- calc_plume_dilution(p, numpar, output$receptor$zagl, veght)
   p
 }
