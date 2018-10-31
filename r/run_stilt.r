@@ -158,9 +158,8 @@ for (d in c('by-id', 'particles', 'footprints')) {
 
 
 # Met path symlink -------------------------------------------------------------
-# Auto symlink the meteorological data path to the working directory to
-# eliminate issues with long (>80 char) paths in fortran. Note that this assumes
-# that all meteorological data is found in the same directory.
+# Auto symlink the meteorological data path to the user's home directory to
+# eliminate issues with long (>80 char) paths in fortran
 if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
   met_loc <- file.path(path.expand('~'), paste0('m', project))
   if (!file.exists(met_loc)) invisible(file.symlink(met_directory, met_loc))
