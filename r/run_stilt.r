@@ -44,6 +44,7 @@ n_met_min       <- 1
 n_hours    <- -24
 numpar     <- 200
 rm_dat     <- T
+run_foot   <- T
 run_trajec <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
@@ -169,9 +170,9 @@ if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
 # Run trajectory simulations ---------------------------------------------------
 # Gather varsiwant into a single character string and fork the process to apply
 # simulation_step() to each receptor across n_cores and n_nodes
-validate_varsiwant(varsiwant)
-if (!is.null(varsiwant[1]))
-  varsiwant <- paste(varsiwant, collapse = '/')
+# validate_varsiwant(varsiwant)
+# if (!is.null(varsiwant[1]))
+#   varsiwant <- paste(varsiwant, collapse = '/')
 
 stilt_apply(FUN = simulation_step,
             slurm = slurm, 
@@ -231,6 +232,7 @@ stilt_apply(FUN = simulation_step,
             r_zagl = receptors$zagl,
             random = random,
             rm_dat = rm_dat,
+            run_foot = run_foot,
             run_trajec = run_trajec,
             siguverr = siguverr,
             sigzierr = sigzierr,
@@ -245,7 +247,7 @@ stilt_apply(FUN = simulation_step,
             tlzierr = tlzierr,
             tratio = tratio,
             tvmix = tvmix,
-            varsiwant = varsiwant,
+            varsiwant = list(varsiwant),
             veght = veght,
             vscale = vscale,
             w_option = w_option,

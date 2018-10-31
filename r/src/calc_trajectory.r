@@ -55,9 +55,9 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
       on.exit()
       break
     } else if (elapsed > timeout) {
-      warning(basename(rundir), ' timeout. Killing hymodelc pid ', pid, '\n')
-      cat('hymodelc timeout after ', elapsed, ' seconds\n',
-          file = file.path(rundir, 'ERROR'))
+      msg <- paste('hymodelc timeout after', elapsed, ' seconds\n')
+      warning(msg)
+      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
       return()
     }
     Sys.sleep(1)
@@ -66,17 +66,19 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
   # Error check hymodelc output
   pf <- file.path(rundir, 'PARTICLE.DAT')
   if (!file.exists(pf)) {
-    warning('Failed to output PARTICLE.DAT in ', basename(rundir))
-    cat('No PARTICLE.DAT found. Check for errors in hymodelc.out\n',
-        file = file.path(rundir, 'ERROR'))
+    msg <- paste('Failed to output PARTICLE.DAT in', basename(rundir),
+                 'Check for errors in hymodelc.out')
+    warning(msg)
+    cat(msg, '\n', file = file.path(rundir, 'ERROR'))
     return()
   }
 
   n_lines <- uataq::count_lines(pf)
   if (n_lines < 2) {
-    warning('No trajectory data found in ', pf)
-    cat('PARTICLE.DAT does not contain any trajectory data. Check for errors ',
-        'in hymodelc.out\n', file = file.path(rundir, 'ERROR'))
+    msg <- paste(pf, 'does not contain any trajectory data.',
+                 'Check for errors in hymodelc.out')
+    warning(msg)
+    cat(msg, '\n', file = file.path(rundir, 'ERROR'))
     return()
   }
 

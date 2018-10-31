@@ -65,6 +65,7 @@ simulation_step <- function(conage = 48,
                             r_zagl,
                             random = 1, 
                             rm_dat = T,
+                            run_foot = T,
                             run_trajec = T,
                             siguverr = NA,
                             sigzierr = NA, 
@@ -95,21 +96,18 @@ simulation_step <- function(conage = 48,
                             z_top = 25000,
                             zcoruverr = NA) {
   try({
+    
     # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
+    varsiwant <- unlist(varsiwant)
     ziscale <- unlist(ziscale)
+
+    # Validate arguments
+    if (!run_trajec && !run_foot)
+      stop('simulation_step(): Nothing to do, set run_trajec or run_foot to T')
     
     # Ensure dependencies are loaded for current node/process
     source(file.path(stilt_wd, 'r/dependencies.r'), local = T)
-    
-    if (is.null(varsiwant)) {
-      varsiwant <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr',
-                     'zsfc', 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld',
-                     'dmas', 'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc',
-                     'dswf', 'wout', 'mlht', 'rain', 'crai')
-    } else if (any(grepl('/', varsiwant))) {
-      varsiwant <- unlist(strsplit(varsiwant, '/', fixed = T))
-    }
     
     # Creates subdirectories in out for each model run time. Each of these
     # subdirectories is populated with symbolic links to the shared datasets
@@ -118,7 +116,6 @@ simulation_step <- function(conage = 48,
                             ifelse(length(r_zagl) > 1, 'X', r_zagl))
     rundir  <- file.path(output_wd, 'by-id',
                          strftime(r_run_time, rundir_format, 'UTC'))
-    uataq::br()
     message(paste('Running simulation ID:  ', basename(rundir)))
     
     # Calculate particle trajectories ------------------------------------------
@@ -137,10 +134,10 @@ simulation_step <- function(conage = 48,
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
       if (length(met_files) < n_met_min) {
-        warning('Insufficient amount of meteorological data found...')
-        cat('Insufficient amount of meteorological data found. Check ',
-            'specifications in run_stilt.r\n',
-            file = file.path(rundir, 'ERROR'))
+        msg <- paste('Insufficient number of meteorological files found. Check',
+                     'specifications in run_stilt.r')
+        warning(msg)
+        cat(msg, '\n', file = file.path(rundir, 'ERROR'))
         return()
       }
       
@@ -199,19 +196,19 @@ simulation_step <- function(conage = 48,
       }
       
       # Save output object to compressed rds file and symlink to out/particles
-      # directory for convenience
       saveRDS(output, output$file)
-      file.symlink(output$file, file.path(output_wd, 'particles',
-                                          basename(output$file))) %>%
-        invisible()
-      
+      invisible(file.symlink(output$file, file.path(output_wd, 'particles',
+                                                    basename(output$file))))
+      # Exit if not performing footprint calculations
+      if (!run_foot) return(invisible(output$file))
+
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
       # file to a data_frame with an adjusted timestamp and index for the
       # simulation step. If none exists, report an error and proceed
       if (!file.exists(output$file)) {
         warning('simulation_step(): No _traj.rds file found in ', rundir,
-                '\n    skipping this timestep and trying the next...')
+                '\n    skipping this receptor and trying the next...')
         return()
       }
       particle <- readRDS(output$file)$particle
@@ -220,7 +217,7 @@ simulation_step <- function(conage = 48,
     # Calculate near-field dilution height based on gaussian plume width
     # approximation and recalculate footprint sensitivity for cases when the
     # plume height is less than the PBL height scaled by veght
-    if (hnf_plume)
+    if (hnf_plume) 
       particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
     
     # Produce footprint --------------------------------------------------------
@@ -235,15 +232,16 @@ simulation_step <- function(conage = 48,
                            xmn = xmn, xmx = xmx, xres = xres,
                            ymn = ymn, ymx = ymx, yres = yres)
     if (is.null(foot)) {
-      warning('No non-zero footprint values found within the footprint domain.')
-      cat('No non-zero footprint values found within the footprint domain.\n',
-          file = file.path(rundir, 'ERROR'))
+      msg <- 'No non-zero footprint values found within the footprint domain.'
+      warning(msg)
+      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
       return()
-    } else {
-      file.symlink(foot_file, file.path(output_wd, 'footprints',
-                                        basename(foot_file))) %>%
-        invisible()
     }
+    
+    # Symlink footprint to out/footprints
+    invisible(file.symlink(foot_file, file.path(output_wd, 'footprints',
+                                                basename(foot_file))))
+
     invisible(gc())
     return(foot)
   })
