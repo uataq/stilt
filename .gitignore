@@ -1,3 +1,6 @@
+# Simulation outputs
+out/*
+
 # Distributions of pre-compiled binaries
 fortran/*.zip
 
