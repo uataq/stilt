@@ -148,9 +148,9 @@ simulation_step <- function(conage = 48,
                               zagl = r_zagl)
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
-                                  hscale, ichem, iconvect, initd, isot, ivmax,
-                                  kbls, kblt, kdef, khmax, kmix0, kmixd, kmsl,
-                                  kpuff, krnd, kspl, kzmix, maxdim, maxpar,
+                                  hscale, hnf_plume, ichem, iconvect, initd, isot,
+                                  ivmax, kbls, kblt, kdef, khmax, kmix0, kmixd,
+                                  kmsl, kpuff, krnd, kspl, kzmix, maxdim, maxpar,
                                   met_files, mgmin, ncycl, ndump, ninit, numpar,
                                   nturb, n_hours, outdt, outfrac, output, p10f,
                                   qcycle, random, splitf, tkerd, tkern, rm_dat,
@@ -173,10 +173,10 @@ simulation_step <- function(conage = 48,
       if (winderrtf > 0) {
         particle_error <- calc_trajectory(varsiwant, conage, cpack, delt, dxf,
                                           dyf, dzf, emisshrs, frhmax, frhs, frme,
-                                          frmr, frts, frvs, hscale, ichem,
-                                          iconvect, initd, isot, ivmax, kbls,
-                                          kblt, kdef, khmax, kmix0, kmixd, kmsl,
-                                          kpuff, krnd, kspl, kzmix, maxdim,
+                                          frmr, frts, frvs, hscale, hnf_plume, 
+                                          ichem, iconvect, initd, isot, ivmax,
+                                          kbls, kblt, kdef, khmax, kmix0, kmixd,
+                                          kmsl, kpuff, krnd, kspl, kzmix, maxdim,
                                           maxpar, met_files, mgmin, ncycl, ndump,
                                           ninit, numpar, nturb, n_hours, outdt,
                                           outfrac, output, p10f, qcycle, random,
@@ -213,12 +213,6 @@ simulation_step <- function(conage = 48,
       }
       particle <- readRDS(output$file)$particle
     }
-    
-    # Calculate near-field dilution height based on gaussian plume width
-    # approximation and recalculate footprint sensitivity for cases when the
-    # plume height is less than the PBL height scaled by veght
-    if (hnf_plume) 
-      particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
     
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This

@@ -12,16 +12,70 @@
 #' @import uataq
 #' @export
 
-calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
-                            emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
-                            hscale, ichem, iconvect, initd, isot, ivmax, kbls,
-                            kblt, kdef, khmax, kmix0, kmixd, kmsl, kpuff, krnd,
-                            kspl, kzmix, maxdim, maxpar, met_files, mgmin, ncycl,
-                            ndump, ninit, numpar, nturb, n_hours, outdt, outfrac,
-                            output, p10f, qcycle, random, splitf, tkerd, tkern,
-                            rm_dat, timeout, tlfrac, tratio, tvmix, veght,
-                            vscale, winderrtf, w_option, zicontroltf, ziscale, 
-                            z_top, rundir) {
+calc_trajectory <- function(varsiwant,
+                            conage,
+                            cpack,
+                            delt,
+                            dxf,
+                            dyf,
+                            dzf,
+                            emisshrs,
+                            frhmax,
+                            frhs,
+                            frme,
+                            frmr,
+                            frts,
+                            frvs,
+                            hnf_plume,
+                            hscale,
+                            ichem,
+                            iconvect,
+                            initd,
+                            isot,
+                            ivmax,
+                            kbls,
+                            kblt,
+                            kdef,
+                            khmax,
+                            kmix0,
+                            kmixd,
+                            kmsl,
+                            kpuff,
+                            krnd,
+                            kspl,
+                            kzmix,
+                            maxdim,
+                            maxpar,
+                            met_files,
+                            mgmin,
+                            ncycl,
+                            ndump,
+                            ninit,
+                            numpar,
+                            nturb,
+                            n_hours,
+                            outdt,
+                            outfrac,
+                            output,
+                            p10f,
+                            qcycle,
+                            random,
+                            splitf,
+                            tkerd,
+                            tkern,
+                            rm_dat,
+                            timeout,
+                            tlfrac,
+                            tratio,
+                            tvmix,
+                            veght,
+                            vscale,
+                            winderrtf,
+                            w_option,
+                            zicontroltf,
+                            ziscale, 
+                            z_top,
+                            rundir) {
 
   require(uataq)
 
@@ -94,5 +148,11 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
     px$xhgt <- rep(x_heights, each = length(px$indx) / length(x_heights))
     p <- merge(p, px, by = 'indx', sort = F)
   }
+
+  # Calculate near-field dilution height based on gaussian plume width
+  # approximation and recalculate footprint sensitivity for cases when the
+  # plume height is less than the PBL height scaled by veght
+  if (hnf_plume) 
+    particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
   p
 }
