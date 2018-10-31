@@ -1,1 +1,17 @@
+# Distributions of pre-compiled binaries
+fortran/*.zip
+
+# System compilation outputs
+*.o
+*.so
+exe/hymodelc
+
+# R history and environment
+.RData
+.Rapp.history
+.Rhistory
+.Rproj.user
+*.Rproj
+
+# MacOS folder attributes
 .DS_Store
