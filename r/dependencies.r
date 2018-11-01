@@ -21,5 +21,7 @@ if (!file.exists(permute_exe))
 dyn.load(permute_exe)
 
 # Validate arguments and load dependencies if necessary
-validate_projection(projection)
-validate_varsiwant(varsiwant)
+if (!'projection' %in% ls())
+  validate_projection(projection)
+if (!'varsiwant' %in% ls())
+  validate_varsiwant(varsiwant)
