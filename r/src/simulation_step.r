@@ -8,58 +8,106 @@
 #'
 #' @export
 
-simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
-                            conage = 48, cpack = 1, delt = 0, dxf = 1, dyf = 1,
-                            dzf = 0.01, emisshrs = 0.01, frhmax = 3, frhs = 1,
-                            frme = 0.1, frmr = 0, frts = 0.1, frvs = 0.1, 
-                            hnf_plume = T, hscale = 10800, horcoruverr = NA, 
-                            horcorzierr = NA, ichem = 0, iconvect = 0, 
-                            initd = 0, isot = 0, kbls = 1, kblt = 1, kdef = 1,
-                            khmax = 9999, kmix0 = 250, kmixd = 3, kmsl = 0, 
-                            kpuff = 0, krnd = 6, kspl = 1, kzmix = 1, 
-                            maxdim = 1, maxpar = 10000, met_file_format, 
-                            met_loc, mgmin = 2000, n_hours = -24, n_met_min = 1,
-                            ncycl = 0, ndump = 0, ninit = 1, nturb = 0,
-                            numpar = 200, outdt = 0, outfrac = 0.9,
-                            output_wd = file.path(stilt_wd, 'out'), p10f = 1,
-                            projection = '+proj=longlat', qcycle = 0, 
-                            r_run_time, r_lati, r_long, r_zagl, random = 1, 
-                            run_trajec = T, siguverr = NA, sigzierr = NA, 
-                            smooth_factor = 1, splitf = 1, time_integrate = F,
-                            timeout = 3600, tkerd = 0.18, tkern = 0.18,
-                            tlfrac = 0.1, tluverr = NA, tlzierr = NA, 
-                            tratio = 0.9, tvmix = 1, varsiwant = NULL, 
-                            veght = 0.5, vscale = 200, w_option = 0, xmn = -180,
-                            xmx = 180, xres = 0.1, ymn = -90, ymx = 90, 
-                            yres = xres, zicontroltf = 0, ziscale = 0,
-                            z_top = 25000, zcoruverr = NA) {
+simulation_step <- function(conage = 48,
+                            cpack = 1,
+                            delt = 0,
+                            dxf = 1,
+                            dyf = 1,
+                            dzf = 0.01,
+                            emisshrs = 0.01,
+                            frhmax = 3,
+                            frhs = 1,
+                            frme = 0.1,
+                            frmr = 0,
+                            frts = 0.1,
+                            frvs = 0.1, 
+                            hnf_plume = T,
+                            hscale = 10800,
+                            horcoruverr = NA, 
+                            horcorzierr = NA,
+                            ichem = 0,
+                            iconvect = 0, 
+                            initd = 0,
+                            isot = 0,
+                            kbls = 1,
+                            kblt = 1,
+                            kdef = 1,
+                            khmax = 9999,
+                            kmix0 = 250,
+                            kmixd = 3,
+                            kmsl = 0, 
+                            kpuff = 0,
+                            krnd = 6,
+                            kspl = 1,
+                            kzmix = 1,
+                            lib.loc = NULL,
+                            maxdim = 1,
+                            maxpar = 10000,
+                            met_file_format, 
+                            met_loc,
+                            mgmin = 2000,
+                            n_hours = -24,
+                            n_met_min = 1,
+                            ncycl = 0,
+                            ndump = 0,
+                            ninit = 1,
+                            nturb = 0,
+                            numpar = 200,
+                            outdt = 0,
+                            outfrac = 0.9,
+                            output_wd = file.path(stilt_wd, 'out'),
+                            p10f = 1,
+                            projection = '+proj=longlat',
+                            qcycle = 0, 
+                            r_run_time,
+                            r_lati,
+                            r_long,
+                            r_zagl,
+                            random = 1, 
+                            rm_dat = T,
+                            run_foot = T,
+                            run_trajec = T,
+                            siguverr = NA,
+                            sigzierr = NA, 
+                            smooth_factor = 1,
+                            splitf = 1,
+                            stilt_wd = getwd(),
+                            time_integrate = F,
+                            timeout = 3600,
+                            tkerd = 0.18,
+                            tkern = 0.18,
+                            tlfrac = 0.1,
+                            tluverr = NA,
+                            tlzierr = NA, 
+                            tratio = 0.9,
+                            tvmix = 1,
+                            varsiwant = NULL, 
+                            veght = 0.5,
+                            vscale = 200,
+                            w_option = 0,
+                            xmn = -180,
+                            xmx = 180,
+                            xres = 0.1,
+                            ymn = -90,
+                            ymx = 90, 
+                            yres = xres,
+                            zicontroltf = 0,
+                            ziscale = 0,
+                            z_top = 25000,
+                            zcoruverr = NA) {
   try({
-    # If using lapply or parLapply, receptors are passed as vectors and need to
-    # be subsetted for the specific simulation index
-    if (length(r_run_time) > 1) {
-      r_run_time <- r_run_time[X]
-      r_lati <- r_lati[X]
-      r_long <- r_long[X]
-      r_zagl <- r_zagl[X]
-      if (is.list(ziscale) && length(ziscale) > 1) ziscale <- ziscale[X]
-    }
     
-    # Values passed as a list of values for lapply and parLapply but a vector in
-    # slurm_apply
+    # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
+    varsiwant <- unlist(varsiwant)
     ziscale <- unlist(ziscale)
+
+    # Validate arguments
+    if (!run_trajec && !run_foot)
+      stop('simulation_step(): Nothing to do, set run_trajec or run_foot to T')
     
     # Ensure dependencies are loaded for current node/process
     source(file.path(stilt_wd, 'r/dependencies.r'), local = T)
-    
-    if (is.null(varsiwant)) {
-      varsiwant <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr',
-                     'zsfc', 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld',
-                     'dmas', 'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc',
-                     'dswf', 'wout', 'mlht', 'rain', 'crai')
-    } else if (any(grepl('/', varsiwant))) {
-      varsiwant <- unlist(strsplit(varsiwant, '/', fixed = T))
-    }
     
     # Creates subdirectories in out for each model run time. Each of these
     # subdirectories is populated with symbolic links to the shared datasets
@@ -68,7 +116,6 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                             ifelse(length(r_zagl) > 1, 'X', r_zagl))
     rundir  <- file.path(output_wd, 'by-id',
                          strftime(r_run_time, rundir_format, 'UTC'))
-    uataq::br()
     message(paste('Running simulation ID:  ', basename(rundir)))
     
     # Calculate particle trajectories ------------------------------------------
@@ -87,10 +134,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
       if (length(met_files) < n_met_min) {
-        warning('Insufficient amount of meteorological data found...')
-        cat('Insufficient amount of meteorological data found. Check ',
-            'specifications in run_stilt.r\n',
-            file = file.path(rundir, 'ERROR'))
+        msg <- paste('Insufficient number of meteorological files found. Check',
+                     'specifications in run_stilt.r')
+        warning(msg)
+        cat(msg, '\n', file = file.path(rundir, 'ERROR'))
         return()
       }
       
@@ -101,9 +148,9 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                               zagl = r_zagl)
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
-                                  hscale, ichem, iconvect, initd, isot, ivmax,
-                                  kbls, kblt, kdef, khmax, kmix0, kmixd, kmsl,
-                                  kpuff, krnd, kspl, kzmix, maxdim, maxpar,
+                                  hscale, hnf_plume, ichem, iconvect, initd, isot,
+                                  ivmax, kbls, kblt, kdef, khmax, kmix0, kmixd,
+                                  kmsl, kpuff, krnd, kspl, kzmix, maxdim, maxpar,
                                   met_files, mgmin, ncycl, ndump, ninit, numpar,
                                   nturb, n_hours, outdt, outfrac, output, p10f,
                                   qcycle, random, splitf, tkerd, tkern, rm_dat,
@@ -126,10 +173,10 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       if (winderrtf > 0) {
         particle_error <- calc_trajectory(varsiwant, conage, cpack, delt, dxf,
                                           dyf, dzf, emisshrs, frhmax, frhs, frme,
-                                          frmr, frts, frvs, hscale, ichem,
-                                          iconvect, initd, isot, ivmax, kbls,
-                                          kblt, kdef, khmax, kmix0, kmixd, kmsl,
-                                          kpuff, krnd, kspl, kzmix, maxdim,
+                                          frmr, frts, frvs, hscale, hnf_plume, 
+                                          ichem, iconvect, initd, isot, ivmax,
+                                          kbls, kblt, kdef, khmax, kmix0, kmixd,
+                                          kmsl, kpuff, krnd, kspl, kzmix, maxdim,
                                           maxpar, met_files, mgmin, ncycl, ndump,
                                           ninit, numpar, nturb, n_hours, outdt,
                                           outfrac, output, p10f, qcycle, random,
@@ -149,29 +196,23 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
       }
       
       # Save output object to compressed rds file and symlink to out/particles
-      # directory for convenience
       saveRDS(output, output$file)
-      file.symlink(output$file, file.path(output_wd, 'particles',
-                                          basename(output$file))) %>%
-        invisible()
-      
+      invisible(file.symlink(output$file, file.path(output_wd, 'particles',
+                                                    basename(output$file))))
+      # Exit if not performing footprint calculations
+      if (!run_foot) return(invisible(output$file))
+
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
       # file to a data_frame with an adjusted timestamp and index for the
       # simulation step. If none exists, report an error and proceed
       if (!file.exists(output$file)) {
         warning('simulation_step(): No _traj.rds file found in ', rundir,
-                '\n    skipping this timestep and trying the next...')
+                '\n    skipping this receptor and trying the next...')
         return()
       }
       particle <- readRDS(output$file)$particle
     }
-    
-    # Calculate near-field dilution height based on gaussian plume width
-    # approximation and recalculate footprint sensitivity for cases when the
-    # plume height is less than the PBL height scaled by veght
-    if (hnf_plume)
-      particle <- calc_plume_dilution(particle, numpar, r_zagl, veght)
     
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
@@ -185,15 +226,16 @@ simulation_step <- function(X, rm_dat = T, stilt_wd = getwd(), lib.loc = NULL,
                            xmn = xmn, xmx = xmx, xres = xres,
                            ymn = ymn, ymx = ymx, yres = yres)
     if (is.null(foot)) {
-      warning('No non-zero footprint values found within the footprint domain.')
-      cat('No non-zero footprint values found within the footprint domain.\n',
-          file = file.path(rundir, 'ERROR'))
+      msg <- 'No non-zero footprint values found within the footprint domain.'
+      warning(msg)
+      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
       return()
-    } else {
-      file.symlink(foot_file, file.path(output_wd, 'footprints',
-                                        basename(foot_file))) %>%
-        invisible()
     }
+    
+    # Symlink footprint to out/footprints
+    invisible(file.symlink(foot_file, file.path(output_wd, 'footprints',
+                                                basename(foot_file))))
+
     invisible(gc())
     return(foot)
   })

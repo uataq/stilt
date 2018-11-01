@@ -20,6 +20,8 @@ if (!file.exists(permute_exe))
   stop('calc_footprint(): failed to find permute.so in r/src/')
 dyn.load(permute_exe)
 
-# Load projection dependencies if necessary
-if ('projection' %in% ls())
+# Validate arguments and load dependencies if necessary
+if (!'projection' %in% ls())
   validate_projection(projection)
+if (!'varsiwant' %in% ls())
+  validate_varsiwant(varsiwant)

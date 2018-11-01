@@ -12,16 +12,70 @@
 #' @import uataq
 #' @export
 
-calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
-                            emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
-                            hscale, ichem, iconvect, initd, isot, ivmax, kbls,
-                            kblt, kdef, khmax, kmix0, kmixd, kmsl, kpuff, krnd,
-                            kspl, kzmix, maxdim, maxpar, met_files, mgmin, ncycl,
-                            ndump, ninit, numpar, nturb, n_hours, outdt, outfrac,
-                            output, p10f, qcycle, random, splitf, tkerd, tkern,
-                            rm_dat, timeout, tlfrac, tratio, tvmix, veght,
-                            vscale, winderrtf, w_option, zicontroltf, ziscale, 
-                            z_top, rundir) {
+calc_trajectory <- function(varsiwant,
+                            conage,
+                            cpack,
+                            delt,
+                            dxf,
+                            dyf,
+                            dzf,
+                            emisshrs,
+                            frhmax,
+                            frhs,
+                            frme,
+                            frmr,
+                            frts,
+                            frvs,
+                            hnf_plume,
+                            hscale,
+                            ichem,
+                            iconvect,
+                            initd,
+                            isot,
+                            ivmax,
+                            kbls,
+                            kblt,
+                            kdef,
+                            khmax,
+                            kmix0,
+                            kmixd,
+                            kmsl,
+                            kpuff,
+                            krnd,
+                            kspl,
+                            kzmix,
+                            maxdim,
+                            maxpar,
+                            met_files,
+                            mgmin,
+                            ncycl,
+                            ndump,
+                            ninit,
+                            numpar,
+                            nturb,
+                            n_hours,
+                            outdt,
+                            outfrac,
+                            output,
+                            p10f,
+                            qcycle,
+                            random,
+                            splitf,
+                            tkerd,
+                            tkern,
+                            rm_dat,
+                            timeout,
+                            tlfrac,
+                            tratio,
+                            tvmix,
+                            veght,
+                            vscale,
+                            winderrtf,
+                            w_option,
+                            zicontroltf,
+                            ziscale, 
+                            z_top,
+                            rundir) {
 
   require(uataq)
 
@@ -55,9 +109,9 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
       on.exit()
       break
     } else if (elapsed > timeout) {
-      warning(basename(rundir), ' timeout. Killing hymodelc pid ', pid, '\n')
-      cat('hymodelc timeout after ', elapsed, ' seconds\n',
-          file = file.path(rundir, 'ERROR'))
+      msg <- paste('hymodelc timeout after', elapsed, ' seconds\n')
+      warning(msg)
+      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
       return()
     }
     Sys.sleep(1)
@@ -66,17 +120,19 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
   # Error check hymodelc output
   pf <- file.path(rundir, 'PARTICLE.DAT')
   if (!file.exists(pf)) {
-    warning('Failed to output PARTICLE.DAT in ', basename(rundir))
-    cat('No PARTICLE.DAT found. Check for errors in hymodelc.out\n',
-        file = file.path(rundir, 'ERROR'))
+    msg <- paste('Failed to output PARTICLE.DAT in', basename(rundir),
+                 'Check for errors in hymodelc.out')
+    warning(msg)
+    cat(msg, '\n', file = file.path(rundir, 'ERROR'))
     return()
   }
 
   n_lines <- uataq::count_lines(pf)
   if (n_lines < 2) {
-    warning('No trajectory data found in ', pf)
-    cat('PARTICLE.DAT does not contain any trajectory data. Check for errors ',
-        'in hymodelc.out\n', file = file.path(rundir, 'ERROR'))
+    msg <- paste(pf, 'does not contain any trajectory data.',
+                 'Check for errors in hymodelc.out')
+    warning(msg)
+    cat(msg, '\n', file = file.path(rundir, 'ERROR'))
     return()
   }
 
@@ -92,5 +148,11 @@ calc_trajectory <- function(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
     px$xhgt <- rep(x_heights, each = length(px$indx) / length(x_heights))
     p <- merge(p, px, by = 'indx', sort = F)
   }
+
+  # Calculate near-field dilution height based on gaussian plume width
+  # approximation and recalculate footprint sensitivity for cases when the
+  # plume height is less than the PBL height scaled by veght
+  if (hnf_plume) 
+    p <- calc_plume_dilution(p, numpar, output$receptor$zagl, veght)
   p
 }

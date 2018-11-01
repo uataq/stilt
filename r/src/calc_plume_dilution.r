@@ -24,7 +24,8 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
          paste(collapse = ', ', varsineed))
 
   p %>%
-    mutate(sigma = samt * sqrt(2) * sigw *
+    mutate(foot_no_hnf_dilution = foot,
+           sigma = samt * sqrt(2) * sigw *
              sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr)-1),
            pbl_mixing = veght * mlht) %>%
     arrange(-time) %>%

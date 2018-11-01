@@ -7,8 +7,6 @@
 
 validate_varsiwant <- function(varsiwant) {
 
-  if (is.null(varsiwant)) return()
-
   valid <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
              'icdx', 'temp', 'samt', 'foot', 'shtf', 'lhtf', 'tcld', 'dmas',
              'dens', 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout',

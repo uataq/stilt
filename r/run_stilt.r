@@ -44,6 +44,7 @@ n_met_min       <- 1
 n_hours    <- -24
 numpar     <- 200
 rm_dat     <- T
+run_foot   <- T
 run_trajec <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
@@ -158,9 +159,8 @@ for (d in c('by-id', 'particles', 'footprints')) {
 
 
 # Met path symlink -------------------------------------------------------------
-# Auto symlink the meteorological data path to the working directory to
-# eliminate issues with long (>80 char) paths in fortran. Note that this assumes
-# that all meteorological data is found in the same directory.
+# Auto symlink the meteorological data path to the user's home directory to
+# eliminate issues with long (>80 char) paths in fortran
 if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
   met_loc <- file.path(path.expand('~'), paste0('m', project))
   if (!file.exists(met_loc)) invisible(file.symlink(met_directory, met_loc))
@@ -170,40 +170,94 @@ if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
 # Run trajectory simulations ---------------------------------------------------
 # Gather varsiwant into a single character string and fork the process to apply
 # simulation_step() to each receptor across n_cores and n_nodes
-validate_varsiwant(varsiwant)
-if (!is.null(varsiwant[1]))
-  varsiwant <- paste(varsiwant, collapse = '/')
+# validate_varsiwant(varsiwant)
+# if (!is.null(varsiwant[1]))
+#   varsiwant <- paste(varsiwant, collapse = '/')
 
-output <- stilt_apply(X = 1:nrow(receptors), FUN = simulation_step,
-                      slurm = slurm, slurm_options = slurm_options,
-                      n_cores = n_cores, n_nodes = n_nodes, rm_dat = rm_dat,
-                      conage = conage, cpack = cpack, delt = delt,
-                      emisshrs = emisshrs, frhmax = frhmax, frhs = frhs,
-                      frme = frme, frmr = frmr, frts = frts, frvs = frvs,
-                      hnf_plume = hnf_plume, horcoruverr = horcoruverr,
-                      horcorzierr = horcorzierr, ichem = ichem,
-                      iconvect = iconvect, initd = initd, isot = isot,
-                      kbls = kbls, kblt = kblt, kdef = kdef, khmax = khmax,
-                      kmix0 = kmix0, kmixd = kmixd, kmsl = kmsl, kpuff = kpuff,
-                      krnd = krnd, kspl = kspl, kzmix = kzmix, maxdim = maxdim,
-                      maxpar = maxpar, lib.loc = lib.loc,
-                      met_file_format = met_file_format, met_loc = met_loc,
-                      mgmin = mgmin, n_hours = n_hours, n_met_min = n_met_min,
-                      ncycl = ncycl, ndump = ndump, ninit = ninit,
-                      nturb = nturb, numpar = numpar, outdt = outdt,
-                      outfrac = outfrac, output_wd = output_wd, p10f = p10f,
-                      projection = projection, qcycle = qcycle,
-                      r_run_time = receptors$run_time, r_lati = receptors$lati,
-                      r_long = receptors$long, r_zagl = receptors$zagl,
-                      random = random, run_trajec = run_trajec,
-                      siguverr = siguverr, sigzierr = sigzierr,
-                      smooth_factor = smooth_factor, splitf = splitf,
-                      stilt_wd = stilt_wd, time_integrate = time_integrate,
-                      timeout = timeout, tkerd = tkerd, tkern = tkern,
-                      tlfrac = tlfrac, tluverr = tluverr, tlzierr = tlzierr,
-                      tratio = tratio, tvmix = tvmix, varsiwant = varsiwant,
-                      veght = veght, vscale = vscale, w_option = w_option,
-                      xmn = xmn, xmx = xmx, xres = xres, ymn = ymn, ymx = ymx,
-                      yres = yres, zicontroltf = zicontroltf, ziscale = ziscale,
-                      z_top = z_top, zcoruverr = zcoruverr)
-q('no')
+stilt_apply(FUN = simulation_step,
+            slurm = slurm, 
+            slurm_options = slurm_options,
+            n_cores = n_cores,
+            n_nodes = n_nodes,
+            conage = conage,
+            cpack = cpack,
+            delt = delt,
+            emisshrs = emisshrs,
+            frhmax = frhmax,
+            frhs = frhs,
+            frme = frme,
+            frmr = frmr,
+            frts = frts,
+            frvs = frvs,
+            hnf_plume = hnf_plume,
+            horcoruverr = horcoruverr,
+            horcorzierr = horcorzierr,
+            ichem = ichem,
+            iconvect = iconvect,
+            initd = initd,
+            isot = isot,
+            kbls = kbls,
+            kblt = kblt,
+            kdef = kdef,
+            khmax = khmax,
+            kmix0 = kmix0,
+            kmixd = kmixd,
+            kmsl = kmsl,
+            kpuff = kpuff,
+            krnd = krnd,
+            kspl = kspl,
+            kzmix = kzmix,
+            maxdim = maxdim,
+            maxpar = maxpar,
+            lib.loc = lib.loc,
+            met_file_format = met_file_format,
+            met_loc = met_loc,
+            mgmin = mgmin,
+            n_hours = n_hours,
+            n_met_min = n_met_min,
+            ncycl = ncycl,
+            ndump = ndump,
+            ninit = ninit,
+            nturb = nturb,
+            numpar = numpar,
+            outdt = outdt,
+            outfrac = outfrac,
+            output_wd = output_wd,
+            p10f = p10f,
+            projection = projection,
+            qcycle = qcycle,
+            r_run_time = receptors$run_time,
+            r_lati = receptors$lati,
+            r_long = receptors$long,
+            r_zagl = receptors$zagl,
+            random = random,
+            rm_dat = rm_dat,
+            run_foot = run_foot,
+            run_trajec = run_trajec,
+            siguverr = siguverr,
+            sigzierr = sigzierr,
+            smooth_factor = smooth_factor,
+            splitf = splitf,
+            stilt_wd = stilt_wd,
+            time_integrate = time_integrate,
+            timeout = timeout,
+            tkerd = tkerd, tkern = tkern,
+            tlfrac = tlfrac,
+            tluverr = tluverr,
+            tlzierr = tlzierr,
+            tratio = tratio,
+            tvmix = tvmix,
+            varsiwant = list(varsiwant),
+            veght = veght,
+            vscale = vscale,
+            w_option = w_option,
+            xmn = xmn,
+            xmx = xmx,
+            xres = xres,
+            ymn = ymn,
+            ymx = ymx,
+            yres = yres,
+            zicontroltf = zicontroltf,
+            ziscale = ziscale,
+            z_top = z_top,
+            zcoruverr = zcoruverr)
