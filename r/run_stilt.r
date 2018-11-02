@@ -168,12 +168,6 @@ if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
 
 
 # Run trajectory simulations ---------------------------------------------------
-# Gather varsiwant into a single character string and fork the process to apply
-# simulation_step() to each receptor across n_cores and n_nodes
-# validate_varsiwant(varsiwant)
-# if (!is.null(varsiwant[1]))
-#   varsiwant <- paste(varsiwant, collapse = '/')
-
 stilt_apply(FUN = simulation_step,
             slurm = slurm, 
             slurm_options = slurm_options,
