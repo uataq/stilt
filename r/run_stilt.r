@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # STILT R Executable
 # For documentation, see https://uataq.github.io/stilt/
 # Ben Fasoli
