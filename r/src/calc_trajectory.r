@@ -76,7 +76,7 @@ calc_trajectory <- function(varsiwant,
                             ziscale, 
                             z_top,
                             rundir) {
-
+  
   require(uataq)
 
   # Enable manual rescaling of mixed layer height
