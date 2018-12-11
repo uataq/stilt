@@ -37,6 +37,8 @@ if (!all(names(args) %in% req_args)) {
     stop(paste('Not all arguments supplied:', 
                 paste(req_args, collapse=',')))
 }
+print(args)
+!all(names(args) %in% req_args)
 
 # Ensure script is executed from the correct place
 for (i in 1:99) {
