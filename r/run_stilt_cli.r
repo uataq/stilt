@@ -146,5 +146,6 @@ stilt_args <- list(
 )
 stilt_args <- stilt_args[sapply(stilt_args, function(x) length(x) > 0)]
 
+print(stilt_args)
 source(file.path(stilt_args$stilt_wd, 'r', 'src', 'simulation_step.r'))
 do.call(simulation_step, stilt_args)
