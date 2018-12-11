@@ -31,14 +31,13 @@ for (arg in strsplit(arg_strings, '=')) {
 }
 
 # Validate required arguments exist
+print(args)
 req_args <- c('met_file_format', 'met_loc', 'r_run_time', 'r_lati', 'r_long',
-             'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
+              'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
 if (!all(names(args) %in% req_args)) {
     stop(paste('Not all arguments supplied:', 
                 paste(req_args, collapse=',')))
 }
-print(args)
-!all(names(args) %in% req_args)
 
 # Ensure script is executed from the correct place
 for (i in 1:99) {
