@@ -11,8 +11,14 @@ invisible(lapply(rsc, source))
 
 # Load external libraries
 if (!'lib.loc' %in% ls()) lib.loc <- NULL
-load_libs('dplyr', 'ncdf4', 'parallel', 'raster', 'readr', 'rslurm', 'uataq',
-          lib.loc = lib.loc)
+libs <- load_libs('dplyr',
+                  'ncdf4',
+                  'parallel',
+                  'raster',
+                  'readr',
+                  'rslurm',
+                  'uataq',
+                  lib.loc = lib.loc)
 
 # Load permute fortran dll for footprint matrix permutation
 permute_exe <- file.path(stilt_wd, 'r/src/permute.so')
@@ -21,7 +27,7 @@ if (!file.exists(permute_exe))
 dyn.load(permute_exe)
 
 # Validate arguments and load dependencies if necessary
-if (!'projection' %in% ls())
+if ((!class(projection) == 'function') && ('projection' %in% ls()))
   validate_projection(projection)
-if (!'varsiwant' %in% ls())
+if ('varsiwant' %in% ls())
   validate_varsiwant(varsiwant)
