@@ -34,7 +34,7 @@ for (arg in strsplit(arg_strings, '=')) {
 print(args)
 req_args <- c('met_file_format', 'met_loc', 'r_run_time', 'r_lati', 'r_long',
               'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
-if (!all(names(args) %in% req_args)) {
+if (!all(req_args %in% names(args))) {
     stop(paste('Not all arguments supplied:', 
                 paste(req_args, collapse=',')))
 }
