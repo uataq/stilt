@@ -84,7 +84,7 @@ calc_trajectory <- function(varsiwant,
     write_zicontrol(ziscale, file.path(rundir, 'ZICONTROL'))
   }
 
-  # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
+  # Write SETUP.CFG and CONTROL files to control model
   write_setup(varsiwant, conage, cpack, delt, dxf, dyf, dzf, frhmax, frhs, frme,
               frmr, frts, frvs, hscale, ichem, iconvect, initd, isot, kbls, kblt, 
               kdef, khmax, kmix0, kmixd, kmsl, kpuff, krnd, kspl, kzmix, maxdim,
