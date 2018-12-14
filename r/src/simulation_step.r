@@ -151,7 +151,6 @@ simulation_step <- function(conage = 48,
         cat(msg, '\n', file = file.path(rundir, 'ERROR'))
         return()
       }
-      print(met_files)
       
       # Execute particle trajectory simulation, and read results into data frame
       output$receptor <- list(run_time = r_run_time,
@@ -169,7 +168,6 @@ simulation_step <- function(conage = 48,
                                   timeout, tlfrac, tratio, tvmix, veght, vscale,
                                   0, w_option, zicontroltf, ziscale, z_top, 
                                   rundir)
-      print(particle)
       if (is.null(particle)) return()
       
       # Bundle trajectory configuration metadata with trajectory informtation
@@ -183,7 +181,6 @@ simulation_step <- function(conage = 48,
       zerr <- write_zierr(sigzierr, tlzierr, horcorzierr,
                           file = file.path(rundir, 'ZIERR'))
       winderrtf <- (!is.null(xyerr)) + 2 * !is.null(zerr)
-      print(winderrtf)
       if (winderrtf > 0) {
         particle_error <- calc_trajectory(varsiwant, conage, cpack, delt, dxf,
                                           dyf, dzf, emisshrs, frhmax, frhs, frme,
@@ -239,7 +236,6 @@ simulation_step <- function(conage = 48,
                            time_integrate = time_integrate,
                            xmn = xmn, xmx = xmx, xres = xres,
                            ymn = ymn, ymx = ymx, yres = yres)
-    print(foot)
     if (is.null(foot)) {
       msg <- 'No non-zero footprint values found within the footprint domain.'
       warning(msg)

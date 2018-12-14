@@ -31,7 +31,6 @@ for (arg in strsplit(arg_strings, '=')) {
 }
 
 # Validate required arguments exist
-print(args)
 req_args <- c('met_file_format', 'met_loc', 'r_run_time', 'r_lati', 'r_long',
               'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
 if (!all(req_args %in% names(args))) {
@@ -147,6 +146,6 @@ stilt_args <- list(
 )
 stilt_args <- stilt_args[sapply(stilt_args, function(x) length(x) > 0)]
 
-print(stilt_args)
 source(file.path(stilt_args$stilt_wd, 'r', 'src', 'simulation_step.r'))
-do.call(simulation_step, stilt_args)
+res <- do.call(simulation_step, stilt_args)
+q('no')
