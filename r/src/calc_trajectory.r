@@ -86,22 +86,26 @@ calc_trajectory <- function(varsiwant,
 
   # Write SETUP.CFG, CONTROL, and runhymodelc.sh files to control model
   write_setup(varsiwant, conage, cpack, delt, dxf, dyf, dzf, frhmax, frhs, frme,
-              frmr, frts, frvs, hscale, ichem, iconvect, initd, isot, kbls, kblt, kdef,
-              khmax, kmix0, kmixd, kmsl, kpuff, krnd, kspl, kzmix, maxdim,
+              frmr, frts, frvs, hscale, ichem, iconvect, initd, isot, kbls, kblt, 
+              kdef, khmax, kmix0, kmixd, kmsl, kpuff, krnd, kspl, kzmix, maxdim,
               maxpar, mgmin, ncycl, ndump, ninit, numpar, nturb, outdt, outfrac,
               p10f, qcycle, random, splitf, tkerd, tkern, tlfrac, tratio, tvmix,
               veght, vscale, winderrtf, zicontroltf,
               file.path(rundir, 'SETUP.CFG'))
   write_control(output$receptor, emisshrs, n_hours, w_option, z_top, met_files,
                 file.path(rundir, 'CONTROL'))
-  sh <- write_runhymodelc(file.path(rundir, 'runhymodelc.sh'))
-
+  
   # Simulation timeout ---------------------------------------------------------
   # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hymodelc and moves on to next simulation
+  #
+  # TODO: as of R 3.5, system() and system2() have introduced a timout arg that
+  # may enable this to be depracated in the future. For now, most linux package
+  # libraries are not up to date so waiting to implement edge requirements
   of <- file.path(rundir, 'hymodelc.out')
   eval_start <- Sys.time()
-  pid <- system(paste('bash', sh), intern = T)
+  cmd <- paste('(cd', rundir, '&& (./hymodelc > hymodelc.out & echo $!))')
+  pid <- system(cmd, intern = T)
   on.exit(tools::pskill(pid))
   repeat {
     elapsed <- as.double.difftime(Sys.time() - eval_start, units = 'secs')
