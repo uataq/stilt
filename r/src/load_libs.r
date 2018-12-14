@@ -33,7 +33,11 @@ load_libs <- function(..., lib.loc = NULL) {
       # If package is not installed
       if (!load_check(pkg, lib.loc)) {
         # Try installing from CRAN
-        try(install.packages(pkg, repo = repo, lib = lib.loc))
+        try(
+          suppressWarnings(
+            install.packages(pkg, repo = repo, lib = lib.loc)
+          )
+        )
         # If the package is not found on CRAN
         if (!load_check(pkg, lib.loc)) {
           # Try Ben Fasoli's github

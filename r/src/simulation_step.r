@@ -42,7 +42,7 @@ simulation_step <- function(conage = 48,
                             kzmix = 1,
                             lib.loc = NULL,
                             maxdim = 1,
-                            maxpar = 10000,
+                            maxpar = max(10000, numpar),
                             met_file_format, 
                             met_loc,
                             mgmin = 2000,
@@ -81,21 +81,27 @@ simulation_step <- function(conage = 48,
                             tlzierr = NA, 
                             tratio = 0.9,
                             tvmix = 1,
-                            varsiwant = NULL, 
+                            varsiwant = c('time', 'indx', 'long', 'lati', 'zagl', 
+                                          'sigw', 'tlgr', 'zsfc', 'icdx', 'temp',
+                                          'samt', 'foot', 'shtf', 'tcld', 'dmas', 
+                                          'dens', 'rhfr', 'sphu', 'solw', 'lcld', 
+                                          'zloc', 'dswf', 'wout', 'mlht', 'rain', 
+                                          'crai', 'pres'), 
                             veght = 0.5,
                             vscale = 200,
                             w_option = 0,
-                            xmn = -180,
-                            xmx = 180,
-                            xres = 0.1,
-                            ymn = -90,
-                            ymx = 90, 
+                            xmn,
+                            xmx,
+                            xres,
+                            ymn,
+                            ymx, 
                             yres = xres,
                             zicontroltf = 0,
                             ziscale = 0,
                             z_top = 25000,
                             zcoruverr = NA) {
   try({
+    setwd(stilt_wd)
     
     # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
@@ -116,6 +122,9 @@ simulation_step <- function(conage = 48,
                             ifelse(length(r_zagl) > 1, 'X', r_zagl))
     rundir  <- file.path(output_wd, 'by-id',
                          strftime(r_run_time, rundir_format, 'UTC'))
+    dir.create(rundir, showWarnings = F, recursive = T)
+    dir.create(file.path(output_wd, 'particles'), showWarnings = F, recursive = T)
+    dir.create(file.path(output_wd, 'footprints'), showWarnings = F, recursive = T)
     message(paste('Running simulation ID:  ', basename(rundir)))
     
     # Calculate particle trajectories ------------------------------------------
@@ -129,7 +138,9 @@ simulation_step <- function(conage = 48,
       # current rundir
       if (!dir.exists(rundir)) dir.create(rundir)
       link_files <- dir(file.path(stilt_wd, 'exe'))
-      file.symlink(file.path(stilt_wd, 'exe', link_files), rundir)
+      suppressWarnings(
+        file.symlink(file.path(stilt_wd, 'exe', link_files), rundir)
+      )
       
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
@@ -148,7 +159,7 @@ simulation_step <- function(conage = 48,
                               zagl = r_zagl)
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
-                                  hscale, hnf_plume, ichem, iconvect, initd, isot,
+                                  hnf_plume, hscale, ichem, iconvect, initd, isot,
                                   ivmax, kbls, kblt, kdef, khmax, kmix0, kmixd,
                                   kmsl, kpuff, krnd, kspl, kzmix, maxdim, maxpar,
                                   met_files, mgmin, ncycl, ndump, ninit, numpar,
@@ -173,7 +184,7 @@ simulation_step <- function(conage = 48,
       if (winderrtf > 0) {
         particle_error <- calc_trajectory(varsiwant, conage, cpack, delt, dxf,
                                           dyf, dzf, emisshrs, frhmax, frhs, frme,
-                                          frmr, frts, frvs, hscale, hnf_plume, 
+                                          frmr, frts, frvs, hnf_plume, hscale,
                                           ichem, iconvect, initd, isot, ivmax,
                                           kbls, kblt, kdef, khmax, kmix0, kmixd,
                                           kmsl, kpuff, krnd, kspl, kzmix, maxdim,

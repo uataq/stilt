@@ -88,8 +88,8 @@ if [ ! -s fortran/hymodelc ]; then
 fi
 # Move hymodelc to shared exe/ directory
 mv fortran/hymodelc exe/hymodelc
-# Ensure hymodelc is executable
-chmod +x exe/hymodelc
+# Ensure hymodelc, run_stilt.r, and stilt_cli.r are executable
+chmod +x exe/hymodelc r/run_stilt.r r/stilt_cli.r
 
 
 # Compile permute DLL for footprint kernel aggregation
