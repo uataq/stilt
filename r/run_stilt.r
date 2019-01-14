@@ -31,6 +31,18 @@ lati <- 40.782561
 long <- -111.980323
 zagl <- 5
 
+# Footprint grid settings, must set at least xmn, xmx, ymn, ymx below
+hnf_plume <- T
+projection <- '+proj=longlat'
+smooth_factor <- 1
+time_integrate <- F
+xmn <- NA
+xmx <- NA
+ymn <- NA
+ymx <- NA
+xres <- 0.01
+yres <- xres
+
 # Expand the run times, latitudes, and longitudes to form the unique receptors
 # that are used for each simulation
 receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
@@ -52,19 +64,6 @@ varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
                 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout', 'mlht',
                 'rain', 'crai', 'pres')
-
-# Footprint grid settings
-hnf_plume <- T
-projection <- '+proj=longlat'
-smooth_factor <- 1
-time_integrate <- F
-xmn <- -114.5
-xmx <- -109
-ymn <- 37
-ymx <- 42
-xres <- 0.01
-yres <- xres
-
 
 # Transport and dispersion settings
 conage      <- 48

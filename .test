@@ -14,10 +14,10 @@ sed -i "s|file.path('{{wd}}', project)|getwd()|g" r/run_stilt.r
 
 # Set receptor and footprint information
 sed -i 's|2015-06-18 22:00:00|2015-12-10 00:00:00|g' r/run_stilt.r
-sed -i 's|xmn <- -114.5|xmn <- -112.30|g' r/run_stilt.r
-sed -i 's|xmx <- -109|xmx <- -111.52|g' r/run_stilt.r
-sed -i 's|ymn <- 37|ymn <- 40.39|g' r/run_stilt.r
-sed -i 's|ymx <- 42|ymx <- 40.95|g' r/run_stilt.r
+sed -i 's|xmn <- NA|xmn <- -112.30|g' r/run_stilt.r
+sed -i 's|xmx <- NA|xmx <- -111.52|g' r/run_stilt.r
+sed -i 's|ymn <- NA|ymn <- 40.39|g' r/run_stilt.r
+sed -i 's|ymx <- NA|ymx <- 40.95|g' r/run_stilt.r
 sed -i 's|xres <- 0.01|xres <- 0.002|g' r/run_stilt.r
 
 # Set met_directory
