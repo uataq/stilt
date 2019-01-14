@@ -36,6 +36,18 @@ zagl <- 5
 receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
                          zagl = zagl, KEEP.OUT.ATTRS = F, stringsAsFactors = F)
 
+# Footprint grid settings, must set at least xmn, xmx, ymn, ymx below
+hnf_plume <- T
+projection <- '+proj=longlat'
+smooth_factor <- 1
+time_integrate <- F
+xmn <- NA
+xmx <- NA
+ymn <- NA
+ymx <- NA
+xres <- 0.01
+yres <- xres
+
 # Meteorological data input
 met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'
 met_file_format <- '%Y%m%d.%Hz.hrrra'
@@ -52,19 +64,6 @@ varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
                 'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout', 'mlht',
                 'rain', 'crai', 'pres')
-
-# Footprint grid settings
-hnf_plume <- T
-projection <- '+proj=longlat'
-smooth_factor <- 1
-time_integrate <- F
-xmn <- -114.5
-xmx <- -109
-ymn <- 37
-ymx <- 42
-xres <- 0.01
-yres <- xres
-
 
 # Transport and dispersion settings
 conage      <- 48
