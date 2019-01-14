@@ -31,6 +31,11 @@ lati <- 40.782561
 long <- -111.980323
 zagl <- 5
 
+# Expand the run times, latitudes, and longitudes to form the unique receptors
+# that are used for each simulation
+receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
+                         zagl = zagl, KEEP.OUT.ATTRS = F, stringsAsFactors = F)
+
 # Footprint grid settings, must set at least xmn, xmx, ymn, ymx below
 hnf_plume <- T
 projection <- '+proj=longlat'
@@ -42,11 +47,6 @@ ymn <- NA
 ymx <- NA
 xres <- 0.01
 yres <- xres
-
-# Expand the run times, latitudes, and longitudes to form the unique receptors
-# that are used for each simulation
-receptors <- expand.grid(run_time = run_times, lati = lati, long = long,
-                         zagl = zagl, KEEP.OUT.ATTRS = F, stringsAsFactors = F)
 
 # Meteorological data input
 met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'
