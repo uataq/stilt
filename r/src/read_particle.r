@@ -21,6 +21,6 @@ read_particle <- function(file, varsiwant) {
   }
 
   read.table(file, header = F, skip = 1,
-             colClasses = 'numeric', col.names = varsiwant) %>%
-    as_data_frame()
+             colClasses = 'numeric', col.names = varsiwant,
+             stringsAsFactors = F)
 }

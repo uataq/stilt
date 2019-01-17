@@ -151,8 +151,8 @@ write_footprint <- function(foot, output, glong, glati, projection, time_out,
   
   # Alternative .csv output
   if (!is.null(output) && grepl('\\.csv$', output, ignore.case = T)) {
-    csv <- data_frame(expand.grid(longitude = glong, latitude  = glati),
-                      c(foot)) %>%
+    csv <- expand.grid(longitude = glong, latitude  = glati) %>%
+      mutate(foot = c(foot)) %>%
       dplyr::filter(foot > 0)
     write('STILT Footprint. For documentation, see uataq.github.io/stilt',
           file = output)

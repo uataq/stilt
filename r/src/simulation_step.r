@@ -215,7 +215,7 @@ simulation_step <- function(conage = 48,
 
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
-      # file to a data_frame with an adjusted timestamp and index for the
+      # file to a data frame with an adjusted timestamp and index for the
       # simulation step. If none exists, report an error and proceed
       if (!file.exists(output$file)) {
         warning('simulation_step(): No _traj.rds file found in ', rundir,
