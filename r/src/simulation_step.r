@@ -222,7 +222,7 @@ simulation_step <- function(conage = 48,
                 '\n    skipping this receptor and trying the next...')
         return()
       }
-      particle <- readRDS(output$file)$particle
+      output <- readRDS(output$file)
     }
     
     # Produce footprint --------------------------------------------------------
@@ -230,7 +230,7 @@ simulation_step <- function(conage = 48,
     # outputs a .rds file, which can be read with readRDS() containing the
     # resultant footprint and various attributes
     foot_file <- file.path(rundir, paste0(basename(rundir), '_foot.nc'))
-    foot <- calc_footprint(particle, output = foot_file,
+    foot <- calc_footprint(output$particle, output = foot_file,
                            r_run_time = r_run_time,
                            smooth_factor = smooth_factor,
                            time_integrate = time_integrate,
