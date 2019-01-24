@@ -239,6 +239,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     
     # User defined function to mutate the output object
     output <- before_footprint()
+    print(str(output))
 
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
