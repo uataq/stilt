@@ -8,8 +8,8 @@
 #'
 #' @export
 
-simulation_step <- function(after_trajec = function(output) {output},
-                            before_trajec = function(output) {output},
+simulation_step <- function(after_trajec = function() {output},
+                            before_trajec = function() {output},
                             conage = 48,
                             cpack = 1,
                             delt = 0,
@@ -159,6 +159,7 @@ simulation_step <- function(after_trajec = function(output) {output},
                               lati = r_lati,
                               long = r_long,
                               zagl = r_zagl)
+      output <- before_trajec()
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
                                   hnf_plume, hscale, ichem, iconvect, initd, isot,
@@ -227,6 +228,9 @@ simulation_step <- function(after_trajec = function(output) {output},
       output <- readRDS(output$file)
     }
     
+    # User defined function to mutate the output object
+    output <- after_trajec()
+
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
     # outputs a .rds file, which can be read with readRDS() containing the
