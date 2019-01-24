@@ -1,4 +1,4 @@
-#' simulation_step runs STILT for the given timestep
+#' simulation_step runs STILT for the given receptor
 #' @author Ben Fasoli
 #'
 #' Executes trajectory calculations with (and optionally without) transport
@@ -8,7 +8,9 @@
 #'
 #' @export
 
-simulation_step <- function(conage = 48,
+simulation_step <- function(after_trajec = function(output) {output},
+                            before_trajec = function(output) {output},
+                            conage = 48,
                             cpack = 1,
                             delt = 0,
                             dxf = 1,
