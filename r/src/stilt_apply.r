@@ -26,9 +26,11 @@ stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
          'Did you mean to set slurm = T in run_stilt.r?')
   }
   
-  # Expand arguments to form a data_frame where rows serve as iterations of FUN
-  # using named columns as arguments to FUN
-  Y <- data_frame(...)
+  # Expand arguments to form a data frame where rows serve as iterations of FUN
+  # using named columns as arguments to FUN. Base R's data.frame class expands
+  # list arguments to multiple rows when constructing a new dataframe (not when
+  # adding a new column) but tibble retains list classed objects
+  Y <- tibble(...)
 
   if (slurm) {
     # Confirm availability of sbatch executable and dispatch simulation

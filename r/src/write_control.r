@@ -28,7 +28,8 @@ write_control <- function(receptor, emisshrs, n_hour, w_option = 0,
     stop('write_control(): file argument must end with CONTROL')
 
   receptor <- with(receptor, 
-                   data_frame(run_time, lati, long, zagl = unlist(zagl)))
+                   data.frame(run_time, lati, long, zagl = unlist(zagl), 
+                              stringsAsFactors = F))
   receptor$print <- with(receptor, paste(lati, long, zagl))
 
   txt = c(

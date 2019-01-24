@@ -1,4 +1,4 @@
-#' simulation_step runs STILT for the given timestep
+#' simulation_step runs STILT for the given receptor
 #' @author Ben Fasoli
 #'
 #' Executes trajectory calculations with (and optionally without) transport
@@ -8,7 +8,9 @@
 #'
 #' @export
 
-simulation_step <- function(conage = 48,
+simulation_step <- function(before_footprint = list(function() {output}),
+                            before_trajec = list(function() {output}),
+                            conage = 48,
                             cpack = 1,
                             delt = 0,
                             dxf = 1,
@@ -103,6 +105,12 @@ simulation_step <- function(conage = 48,
   try({
     setwd(stilt_wd)
     
+    # Ensure user specified functions reference the simulation_step environment
+    before_footprint <- before_footprint[[1]]
+    before_trajec <- before_trajec[[1]]
+    environment(before_footprint) <- environment()
+    environment(before_trajec) <- environment()
+
     # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
     varsiwant <- unlist(varsiwant)
@@ -157,6 +165,10 @@ simulation_step <- function(conage = 48,
                               lati = r_lati,
                               long = r_long,
                               zagl = r_zagl)
+
+      # User defined function to mutate the output object
+      output <- before_trajec()
+
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
                                   hnf_plume, hscale, ichem, iconvect, initd, isot,
@@ -215,22 +227,25 @@ simulation_step <- function(conage = 48,
 
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
-      # file to a data_frame with an adjusted timestamp and index for the
+      # file to a data frame with an adjusted timestamp and index for the
       # simulation step. If none exists, report an error and proceed
       if (!file.exists(output$file)) {
         warning('simulation_step(): No _traj.rds file found in ', rundir,
                 '\n    skipping this receptor and trying the next...')
         return()
       }
-      particle <- readRDS(output$file)$particle
+      output <- readRDS(output$file)
     }
     
+    # User defined function to mutate the output object
+    output <- before_footprint()
+
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
     # outputs a .rds file, which can be read with readRDS() containing the
     # resultant footprint and various attributes
     foot_file <- file.path(rundir, paste0(basename(rundir), '_foot.nc'))
-    foot <- calc_footprint(particle, output = foot_file,
+    foot <- calc_footprint(output$particle, output = foot_file,
                            r_run_time = r_run_time,
                            smooth_factor = smooth_factor,
                            time_integrate = time_integrate,

@@ -130,6 +130,10 @@ horcorzierr <- NA
 sigzierr    <- NA
 tlzierr     <- NA
 
+# Interface to mutate the output object with user defined functions
+before_trajec <- function() {output}
+before_footprint <- function() {output}
+
 
 # Startup messages -------------------------------------------------------------
 message('Initializing STILT')
@@ -173,6 +177,8 @@ stilt_apply(FUN = simulation_step,
             slurm_options = slurm_options,
             n_cores = n_cores,
             n_nodes = n_nodes,
+            before_footprint = list(before_footprint),
+            before_trajec = list(before_trajec),
             conage = conage,
             cpack = cpack,
             delt = delt,
