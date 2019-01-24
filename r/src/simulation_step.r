@@ -106,6 +106,8 @@ simulation_step <- function(before_footprint = function() {output},
     setwd(stilt_wd)
     
     # Vector style arguments passed as a list
+    before_footprint <- before_footprint[[1]]
+    before_trajec <- before_trajec[[1]]
     print(str(before_footprint))
     print(str(before_trajec))
     r_zagl <- unlist(r_zagl)
