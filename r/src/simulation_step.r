@@ -8,7 +8,7 @@
 #'
 #' @export
 
-simulation_step <- function(after_trajec = function() {output},
+simulation_step <- function(before_footprint = function() {output},
                             before_trajec = function() {output},
                             conage = 48,
                             cpack = 1,
@@ -229,7 +229,7 @@ simulation_step <- function(after_trajec = function() {output},
     }
     
     # User defined function to mutate the output object
-    output <- after_trajec()
+    output <- before_footprint()
 
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
