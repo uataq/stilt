@@ -8,8 +8,8 @@
 #'
 #' @export
 
-simulation_step <- function(before_footprint = function() {output},
-                            before_trajec = function() {output},
+simulation_step <- function(before_footprint = list(function() {output}),
+                            before_trajec = list(function() {output}),
                             conage = 48,
                             cpack = 1,
                             delt = 0,
@@ -110,7 +110,7 @@ simulation_step <- function(before_footprint = function() {output},
     before_trajec <- before_trajec[[1]]
     environment(before_footprint) <- environment()
     environment(before_trajec) <- environment()
-    
+
     # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
     varsiwant <- unlist(varsiwant)
@@ -165,16 +165,10 @@ simulation_step <- function(before_footprint = function() {output},
                               lati = r_lati,
                               long = r_long,
                               zagl = r_zagl)
-      message('Debug: before_trajec()')
-      print(before_trajec)
-      print(' ')
-      print(str(before_trajec))
-      print(' ')
-      print('Namespace:')
-      print(ls())
-      print('Environment:')
-      print(environment())
+
+      # User defined function to mutate the output object
       output <- before_trajec()
+
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
                                   hnf_plume, hscale, ichem, iconvect, initd, isot,
