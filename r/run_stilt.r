@@ -131,8 +131,8 @@ sigzierr    <- NA
 tlzierr     <- NA
 
 # Interface to mutate the output object with user defined functions
-before_trajec <- function() {print(str(output)); print(str(ls())); output}
-before_footprint <- function() {print(str(output)); print(str(ls())); output}
+before_trajec <- function() {print(str(ls())); print(str(output)); output}
+before_footprint <- function() {print(str(ls())); print(str(output)); output}
 
 
 # Startup messages -------------------------------------------------------------
