@@ -131,11 +131,7 @@ sigzierr    <- NA
 tlzierr     <- NA
 
 # Interface to mutate the output object with user defined functions
-# before_trajec <- function() {output}
-before_trajec <- function() {
-  output$link_files <- link_files
-  output
-}
+before_trajec <- function() {output}
 before_footprint <- function() {output}
 
 
