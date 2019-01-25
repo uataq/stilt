@@ -101,9 +101,12 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             zicontroltf = 0,
                             ziscale = 0,
                             z_top = 25000,
-                            zcoruverr = NA) {
+                            zcoruverr = NA,
+                            ...) {
   try({
     setwd(stilt_wd)
+    
+    args <- list(...)
     
     # Ensure user specified functions reference the simulation_step environment
     before_footprint <- before_footprint[[1]]
