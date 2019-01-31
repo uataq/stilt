@@ -94,8 +94,8 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   # Gaussian kernel bandwidth scaling
   kernel <- i %>%
     group_by(time) %>%
-    summarize(varsum = var(long, na.rm = T) + var(lati, na.rm = T),
-              lati = mean(lati, na.rm = T)) %>%
+    dplyr::summarize(varsum = var(long, na.rm = T) + var(lati, na.rm = T),
+                     lati = mean(lati, na.rm = T)) %>%
     na.omit()
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$time/1440)^(1/2)
@@ -147,7 +147,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
               foot = foot,
               time = time) %>%
     group_by(loi, lai, time) %>%
-    summarize(foot = sum(foot, na.rm = T)) %>%
+    dplyr::summarize(foot = sum(foot, na.rm = T)) %>%
     ungroup()
   
   # Dimensions in accordance with CF convention (x, y, t)
