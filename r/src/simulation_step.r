@@ -109,8 +109,12 @@ simulation_step <- function(before_footprint = list(function() {output}),
     args <- list(...)
     
     # Ensure user specified functions reference the simulation_step environment
-    before_footprint <- before_footprint[[1]]
-    before_trajec <- before_trajec[[1]]
+    if (is.list(before_footprint)) {
+      before_footprint <- before_footprint[[1]]
+    }
+    if (is.list(before_trajec)) {
+      before_trajec <- before_trajec[[1]]
+    }
     environment(before_footprint) <- environment()
     environment(before_trajec) <- environment()
 
