@@ -17,7 +17,6 @@ libs <- load_libs('dplyr',
                   'raster',
                   'readr',
                   'rslurm',
-                  'uataq',
                   lib.loc = lib.loc)
 
 # Load permute fortran dll for footprint matrix permutation
