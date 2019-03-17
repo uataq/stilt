@@ -39,9 +39,8 @@ load_libs <- function(..., lib.loc = NULL) {
           )
         )
         # If the package is not found on CRAN
-          if (!load_check(pkg, lib.loc)) {
-            stop(paste('load_libs(): Failed to load', pkg))
-          }
+        if (!load_check(pkg, lib.loc)) {
+          stop(paste('load_libs(): Failed to load', pkg))
         }
       }
     })
