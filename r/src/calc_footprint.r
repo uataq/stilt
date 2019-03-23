@@ -47,9 +47,11 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   np <- length(unique(p$indx))
   
   # Interpolate particle locations during initial time steps
-  times <- c(seq(0, -10, by = -0.1),
-             seq(-10.2, -20, by = -0.2),
-             seq(-20.5, -100, by = -0.5))
+  times <- c(seq(0, 10, by = 0.1),
+             seq(10.2, 20, by = 0.2),
+             seq(20.5, 100, by = 0.5))
+  time_sign <- sign(median(p$time))
+  times <- times * time_sign
   
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
