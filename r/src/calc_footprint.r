@@ -47,9 +47,11 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   np <- length(unique(p$indx))
   
   # Interpolate particle locations during initial time steps
-  times <- c(seq(0, -10, by = -0.1),
-             seq(-10.2, -20, by = -0.2),
-             seq(-20.5, -100, by = -0.5))
+  times <- c(seq(0, 10, by = 0.1),
+             seq(10.2, 20, by = 0.2),
+             seq(20.5, 100, by = 0.5))
+  time_sign <- sign(median(p$time))
+  times <- times * time_sign
   
   i <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
@@ -65,14 +67,16 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     mutate(time = round(time, 1))
   
   # Scale interpolated values to retain total field
-  mi <- i$time >= -10
-  mp <- p$time >= -10
+  aitime <- abs(i$time)
+  aptime <- abs(p$time)
+  mi <- aitime <= 10
+  mp <- aptime <= 10
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
-  mi <- i$time < -10 & i$time >= -20
-  mp <- p$time < -10 & p$time >= -20
+  mi <- aitime > 10 & aitime <= 20
+  mp <- aptime > 10 & aptime <= 20
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
-  mi <- i$time < -20 & i$time >= -100
-  mp <- p$time < -20 & p$time >= -100
+  mi <- aitime > 20 & aitime <= 100
+  mp <- aptime > 20 & aptime <= 100
   i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
   
   # Translate x, y coordinates into desired map projection
