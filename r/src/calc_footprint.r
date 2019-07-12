@@ -32,7 +32,7 @@
 #' @param ymx sets grid end latitude
 #' @param yres resolution for latitude grid
 #'
-#' @import dplyr, proj4, raster, uataq
+#' @import dplyr, proj4, raster
 #' @export
 
 calc_footprint <- function(p, output = NULL, r_run_time,
@@ -42,7 +42,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   
   require(dplyr)
   require(raster)
-  require(uataq)
   
   np <- length(unique(p$indx))
   

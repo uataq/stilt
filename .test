@@ -30,6 +30,7 @@ sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
 cat r/run_stilt.r
 
 # Execute r/run_stilt.r
+echo "Running r/run_stilt.r"
 Rscript r/run_stilt.r
 
 # Check output
@@ -38,6 +39,29 @@ if [ $model_output -lt 2 ]; then
   echo "Model output not found."
   exit 1
 fi
+
+# Print contents of output directory
+ls -lh out/by-id/2015121000_-111.980323_40.782561_5
+
+# Wipe output directory
+rm -rf out/
+
+# Run CLI single shot simulation
+chmod +x r/stilt_cli.r
+echo "Running r/stilt_cli.r"
+r/stilt_cli.r \
+  r_run_time=2015-12-10T00:00:00Z \
+  r_lati=40.5 \
+  r_long=-112.0 \
+  r_zagl=5 \
+  met_loc=stilt-tutorials/01-wbb/met/ \
+  met_file_format=%Y%m%d.%H \
+  xmn=-112.3 \
+  xmx=-111.52 \
+  xres=0.01 \
+  ymn=40.39 \
+  ymx=40.95 \
+  yres=0.01
 
 # Print contents of output directory
 ls -lh out/by-id/2015121000_-111.980323_40.782561_5

@@ -6,14 +6,14 @@
 #' @param file location of PARTICLE.DAT file
 #' @param varsiwant character vector of 4-letter hymodelc variables
 #'
-#' @import dplyr, uataq
+#' @import dplyr
 #' @export
 
 read_particle <- function(file, varsiwant) {
 
   require(dplyr)
 
-  n_lines <- uataq::count_lines(file)
+  n_lines <- count_lines(file)
 
   if (n_lines < 2) {
     warning(paste('read_particle(): only 1 line found in', file))
