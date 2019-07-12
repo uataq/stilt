@@ -9,7 +9,7 @@
 git clone https://github.com/uataq/stilt-tutorials
 
 # Replace {{project}} and {{wd}}
-sed -i 's|{{project}}|stilt|g' r/run_stilt.r
+sed -i 's|{{project}}|stilt-test|g' r/run_stilt.r
 sed -i "s|file.path('{{wd}}', project)|getwd()|g" r/run_stilt.r
 
 # Set receptor and footprint information
@@ -38,6 +38,10 @@ if [ $model_output -lt 2 ]; then
   echo "Model output not found."
   echo "hymodelc.out:"
   cat out/by-id/2015121000_-112_40.5_5/hymodelc.out
+  echo "CONTROL:"
+  cat out/by-id/2015121000_-112_40.5_5/CONTROL
+  echo "Meteorological data:"
+  ls -lh stilt-tutorials/01-wbb/met
   exit 1
 fi
 
@@ -45,7 +49,7 @@ fi
 ls -lh out/by-id/2015121000_-112_40.5_5
 
 # Wipe output directory
-rm -rf out/by-id/* out/footprints out/particles
+rm out/by-id/2015121000_-112_40.5_5/*
 
 # Run CLI single shot simulation
 chmod +x r/stilt_cli.r
@@ -55,7 +59,7 @@ r/stilt_cli.r \
   r_lati=40.5 \
   r_long=-112.0 \
   r_zagl=5 \
-  met_loc=stilt-tutorials/01-wbb/met/ \
+  met_loc=$(pwd)/stilt-tutorials/01-wbb/met \
   met_file_format=%Y%m%d.%Hz.hrrra \
   xmn=-112.3 \
   xmx=-111.52 \
@@ -70,6 +74,10 @@ if [ $model_output -lt 2 ]; then
   echo "Model output not found."
   echo "hymodelc.out:"
   cat out/by-id/2015121000_-112_40.5_5/hymodelc.out
+  echo "CONTROL:"
+  cat out/by-id/2015121000_-112_40.5_5/CONTROL
+  echo "Meteorological data:"
+  ls -lh stilt-tutorials/01-wbb/met
   exit 1
 fi
 
