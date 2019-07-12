@@ -37,6 +37,8 @@ Rscript r/run_stilt.r
 model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5* | wc -l)
 if [ $model_output -lt 2 ]; then
   echo "Model output not found."
+  echo "hymodelc.out:"
+  cat out/by-id/2015121000_-111.980323_40.782561_5/hymodelc.out
   exit 1
 fi
 
@@ -44,7 +46,7 @@ fi
 ls -lh out/by-id/2015121000_-111.980323_40.782561_5
 
 # Wipe output directory
-rm -rf out/
+rm -rf out/by-id/* out/footprints out/particles
 
 # Run CLI single shot simulation
 chmod +x r/stilt_cli.r
@@ -55,13 +57,22 @@ r/stilt_cli.r \
   r_long=-112.0 \
   r_zagl=5 \
   met_loc=stilt-tutorials/01-wbb/met/ \
-  met_file_format=%Y%m%d.%H \
+  met_file_format=%Y%m%d.%Hz.hrrra \
   xmn=-112.3 \
   xmx=-111.52 \
   xres=0.01 \
   ymn=40.39 \
   ymx=40.95 \
   yres=0.01
+
+# Check output
+model_output=$(ls out/by-id/2015121000_-111.980323_40.782561_5/2015121000_-111.980323_40.782561_5* | wc -l)
+if [ $model_output -lt 2 ]; then
+  echo "Model output not found."
+  echo "hymodelc.out:"
+  cat out/by-id/2015121000_-111.980323_40.782561_5/hymodelc.out
+  exit 1
+fi
 
 # Print contents of output directory
 ls -lh out/by-id/2015121000_-111.980323_40.782561_5
