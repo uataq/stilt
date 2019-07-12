@@ -27,8 +27,8 @@ run_times <- seq(from = as.POSIXct(t_start, tz = 'UTC'),
                  by   = 'hour')
 
 # Receptor location(s)
-lati <- 40.782561
-long <- -111.980323
+lati <- 40.5
+long <- -112.0
 zagl <- 5
 
 # Expand the run times, latitudes, and longitudes to form the unique receptors
