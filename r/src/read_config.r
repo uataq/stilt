@@ -9,7 +9,7 @@
 
 read_config <- function(file) {
 
-  n_lines <- uataq::count_lines(file)
+  n_lines <- count_lines(file)
 
   if (n_lines < 2) {
     warning(paste('read_config(): only 1 line found in', file))

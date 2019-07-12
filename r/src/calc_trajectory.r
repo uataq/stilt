@@ -9,7 +9,6 @@
 #'
 #' For documentation, see https://uataq.github.io/stilt/
 #'
-#' @import uataq
 #' @export
 
 calc_trajectory <- function(varsiwant,
@@ -77,8 +76,6 @@ calc_trajectory <- function(varsiwant,
                             z_top,
                             rundir) {
   
-  require(uataq)
-
   # Enable manual rescaling of mixed layer height
   if (as.logical(zicontroltf)) {
     write_zicontrol(ziscale, file.path(rundir, 'ZICONTROL'))
@@ -131,7 +128,7 @@ calc_trajectory <- function(varsiwant,
     return()
   }
 
-  n_lines <- uataq::count_lines(pf)
+  n_lines <- count_lines(pf)
   if (n_lines < 2) {
     msg <- paste(pf, 'does not contain any trajectory data.',
                  'Check for errors in hymodelc.out')

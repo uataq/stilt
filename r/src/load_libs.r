@@ -40,14 +40,7 @@ load_libs <- function(..., lib.loc = NULL) {
         )
         # If the package is not found on CRAN
         if (!load_check(pkg, lib.loc)) {
-          # Try Ben Fasoli's github
-          if (!load_check('devtools', lib.loc))
-            install.packages('devtools', repo = repo, lib = lib.loc)
-          try(devtools::install_github(paste0('benfasoli/', pkg)))
-          # Throw error if the package can't be found on CRAN or github
-          if (!load_check(pkg, lib.loc)) {
-            stop(paste('load_libs(): Failed to load', pkg))
-          }
+          stop(paste('load_libs(): Failed to load', pkg))
         }
       }
     })
