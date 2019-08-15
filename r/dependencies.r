@@ -15,7 +15,6 @@ libs <- load_libs('dplyr',
                   'ncdf4',
                   'parallel',
                   'raster',
-                  'readr',
                   'rslurm',
                   lib.loc = lib.loc)
 
