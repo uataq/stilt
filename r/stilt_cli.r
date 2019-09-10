@@ -21,13 +21,11 @@
 # Extract kv pairs for supplied arguments -------------------------------------
 arg_strings <- commandArgs(trailingOnly = T)
 args <- list()
-for (arg in strsplit(arg_strings, '=')) {
-    if (length(arg) > 2) {
-        arg <- arg[1:2]
-    } else if (length(arg) == 1) {
+for (arg in strsplit(arg_strings, '=', fixed = T)) {
+    if (length(arg) == 1) {
         arg <- c(arg, 'NA')
     }
-    args[arg[1]] <- arg[2]
+    args[arg[1]] <- paste(arg[2:length(arg)], collapse='=')
 }
 
 # Validate required arguments exist
@@ -145,7 +143,7 @@ stilt_args <- list(
     zcoruverr = as.numeric(args$zcoruverr)
 )
 stilt_args <- stilt_args[sapply(stilt_args, function(x) length(x) > 0)]
-print(stilt_args)
+
 source(file.path(stilt_args$stilt_wd, 'r', 'src', 'simulation_step.r'))
 res <- do.call(simulation_step, stilt_args)
 q('no')
