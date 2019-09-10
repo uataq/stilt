@@ -112,7 +112,7 @@ stilt_args <- list(
     r_long = as.numeric(args$r_long),
     r_zagl = as.numeric(args$r_zagl),
     random = as.numeric(args$random),
-    rm_dat = as.numeric(args$rm_dat),
+    rm_dat = as.logical(args$rm_dat),
     run_foot = as.logical(args$run_foot),
     run_trajec = as.logical(args$run_trajec),
     siguverr = as.numeric(args$siguverr),
@@ -120,7 +120,7 @@ stilt_args <- list(
     smooth_factor = as.numeric(args$smooth_factor),
     splitf = as.numeric(args$splitf),
     stilt_wd = as.character(args$stilt_wd),
-    time_integrate = as.numeric(args$time_integrate),
+    time_integrate = as.logical(args$time_integrate),
     timeout = as.numeric(args$timeout),
     tkerd = as.numeric(args$tkerd),
     tkern = as.numeric(args$tkern),
@@ -145,7 +145,7 @@ stilt_args <- list(
     zcoruverr = as.numeric(args$zcoruverr)
 )
 stilt_args <- stilt_args[sapply(stilt_args, function(x) length(x) > 0)]
-
+print(stilt_args)
 source(file.path(stilt_args$stilt_wd, 'r', 'src', 'simulation_step.r'))
 res <- do.call(simulation_step, stilt_args)
 q('no')
