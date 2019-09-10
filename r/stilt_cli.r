@@ -103,7 +103,7 @@ stilt_args <- list(
     outfrac = as.numeric(args$outfrac),
     output_wd = as.character(args$output_wd),
     p10f = as.numeric(args$p10f),
-    projection = as.numeric(args$projection),
+    projection = as.character(args$projection),
     qcycle = as.numeric(args$qcycle),
     r_run_time = as.POSIXct(args$r_run_time,
                             tz = 'UTC',
