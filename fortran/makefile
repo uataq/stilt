@@ -25,25 +25,28 @@ SGI5 = -O -bytereclen -I. -freeform
 ABSF = -O1 -f free -I. 
 #PGF9 = -O -Mfree -byteswapio -Mlfs -I.
 #PGF9 = -O -g -Mfree -Mbounds -byteswapio -Mlfs -I.
-PGF9 = -O3 -g -Mfree -Mbounds -byteswapio -Mlfs -I.
+PGF9 = -O2 -Mfree -Mbounds -byteswapio -Mlfs -I.
 INTL = -O -FR -assume byterecl -convert big_endian -I.
 GF95 = -O2 -g -fendian=big -ffree-form -ftrace=full -I.
 GFOR = -O2 -fconvert=big-endian -frecord-marker=4 -fbounds-check -ffree-form -I.
 #for Pleiades:
-#FC = ifort
+# FC = ifort
 IFOR = -check bounds -free -O -w -I. -assume byterecl -mcmodel=medium #bounds checking will slow down the run
 IFOR = -free -O -w -I. -assume byterecl -mcmodel=medium
 #LDFLAGS = -shared-intel #needed for old stilt on Pleiades, not needed for multi (?)
 
 HUM = -qsource -O2 -qmaxmem=-1 -q64 -C #AER-humboldt for xlf compilers; -C does bounds checking
 CFLAGS = $(GFOR)
-#CFLAGS = $(PGF9)
+#  CFLAGS = $(HUM)
 # LFLAGS = -vr -X64   (NCEP implementation)           
 LFLAGS = -vr           
 #FC = f90
 FC = gfortran
-#FC = pgf90
-#FC = pgf95
+# FC = xlf90
+
+#
+CNOOPT = $(patsubst -O%,-g,$(CFLAGS))
+
 CODE =          \
        funits.f \
        metval.f \
@@ -53,11 +56,7 @@ CODE =          \
        module_map_utils.f \
        gasdev.f \
        stbcon.f \
-       mapbox.f \
-       iercfg.f \
        adviec.f \
-       advrkm.f \
-       advrnt.f \
        adv2nt.f \
        adv3nt.f \
        adviso.f \
@@ -76,7 +75,6 @@ CODE =          \
        consum.f \
        conzro.f \
        cpolll_stilt.f \
-       cyl2xy.f \
        datset.f \
        dalloc.f \
        decodi.f \
@@ -94,14 +92,11 @@ CODE =          \
        emsmat.f \
        emstmp.f \
        emrise.f \
-       geplot.f \
        gbl2ll.f \
        gbl2xy.f \
        gbldxy.f \
-       gbldll.f \
        gblset.f \
        geo_ll.f \
-       grfbdy.f \
        lagems.f \
        lagout.f \
        lagsum.f \
@@ -144,13 +139,7 @@ CODE =          \
        proj_3d.f \
        pufdel.f \
        pufdsp.f \
-       pufmin.f \
-       pufmrg.f \
        pufpar.f \
-       pufrnd.f \
-       pufsph.f \
-       pufspv.f \
-       pufsrt.f \
        runset.f \
        sfcinp.f \
        sobstr.f \
@@ -168,92 +157,20 @@ CODE =          \
        tm2min.f \
        tminit.f \
        tmplus.f \
-       trjdsk.f \
-       trjset.f \
        x_prod.f \
        xe_xy.f \
        xy_map.f \
-       con2xy.f \
-       conavg.f \
-       coninp.f \
-       congrd.f \
-       conmap.f \
-       conndx.f \
-       consmt.f \
-       contur.f \
-       contxt.f \
-       map2xy.f \
-       mapbdy.f \
-       mapini.f \
-       monset.f \
        module_defgrid.f \
-       shpbdy.f \
-       trjinp.f \
-       trjlmt.f \
-       trjmap.f \
-       trjndx.f \
+       module_medzpos.f \
+       module_wrfeta.f \
        cc2gll.f \
        cc2gxy.f \
-       ccrvll.f \
-       ccrvxy.f \
-       cg2cll.f \
-       cg2cxy.f \
-       cg2wll.f \
-       cg2wxy.f \
-       cgszll.f \
-       cgszxy.f \
        cgszxy_wps.f \
-       cll2xy.f \
        cll2xy_wps.f \
-       cnllxy.f \
        cnxyll.f \
-       cpolll.f \
-       cpolxy.f \
        cspanf.f \
-       cw2gll.f \
-       cw2gxy.f \
        cxy2ll.f \
        cxy2ll_wps.f \
-       eqvlat.f \
-       stcm1p.f \
-       stcm2p.f \
-       stlmbr.f \
-       fcclos.f \
-       fcopen.f \
-       fcptps.f \
-       fcgtps.f \
-       fcread.f \
-       w3code.f \
-       iercon.f \
-       ierno2.f \
-       ierset.f \
-       iersum.f \
-       iervoc.f \
-       grseqn.f \
-       grscon.f \
-       grsdst.f \
-       prchem.f \
-       chmphg.f \
-       viscrt.f \
-       gemcfg.f \
-       gemkon.f \
-       gemvar.f \
-       gemchk.f \
-       gemcol.f \
-       gemdat.f \
-       gemday.f \
-       gemdep.f \
-       gemdiv.f \
-       gemeqn.f \
-       gemgrd.f \
-       gemini.f \
-       geminp.f \
-       gemout.f \
-       gempar.f \
-       gemset.f \
-       gemstb.f \
-       gemswf.f \
-       gemsum.f \
        gasdev.f \
        ext_zsg.f \
        cgrell.f \
@@ -263,13 +180,14 @@ CODE =          \
        adv3ntZLOC.f \
        advmetGRELL.f \
        adv3ntWIND.f \
+       prfgeo.f \
        prfwrf.f \
        rsat.f \
        rtsafe.f \
        thes.f \
        sunclr.f \
-       sunave.f \
-       gemtst.f
+       sunave.f
+
 
 all: $(LIB) hymodelc
 
@@ -283,6 +201,15 @@ hymodelc : hymodelc.f90 $(LIB)
 .f.o:
 	$(FC) -c $(CFLAGS) $<
 
+output.o: output.f
+	$(FC) -c $(CNOOPT) output.f
+
+advpnt.o: advpnt.f
+	$(FC) -c $(CNOOPT) advpnt.f
+
+pardsp.o: pardsp.f
+	$(FC) -c $(CNOOPT) pardsp.f
+
 clean :
 	rm -f hymodelc
 	rm -f *.o
@@ -290,9 +217,11 @@ clean :
 	rm -f *.mod
 	rm -f *.lst
 
+adviec.o: ext_zsg.o
+adviso.o: ext_zsg.o
 advmet.o: DEFMETO.INC
 advmetGRELL.o: DEFMETO.INC
-advpnt.o: funits.o metval.o module_defgrid.o DEFARG2.INC DEFARG3.INC \
+advpnt.o: funits.o metval.o module_defgrid.o module_wrfeta.o DEFARG2.INC DEFARG3.INC \
 	DEFCONC.INC DEFMETO.INC
 advrng.o: funits.o module_defgrid.o
 cc2gxy.o: module_defgrid.o
@@ -374,20 +303,23 @@ pakini.o: DEFPACK.INC
 pakndx.o: DEFPACK.INC
 pakrec.o: DEFPACK.INC
 pakset.o: DEFPACK.INC
-pardsp.o: DEFARG2.INC
+pardsp.o: DEFARG2.INC module_wrfeta.o
 parinp.o: funits.o module_defgrid.o
 parout.o: funits.o module_defgrid.o
 parpuf.o: funits.o
 prchem.o: funits.o
 prfcom.o: funits.o module_defgrid.o DEFARG4.INC
 prfecm.o: funits.o
+prfgeo.o: funits.o
 prfprs.o: funits.o
 prfsig.o: funits.o
 prfter.o: funits.o
-prfwrf.o: funits.o
+prfwrf.o: funits.o module_wrfeta.o
+pufdsp.o: ext_zsg.o
 pufpar.o: funits.o
 pufsph.o: funits.o
 runset.o: funits.o module_defgrid.o DEFSPOT.INC
+stcm1p_stilt.o: module_defgrid.o
 sfcinp.o: funits.o
 stbanl.o: funits.o stbcon.o
 stbsnd.o: stbcon.o
@@ -396,6 +328,7 @@ stbvar.o: stbcon.o
 trjdsk.o: funits.o
 trjlmt.o: mapbox.o
 trjset.o: funits.o module_defgrid.o DEFSPOT.INC
-hymodelc.o: funits.o module_defgrid.o DEFARG1.INC DEFARG2.INC DEFARG3.INC \
+hymodelc.o: ext_zsg.o funits.o module_defgrid.o module_medzpos.o module_wrfeta.o \
+	DEFARG1.INC DEFARG2.INC DEFARG3.INC \
 	DEFCHEM.INC DEFCONC.INC DEFLAGS.INC DEFMETO.INC DEFSPOT.INC \
 	DEFSPRT.INC

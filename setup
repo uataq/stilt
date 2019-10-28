@@ -12,6 +12,14 @@ if [ $dircnt -lt 3 ]; then
   exit 1
 fi
 
+# Compile permute DLL for footprint kernel aggregation
+echo "Compiling footprint kernel aggregation subroutine..."
+R CMD SHLIB r/src/permute.f90
+if [ ! -s r/src/permute.so ]; then
+  echo "Problem compiling r/src/permute.so."
+  exit 1
+fi
+
 # Prompt user for binary/compile installation
 if [ -z $1 ]; then
   echo "
@@ -90,15 +98,6 @@ fi
 mv fortran/hymodelc exe/hymodelc
 # Ensure hymodelc, run_stilt.r, and stilt_cli.r are executable
 chmod +x exe/hymodelc r/run_stilt.r r/stilt_cli.r
-
-
-# Compile permute DLL for footprint kernel aggregation
-echo "Compiling footprint kernel aggregation subroutine..."
-R CMD SHLIB r/src/permute.f90
-if [ ! -s r/src/permute.so ]; then
-  echo "Problem compiling r/src/permute.so."
-  exit 1
-fi
 
 
 echo "

@@ -3,7 +3,8 @@ out/*
 _rslurm*
 
 # Distributions of pre-compiled binaries
-fortran/*.zip
+fortran/*
+!fortran/makefile
 
 # System compilation outputs
 *.o
