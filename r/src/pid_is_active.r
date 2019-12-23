@@ -9,6 +9,6 @@ pid_is_active <- function(pid) {
 
   pid <- as.character(pid)
 
-  cmd  <- paste('ps -A -o pid,command | grep hymodelc | grep -v defunct')
+  cmd  <- paste('ps -A -o pid,command | grep hycs_std | grep -v defunct')
   any(grepl(pid, system(cmd, intern = T), fixed = T))
 }

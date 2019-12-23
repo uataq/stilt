@@ -20,8 +20,8 @@ slurm_options <- list(
 )
 
 # Simulation timing, yyyy-mm-dd HH:MM:SS (UTC)
-t_start <- '2015-06-18 22:00:00'
-t_end   <- '2015-06-18 22:00:00'
+t_start <- '2015-12-10 00:00:00'
+t_end   <- '2015-12-10 00:00:00'
 run_times <- seq(from = as.POSIXct(t_start, tz = 'UTC'),
                  to   = as.POSIXct(t_end, tz = 'UTC'),
                  by   = 'hour')
@@ -62,16 +62,19 @@ run_trajec <- T
 timeout    <- 3600
 varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
                 'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
-                'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout', 'mlht',
-                'rain', 'crai', 'pres')
+                'rhfr', 'sphu', 'lcld', 'zloc', 'dswf', 'wout', 'mlht', 'rain',
+                'crai', 'pres')
 
 # Transport and dispersion settings
+capemin     <- -1
+cmass       <- 0
 conage      <- 48
 cpack       <- 1
 delt        <- 0
 dxf         <- 1
 dyf         <- 1
 dzf         <- 0.1
+efile       <- ''
 emisshrs    <- 0.01
 frhmax      <- 3
 frhs        <- 1
@@ -80,44 +83,64 @@ frmr        <- 0
 frts        <- 0.1
 frvs        <- 0.1
 hscale      <- 10800
-ichem       <- 0
+ichem       <- 8
 iconvect    <- 0
+idsp        <- 2
 initd       <- 0
 isot        <- 0
+k10m        <- 1
+kagl        <- 1
 kbls        <- 1
 kblt        <- 1
 kdef        <- 1
+khinp       <- 0
 khmax       <- 9999
 kmix0       <- 250
 kmixd       <- 3
 kmsl        <- 0
 kpuff       <- 0
+krand       <- 2
 krnd        <- 6
 kspl        <- 1
+kwet        <- 0
 kzmix       <- 1
 maxdim      <- 1
 maxpar      <- min(10000, numpar)
-mgmin       <- 2000
+mgmin       <- 10
+mhrs        <- 9999
+nbptyp      <- 1
 ncycl       <- 0
 ndump       <- 0
 ninit       <- 1
+nstr        <- 0
 nturb       <- 0
+nver        <- 0
 outdt       <- 0
-outfrac     <- 0.9
 p10f        <- 1
+pinbc       <- ''
+pinpf       <- ''
+poutf       <- ''
 qcycle      <- 0
-random      <- 1
+rhb         <- 80
+rht         <- 60
 splitf      <- 1
 tkerd       <- 0.18
 tkern       <- 0.18
 tlfrac      <- 0.1
+tout        <- 0
 tratio      <- 0.9
 tvmix       <- 1
 veght       <- 0.5
 vscale      <- 200
+vscaleu     <- 200
+vscales     <- 200
+wbbh        <- 0
+wbwf        <- 0
+wbwr        <- 0
+wvert       <- FALSE
 w_option    <- 0
 zicontroltf <- 0
-ziscale     <- rep(list(rep(0.8, 24)), nrow(receptors))
+ziscale     <- rep(list(rep(1, 24)), nrow(receptors))
 z_top       <- 25000
 
 # Transport error settings
@@ -179,9 +202,16 @@ stilt_apply(FUN = simulation_step,
             n_nodes = n_nodes,
             before_footprint = list(before_footprint),
             before_trajec = list(before_trajec),
+            lib.loc = lib.loc,
+            capemin = capemin,
+            cmass = cmass,
             conage = conage,
             cpack = cpack,
             delt = delt,
+            dxf = dxf,
+            dyf = dyf,
+            dzf = dzf,
+            efile = efile,
             emisshrs = emisshrs,
             frhmax = frhmax,
             frhs = frhs,
@@ -192,24 +222,30 @@ stilt_apply(FUN = simulation_step,
             hnf_plume = hnf_plume,
             horcoruverr = horcoruverr,
             horcorzierr = horcorzierr,
+            hscale = hscale,
             ichem = ichem,
             iconvect = iconvect,
+            idsp = idsp,
             initd = initd,
             isot = isot,
+            k10m = k10m,
+            kagl = kagl,
             kbls = kbls,
             kblt = kblt,
             kdef = kdef,
+            khinp = khinp,
             khmax = khmax,
             kmix0 = kmix0,
             kmixd = kmixd,
             kmsl = kmsl,
             kpuff = kpuff,
+            krand = krand,
             krnd = krnd,
             kspl = kspl,
+            kwet = kwet,
             kzmix = kzmix,
             maxdim = maxdim,
             maxpar = maxpar,
-            lib.loc = lib.loc,
             met_file_format = met_file_format,
             met_loc = met_loc,
             mgmin = mgmin,
@@ -218,19 +254,24 @@ stilt_apply(FUN = simulation_step,
             ncycl = ncycl,
             ndump = ndump,
             ninit = ninit,
+            nstr = nstr,
             nturb = nturb,
             numpar = numpar,
+            nver = nver,
             outdt = outdt,
-            outfrac = outfrac,
             output_wd = output_wd,
             p10f = p10f,
+            pinbc = pinbc,
+            pinpf = pinpf,
+            poutf = poutf,
             projection = projection,
             qcycle = qcycle,
             r_run_time = receptors$run_time,
             r_lati = receptors$lati,
             r_long = receptors$long,
             r_zagl = receptors$zagl,
-            random = random,
+            rhb = rhb,
+            rht = rht,
             rm_dat = rm_dat,
             run_foot = run_foot,
             run_trajec = run_trajec,
@@ -241,16 +282,24 @@ stilt_apply(FUN = simulation_step,
             stilt_wd = stilt_wd,
             time_integrate = time_integrate,
             timeout = timeout,
-            tkerd = tkerd, tkern = tkern,
+            tkerd = tkerd,
+            tkern = tkern,
             tlfrac = tlfrac,
             tluverr = tluverr,
             tlzierr = tlzierr,
+            tout = tout,
             tratio = tratio,
             tvmix = tvmix,
             varsiwant = list(varsiwant),
             veght = veght,
             vscale = vscale,
+            vscaleu = vscaleu,
+            vscales = vscales,
             w_option = w_option,
+            wbbh = wbbh,
+            wbwf = wbwf,
+            wbwr = wbwr,
+            wvert = wvert,
             xmn = xmn,
             xmx = xmx,
             xres = xres,

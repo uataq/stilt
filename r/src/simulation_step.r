@@ -10,12 +10,15 @@
 
 simulation_step <- function(before_footprint = list(function() {output}),
                             before_trajec = list(function() {output}),
+                            capemin = -1,
+                            cmass = 0,
                             conage = 48,
                             cpack = 1,
                             delt = 0,
                             dxf = 1,
                             dyf = 1,
                             dzf = 0.01,
+                            efile = '',
                             emisshrs = 0.01,
                             frhmax = 3,
                             frhs = 1,
@@ -24,48 +27,60 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             frts = 0.1,
                             frvs = 0.1, 
                             hnf_plume = T,
-                            hscale = 10800,
                             horcoruverr = NA, 
                             horcorzierr = NA,
-                            ichem = 0,
-                            iconvect = 0, 
+                            hscale = 10800,
+                            ichem = 8,
+                            iconvect = 0,
+                            idsp = 2,
                             initd = 0,
                             isot = 0,
+                            k10m = 1,
+                            kagl = 1,
                             kbls = 1,
                             kblt = 1,
                             kdef = 1,
+                            khinp = 0,
                             khmax = 9999,
                             kmix0 = 250,
                             kmixd = 3,
                             kmsl = 0, 
                             kpuff = 0,
+                            krand = 2,
                             krnd = 6,
                             kspl = 1,
+                            kwet = 0,
                             kzmix = 1,
                             lib.loc = NULL,
                             maxdim = 1,
                             maxpar = max(10000, numpar),
                             met_file_format, 
                             met_loc,
-                            mgmin = 2000,
+                            mgmin = 10,
+                            mhrs = 9999,
                             n_hours = -24,
                             n_met_min = 1,
                             ncycl = 0,
                             ndump = 0,
                             ninit = 1,
+                            nstr = 0,
                             nturb = 0,
+                            nver = 0,
                             numpar = 200,
                             outdt = 0,
-                            outfrac = 0.9,
                             output_wd = file.path(stilt_wd, 'out'),
                             p10f = 1,
+                            pinbc = '',
+                            pinpf = '',
+                            poutf = '',
                             projection = '+proj=longlat',
                             qcycle = 0, 
                             r_run_time,
                             r_lati,
                             r_long,
                             r_zagl,
-                            random = 1, 
+                            rhb = 80,
+                            rht = 60, 
                             rm_dat = T,
                             run_foot = T,
                             run_trajec = T,
@@ -80,18 +95,25 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             tkern = 0.18,
                             tlfrac = 0.1,
                             tluverr = NA,
-                            tlzierr = NA, 
+                            tlzierr = NA,
+                            tout = 0, 
                             tratio = 0.9,
                             tvmix = 1,
                             varsiwant = c('time', 'indx', 'long', 'lati', 'zagl', 
                                           'sigw', 'tlgr', 'zsfc', 'icdx', 'temp',
                                           'samt', 'foot', 'shtf', 'tcld', 'dmas', 
-                                          'dens', 'rhfr', 'sphu', 'solw', 'lcld', 
-                                          'zloc', 'dswf', 'wout', 'mlht', 'rain', 
-                                          'crai', 'pres'), 
+                                          'dens', 'rhfr', 'sphu', 'lcld', 'zloc',
+                                          'dswf', 'wout', 'mlht', 'rain', 'crai',
+                                          'pres'), 
                             veght = 0.5,
                             vscale = 200,
+                            vscaleu = 200,
+                            vscales = 200,
                             w_option = 0,
+                            wbbh = 0,
+                            wbwf = 0,
+                            wbwr = 0,
+                            wvert = FALSE,
                             xmn,
                             xmx,
                             xres,
@@ -117,18 +139,97 @@ simulation_step <- function(before_footprint = list(function() {output}),
     }
     environment(before_footprint) <- environment()
     environment(before_trajec) <- environment()
-
+    
     # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
     varsiwant <- unlist(varsiwant)
     ziscale <- unlist(ziscale)
-
+    
     # Validate arguments
     if (!run_trajec && !run_foot)
       stop('simulation_step(): Nothing to do, set run_trajec or run_foot to T')
     
     # Ensure dependencies are loaded for current node/process
     source(file.path(stilt_wd, 'r/dependencies.r'), local = T)
+    
+    # Aggregate STILT/HYSPLIT namelist
+    namelist <- list(
+      capemin = capemin,
+      cmass = cmass,
+      conage = conage,
+      cpack = cpack,
+      delt = delt,
+      dxf = dxf,
+      dyf = dyf,
+      dzf = dzf,
+      efile = efile,
+      frhmax = frhmax,
+      frhs = frhs,
+      frme = frme,
+      frmr = frmr,
+      frts = frts,
+      frvs = frvs,
+      hnf_plume = hnf_plume,
+      hscale = hscale,
+      ichem = ichem,
+      iconvect = iconvect,
+      idsp = idsp,
+      initd = initd,
+      isot = isot,
+      k10m = k10m,
+      kagl = kagl,
+      kbls = kbls,
+      kblt = kblt,
+      kdef = kdef,
+      khinp = khinp,
+      khmax = khmax,
+      kmix0 = kmix0,
+      kmixd = kmixd,
+      kmsl = kmsl,
+      kpuff = kpuff,
+      krand = krand,
+      krnd = krnd,
+      kspl = kspl,
+      kwet = kwet,
+      kzmix = kzmix,
+      maxdim = maxdim,
+      maxpar = maxpar,
+      mgmin = mgmin,
+      ncycl = ncycl,
+      ndump = ndump,
+      ninit = ninit,
+      nstr = nstr,
+      nturb = nturb,
+      numpar = numpar,
+      nver = nver,
+      outdt = outdt,
+      p10f = p10f,
+      pinbc = pinbc,
+      pinpf = pinpf,
+      poutf = poutf,
+      qcycle = qcycle,
+      rhb = rhb,
+      rht = rht,
+      splitf = splitf,
+      tkerd = tkerd,
+      tkern = tkern,
+      tlfrac = tlfrac,
+      tout = tout,
+      tratio = tratio,
+      tvmix = tvmix,
+      varsiwant = varsiwant,
+      veght = veght,
+      vscale = vscale,
+      vscaleu = vscaleu,
+      vscales = vscales,
+      wbbh = wbbh,
+      wbwf = wbwf,
+      wbwr = wbwr,
+      winderrtf = 0,
+      wvert = wvert,
+      zicontroltf = zicontroltf,
+      ziscale = ziscale
+    )
     
     # Creates subdirectories in out for each model run time. Each of these
     # subdirectories is populated with symbolic links to the shared datasets
@@ -172,21 +273,12 @@ simulation_step <- function(before_footprint = list(function() {output}),
                               lati = r_lati,
                               long = r_long,
                               zagl = r_zagl)
-
+      
       # User defined function to mutate the output object
       output <- before_trajec()
-
-      particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
-                                  emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
-                                  hnf_plume, hscale, ichem, iconvect, initd, isot,
-                                  ivmax, kbls, kblt, kdef, khmax, kmix0, kmixd,
-                                  kmsl, kpuff, krnd, kspl, kzmix, maxdim, maxpar,
-                                  met_files, mgmin, ncycl, ndump, ninit, numpar,
-                                  nturb, n_hours, outdt, outfrac, output, p10f,
-                                  qcycle, random, splitf, tkerd, tkern, rm_dat,
-                                  timeout, tlfrac, tratio, tvmix, veght, vscale,
-                                  0, w_option, zicontroltf, ziscale, z_top, 
-                                  rundir)
+      particle <- calc_trajectory(namelist, rundir, emisshrs, hnf_plume, 
+                                  met_files, n_hours, output, rm_dat, timeout,
+                                  w_option, z_top)
       if (is.null(particle)) return()
       
       # Bundle trajectory configuration metadata with trajectory informtation
@@ -201,19 +293,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
                           file = file.path(rundir, 'ZIERR'))
       winderrtf <- (!is.null(xyerr)) + 2 * !is.null(zerr)
       if (winderrtf > 0) {
-        particle_error <- calc_trajectory(varsiwant, conage, cpack, delt, dxf,
-                                          dyf, dzf, emisshrs, frhmax, frhs, frme,
-                                          frmr, frts, frvs, hnf_plume, hscale,
-                                          ichem, iconvect, initd, isot, ivmax,
-                                          kbls, kblt, kdef, khmax, kmix0, kmixd,
-                                          kmsl, kpuff, krnd, kspl, kzmix, maxdim,
-                                          maxpar, met_files, mgmin, ncycl, ndump,
-                                          ninit, numpar, nturb, n_hours, outdt,
-                                          outfrac, output, p10f, qcycle, random,
-                                          splitf, tkerd, tkern, rm_dat, timeout,
-                                          tlfrac, tratio, tvmix, veght, vscale,
-                                          winderrtf, w_option, zicontroltf,
-                                          ziscale, z_top, rundir)
+        particle_error <- calc_trajectory(
+          merge_lists(namelist, list(winderrtf = winderrtf)), rundir, emisshrs,
+          hnf_plume, met_files, n_hours, output, rm_dat, timeout, w_option, 
+          z_top)
         if (is.null(particle_error)) return()
         output$particle_error <- particle_error
         output$particle_error_params <- list(siguverr = siguverr,
@@ -222,7 +305,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
                                              horcoruverr = horcoruverr,
                                              sigzierr = sigzierr,
                                              tlzierr = tlzierr,
-                                             horcorzierr = horcorzierr)
+                                             horcorzierr = horcorzierr,
+                                             winderrtf = winderrtf)
       }
       
       # Save output object to compressed rds file and symlink to out/particles
@@ -231,7 +315,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
                                                     basename(output$file))))
       # Exit if not performing footprint calculations
       if (!run_foot) return(invisible(output$file))
-
+      
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
       # file to a data frame with an adjusted timestamp and index for the
@@ -246,7 +330,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     
     # User defined function to mutate the output object
     output <- before_footprint()
-
+    
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
     # outputs a .rds file, which can be read with readRDS() containing the
@@ -268,7 +352,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # Symlink footprint to out/footprints
     invisible(file.symlink(foot_file, file.path(output_wd, 'footprints',
                                                 basename(foot_file))))
-
+    
     invisible(gc())
     return(foot)
   })

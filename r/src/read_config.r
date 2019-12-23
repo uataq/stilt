@@ -1,7 +1,7 @@
 #' read_config parses the CONC.CFG output file
 #' @author Ben Fasoli
 #'
-#' Reads CONC.CFG hymodelc output file into named list
+#' Reads CONC.CFG hysplit output file into named list
 #'
 #' @param file location of CONC.CFG file
 #'

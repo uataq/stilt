@@ -8,5 +8,5 @@
 #' @export
 
 count_lines <- function(file) {
-  return(as.numeric(system(paste('wc -l <', file), intern = T)))
+  as.numeric(system(paste('wc -l <', file), intern = T))
 }

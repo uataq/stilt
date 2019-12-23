@@ -2,8 +2,8 @@
 # Ben Fasoli
 # Integration testing for STILT R wrapper
 
-# Execute setup script and fetch the ubuntu-16.04 binary (option 3)
-./setup 3
+# Execute setup script to install stilt
+./setup
 
 # Fetch the tutorial data
 git clone https://github.com/uataq/stilt-tutorials
@@ -23,7 +23,7 @@ sed -i 's|ymx <- NA|ymx <- 40.95|g' r/run_stilt.r
 sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(stilt_wd, 'stilt-tutorials/01-wbb/met')|g" r/run_stilt.r
 
 # Minimize run duration
-sed -i 's|n_hours    <- -24|n_hours <- -1|g' r/run_stilt.r
+sed -i 's|n_hours    <- -24|n_hours <- -2|g' r/run_stilt.r
 
 # Print r/run_stilt.r for diagnostics
 cat r/run_stilt.r
@@ -36,12 +36,8 @@ Rscript r/run_stilt.r
 model_output=$(ls out/by-id/2015121000_-112_40.5_5/2015121000_-112_40.5_5* | wc -l)
 if [ $model_output -lt 2 ]; then
   echo "Model output not found."
-  echo "hymodelc.out:"
-  cat out/by-id/2015121000_-112_40.5_5/hymodelc.out
-  echo "CONTROL:"
-  cat out/by-id/2015121000_-112_40.5_5/CONTROL
-  echo "Meteorological data:"
-  ls -lh stilt-tutorials/01-wbb/met
+  echo "log.txt:"
+  cat out/by-id/2015121000_-112_40.5_5/log.txt
   exit 1
 fi
 
@@ -72,12 +68,8 @@ r/stilt_cli.r \
 model_output=$(ls out/by-id/2015121000_-112_40.5_5/2015121000_-112_40.5_5* | wc -l)
 if [ $model_output -lt 2 ]; then
   echo "Model output not found."
-  echo "hymodelc.out:"
-  cat out/by-id/2015121000_-112_40.5_5/hymodelc.out
-  echo "CONTROL:"
-  cat out/by-id/2015121000_-112_40.5_5/CONTROL
-  echo "Meteorological data:"
-  ls -lh stilt-tutorials/01-wbb/met
+  echo "log.txt:"
+  cat out/by-id/2015121000_-112_40.5_5/log.txt
   exit 1
 fi
 

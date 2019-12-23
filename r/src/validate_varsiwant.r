@@ -1,7 +1,7 @@
 #' validate_varsiwant checks for valid 4-letter variable codes
 #' @author Ben Fasoli
 #'
-#' @param varsiwant character vector of 4-letter hymodelc variables
+#' @param varsiwant character vector of 4-letter hysplit variables
 #'
 #' @export
 
