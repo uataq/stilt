@@ -2,14 +2,11 @@
 out/*
 _rslurm*
 
-# Distributions of pre-compiled binaries
-fortran/*
-!fortran/makefile
-
 # System compilation outputs
 *.o
 *.so
 exe/hymodelc
+exe/hycs_std
 
 # R history and environment
 .RData
@@ -20,3 +17,6 @@ exe/hymodelc
 
 # MacOS folder attributes
 .DS_Store
+
+# Test inputs
+stilt-tutorials
