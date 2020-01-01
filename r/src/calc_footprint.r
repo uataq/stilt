@@ -159,7 +159,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   grd <- matrix(0, nrow = ny, ncol = nx)
   
   # Split particle data by footprint layer
-  inverval <- 3600
+  interval <- 3600
   interval_mins <- interval / 60
   xyzt$layer <- if (time_integrate) 0 else floor(xyzt$time / interval_mins)
   layers <- sort(unique(xyzt$layer))
