@@ -70,7 +70,7 @@ capemin     <- -1
 cmass       <- 0
 conage      <- 48
 cpack       <- 1
-delt        <- 0
+delt        <- 1
 dxf         <- 1
 dyf         <- 1
 dzf         <- 0.1
