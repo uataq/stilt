@@ -159,7 +159,9 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   grd <- matrix(0, nrow = ny, ncol = nx)
   
   # Split particle data by footprint layer
-  xyzt$layer <- if (time_integrate) 0 else floor(xyzt$time / 60)
+  inverval <- 3600
+  interval_mins <- interval / 60
+  xyzt$layer <- if (time_integrate) 0 else floor(xyzt$time / interval_mins)
   layers <- sort(unique(xyzt$layer))
   nlayers <- length(layers)
   
@@ -196,7 +198,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   if (time_integrate) {
     time_out <- as.numeric(r_run_time) 
   } else {
-    time_out <- as.numeric(r_run_time + layers * 3600)
+    time_out <- as.numeric(r_run_time + layers * interval)
   }
   
   # Set footprint metadata and write to file
