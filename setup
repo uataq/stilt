@@ -72,19 +72,19 @@ if [[ $install -eq 1 ]]; then
 # Fetch binary from GitHub release
 elif [[ $install -eq 2 ]]; then
   wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-centos-7.4.zip
+    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-centos-7.4.zip
   unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 3 ]]; then
   wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-16.04.zip
+    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-ubuntu-16.04.zip
   unzip -p fortran/hymodelc-ubuntu-16.04.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 4 ]]; then
   wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-ubuntu-14.04.zip
+    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-ubuntu-14.04.zip
   unzip -p fortran/hymodelc-ubuntu-14.04.zip hymodelc > fortran/hymodelc
 elif [[ $install -eq 5 ]]; then
   wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.1/hymodelc-macos-10.13.zip
+    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-macos-10.13.zip
   unzip -p fortran/hymodelc-macos-10.13.zip hymodelc > fortran/hymodelc
 else
   echo "Invalid install option."
