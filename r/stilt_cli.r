@@ -73,7 +73,6 @@ stilt_args <- list(
     horcorzierr = as.numeric(args$horcorzierr),
     hscale = as.numeric(args$hscale),
     ichem = as.numeric(args$ichem),
-    iconvect = as.numeric(args$iconvect),
     idsp = as.numeric(args$idsp),
     initd = as.numeric(args$initd),
     isot = as.numeric(args$isot),

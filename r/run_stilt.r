@@ -84,7 +84,6 @@ frts        <- 0.1
 frvs        <- 0.1
 hscale      <- 10800
 ichem       <- 8
-iconvect    <- 0
 idsp        <- 2
 initd       <- 0
 isot        <- 0
@@ -224,7 +223,6 @@ stilt_apply(FUN = simulation_step,
             horcorzierr = horcorzierr,
             hscale = hscale,
             ichem = ichem,
-            iconvect = iconvect,
             idsp = idsp,
             initd = initd,
             isot = isot,
