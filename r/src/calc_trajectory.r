@@ -80,7 +80,10 @@ calc_trajectory <- function(namelist,
   # Read particle file, optionally remove PARTICLE.DAT in favor of compressed
   # .rds file, and return particle data frame
   p <- read_particle(file = pf, varsiwant = namelist[['varsiwant']])
-  if (rm_dat) system(paste('rm', pf))
+  if (rm_dat) {
+    system(paste('rm', pf))
+    system(paste('rm', file.path(rundir, 'PARTICLE.DAT')))
+  }
   
   numpar <- max(p$indx)
   
