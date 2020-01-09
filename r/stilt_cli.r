@@ -40,7 +40,7 @@ if (!all(req_args %in% names(args))) {
 for (i in 1:99) {
     if ('stilt_wd' %in% names(args)) break
     cwd <- dir()
-    is_stilt <- all(c('exe', 'fortran', 'r', 'README.md', 'setup') %in% cwd)
+    is_stilt <- all(c('bin', 'exe', 'r', 'README.md', 'setup') %in% cwd)
     if (is_stilt) {
         args$stilt_wd <- getwd()
     } else {

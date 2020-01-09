@@ -8,7 +8,7 @@
 set -e
 
 # Check if ./setup is run from the top level of the project
-dircnt=$(ls -d */ | grep -x -e exe/ -e r/ -e fortran/ | wc -l)
+dircnt=$(ls -d */ | grep -x -e bin/ -e r/ -e exe/ | wc -l)
 if [ $dircnt -lt 3 ]; then
   echo "./setup must be run from the top level directory of the STILT project"
   exit 1
@@ -39,9 +39,9 @@ else
 fi
 
 if [[ $install -eq 1 ]]; then
-  cp fortran/linux_x64/hycs_std exe/
+  cp bin/linux_x64/hycs_std exe/
 elif [[ $install -eq 2 ]]; then
-  cp fortran/macos_x64/hycs_std exe/
+  cp bin/macos_x64/hycs_std exe/
 else
   echo "Invalid install option."
   exit 1
