@@ -60,9 +60,8 @@ calc_trajectory <- function(namelist,
   }
   
   # Exit if running in HYSPLIT mode
-  if (ichem != 8) return()
+  if (namelist[['ichem']] != 8) return()
 
-  # Error check hysplit output
   pf <- file.path(rundir, 'PARTICLE_STILT.DAT')
   if (!file.exists(pf)) {
     msg <- paste('Failed to output ', pf, ' check for errors in log.txt')
