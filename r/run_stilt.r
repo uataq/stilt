@@ -73,7 +73,7 @@ cpack       <- 1
 delt        <- 1
 dxf         <- 1
 dyf         <- 1
-dzf         <- 0.1
+dzf         <- 0.01
 efile       <- ''
 emisshrs    <- 0.01
 frhmax      <- 3
@@ -81,7 +81,7 @@ frhs        <- 1
 frme        <- 0.1
 frmr        <- 0
 frts        <- 0.1
-frvs        <- 0.1
+frvs        <- 0.01
 hscale      <- 10800
 ichem       <- 8
 idsp        <- 2
@@ -90,11 +90,11 @@ isot        <- 0
 k10m        <- 1
 kagl        <- 1
 kbls        <- 1
-kblt        <- 1
+kblt        <- 5
 kdef        <- 1
 khinp       <- 0
 khmax       <- 9999
-kmix0       <- 250
+kmix0       <- 150
 kmixd       <- 3
 kmsl        <- 0
 kpuff       <- 0
@@ -102,7 +102,7 @@ krand       <- 2
 krnd        <- 6
 kspl        <- 1
 kwet        <- 0
-kzmix       <- 1
+kzmix       <- 0
 maxdim      <- 1
 maxpar      <- min(10000, numpar)
 mgmin       <- 10
@@ -127,12 +127,12 @@ tkerd       <- 0.18
 tkern       <- 0.18
 tlfrac      <- 0.1
 tout        <- 0
-tratio      <- 0.9
+tratio      <- 0.75
 tvmix       <- 1
 veght       <- 0.5
 vscale      <- 200
 vscaleu     <- 200
-vscales     <- 200
+vscales     <- -1
 wbbh        <- 0
 wbwf        <- 0
 wbwr        <- 0
