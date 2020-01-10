@@ -1,6 +1,7 @@
 #!/bin/bash
 # Ben Fasoli
 # Integration testing for STILT R wrapper
+set -e
 
 # Execute setup script to install stilt
 ./setup
@@ -46,6 +47,8 @@ ls -lh out/by-id/2015121000_-112_40.5_5
 
 # Wipe output directory
 rm out/by-id/2015121000_-112_40.5_5/*
+rm out/footprints/*
+rm out/particles/*
 
 # Run CLI single shot simulation
 chmod +x r/stilt_cli.r
