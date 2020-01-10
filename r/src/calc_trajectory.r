@@ -59,6 +59,9 @@ calc_trajectory <- function(namelist,
     Sys.sleep(1)
   }
   
+  # Exit if running in HYSPLIT mode
+  if (ichem != 8) return()
+
   # Error check hysplit output
   pf <- file.path(rundir, 'PARTICLE_STILT.DAT')
   if (!file.exists(pf)) {
