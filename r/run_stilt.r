@@ -86,7 +86,7 @@ hscale      <- 10800
 ichem       <- 8
 idsp        <- 2
 initd       <- 0
-isot        <- 0
+isot        <- -99
 k10m        <- 1
 kagl        <- 1
 kbls        <- 1
@@ -101,7 +101,7 @@ kpuff       <- 0
 krand       <- 2
 krnd        <- 6
 kspl        <- 1
-kwet        <- 0
+kwet        <- 1
 kzmix       <- 0
 maxdim      <- 1
 maxpar      <- min(10000, numpar)
