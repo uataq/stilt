@@ -1,8 +1,8 @@
 language: r
 cache: packages
 
-dist: trusty
-sudo: false
+os: linux
+dist: bionic
 
 warnings_are_errors: true
 
@@ -10,16 +10,20 @@ branches:
   except:
     - gh-pages
 
-addons:
-  apt:
-    sources:
-      - r-packages-trusty
-    packages:
-      - libhdf5-serial-dev libnetcdf-dev netcdf-bin unzip 
+apt_packages:
+  - libhdf5-serial-dev 
+  - libnetcdf-dev
+  - netcdf-bin
+  - unzip
 
-install: true
+r_packages:
+  - dplyr
+  - ncdf4
+  - parallel
+  - raster
+  - rslurm
 
-before_script:
+install:
   - bash test/test_setup.sh
 
 script:

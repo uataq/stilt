@@ -23,7 +23,6 @@ sed -i "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(
 # Minimize run duration
 sed -i 's|n_hours    <- -24|n_hours <- -6|g' r/run_stilt.r
 
-# Execute r/run_stilt.r
 echo "Running r/run_stilt.r"
 Rscript r/run_stilt.r
 
@@ -40,11 +39,10 @@ if [ $model_output -lt 2 ]; then
   exit 1
 fi
 
-# Print contents of output directory
 echo "out/by-id/<id> contents:"
 ls -lh out/by-id/2015121000_-112_40.5_5
 
-# Teardown
+echo "Removing model outputs"
 rm out/by-id/2015121000_-112_40.5_5/*
 rm out/footprints/*
 rm out/particles/*

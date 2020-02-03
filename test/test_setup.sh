@@ -2,10 +2,10 @@
 # Ben Fasoli
 set -e
 
-# Execute setup script to install stilt
+echo "Executing setup script..."
 ./setup
 
-# Ensure R package dependencies are installed
+echo "Sourcing R dependencies..."
 Rscript r/dependencies.r
 
 echo "Setup successful."

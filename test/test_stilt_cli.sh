@@ -5,7 +5,6 @@ set -e
 
 chmod +x r/stilt_cli.r
 
-# Run CLI single shot simulation
 echo "Running r/stilt_cli.r"
 r/stilt_cli.r \
   r_run_time=2015-12-10T00:00:00Z \
@@ -35,13 +34,12 @@ if [ $model_output -lt 2 ]; then
   exit 1
 fi
 
-# Print contents of output directory
 echo "out/by-id/<id> contents:"
 ls -lh out/by-id/2015121000_-112_40.5_5
 
-# Teardown
+echo "Removing model outputs"
 rm out/by-id/2015121000_-112_40.5_5/*
 rm out/footprints/*
 rm out/particles/*
 
-echo "Model test successful."
+echo "Model test successful"
