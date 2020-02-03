@@ -2,25 +2,19 @@ language: r
 cache: packages
 
 dist: bionic
-
 warnings_are_errors: true
 
 branches:
   except:
     - gh-pages
 
-apt_packages:
-  - libhdf5-serial-dev 
-  - libnetcdf-dev
-  - netcdf-bin
-  - unzip
-
-r_packages:
-  - dplyr
-  - ncdf4
-  - parallel
-  - raster
-  - rslurm
+addons:
+  apt:
+    packages:
+      - libhdf5-serial-dev 
+      - libnetcdf-dev
+      - netcdf-bin
+      - unzip
 
 install:
   - bash test/test_setup.sh
