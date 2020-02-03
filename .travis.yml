@@ -20,8 +20,8 @@ addons:
 install: true
 
 before_script:
-  - bash .test/test_setup.sh
+  - bash test/test_setup.sh
 
 script:
-  - bash .test/test_run_stilt.sh
-  - bash .test/test_stilt_cli.sh
+  - bash test/test_run_stilt.sh
+  - bash test/test_stilt_cli.sh
