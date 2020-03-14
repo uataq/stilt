@@ -152,7 +152,7 @@ write_setup <- function(varsiwant, conage = 48, cpack = 1, delt = 0, dxf = 1,
   eq <- function(lhs, rhs) {
     if (is.logical(rhs))
       rhs <- as.numeric(rhs)
-    paste0(lhs, '=', rhs, ',')
+    paste0(lhs, '=', format(rhs, scientific = F), ',')
   }
 
   txt <- c('$SETUP',
