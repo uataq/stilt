@@ -3,6 +3,9 @@
 # Integration testing for STILT R wrapper
 set -e
 
+# Fetch the tutorial data
+[[ -d stilt-tutorials ]] || git clone https://github.com/uataq/stilt-tutorials
+
 chmod +x r/stilt_cli.r
 
 echo "Running r/stilt_cli.r"
