@@ -19,9 +19,13 @@ jobs:
           libhdf5-serial-dev \
           libnetcdf-dev \
           netcdf-bin \
+          r-base \
+          r-base-dev \
           unzip
     - name: Checkout repo
       uses: actions/checkout@v2
+    - name: Install R dependencies
+      run: Rscript r/dependencies.r
     - name: Run simulation test
       run: bash .test
       
