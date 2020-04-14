@@ -117,12 +117,12 @@ simulation_step <- function(before_footprint = list(function() {output}),
     }
     environment(before_footprint) <- environment()
     environment(before_trajec) <- environment()
-
+    
     # Vector style arguments passed as a list
     r_zagl <- unlist(r_zagl)
     varsiwant <- unlist(varsiwant)
     ziscale <- unlist(ziscale)
-
+    
     # Validate arguments
     if (!run_trajec && !run_foot)
       stop('simulation_step(): Nothing to do, set run_trajec or run_foot to T')
@@ -172,10 +172,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
                               lati = r_lati,
                               long = r_long,
                               zagl = r_zagl)
-
+      
       # User defined function to mutate the output object
       output <- before_trajec()
-
+      
       particle <- calc_trajectory(varsiwant, conage, cpack, delt, dxf, dyf, dzf,
                                   emisshrs, frhmax, frhs, frme, frmr, frts, frvs,
                                   hnf_plume, hscale, ichem, iconvect, initd, isot,
@@ -227,11 +227,11 @@ simulation_step <- function(before_footprint = list(function() {output}),
       
       # Save output object to compressed rds file and symlink to out/particles
       saveRDS(output, output$file)
-      invisible(file.symlink(output$file, file.path(output_wd, 'particles',
-                                                    basename(output$file))))
+      link <- file.path(output_wd, 'particles', basename(output$file))
+      suppressWarnings(file.symlink(output$file, link))
       # Exit if not performing footprint calculations
       if (!run_foot) return(invisible(output$file))
-
+      
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
       # file to a data frame with an adjusted timestamp and index for the
@@ -246,7 +246,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     
     # User defined function to mutate the output object
     output <- before_footprint()
-
+    
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
     # outputs a .rds file, which can be read with readRDS() containing the
@@ -266,9 +266,9 @@ simulation_step <- function(before_footprint = list(function() {output}),
     }
     
     # Symlink footprint to out/footprints
-    invisible(file.symlink(foot_file, file.path(output_wd, 'footprints',
-                                                basename(foot_file))))
-
+    link <- file.path(output_wd, 'footprints', basename(foot_file))
+    suppressWarnings(file.symlink(foot_file, link))
+    
     invisible(gc())
     return(foot)
   })
