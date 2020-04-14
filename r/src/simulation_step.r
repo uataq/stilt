@@ -232,7 +232,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # Creates subdirectories in out for each model run time. Each of these
     # subdirectories is populated with symbolic links to the shared datasets
     # below and a run-specific SETUP.CFG and CONTROL
-    rundir_format <- paste0('%Y%m%d%H_', r_long, '_', r_lati, '_', 
+    rundir_format <- paste0('%Y%m%d%H%M_', r_long, '_', r_lati, '_', 
                             ifelse(length(r_zagl) > 1, 'X', r_zagl))
     rundir  <- file.path(output_wd, 'by-id',
                          strftime(r_run_time, rundir_format, 'UTC'))
