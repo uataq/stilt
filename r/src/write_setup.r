@@ -89,7 +89,9 @@ write_setup <- function(varsiwant,
   varsiwant <- paste0('\'', paste(varsiwant, collapse = '\', \''), '\'')
 
   eq <- function(lhs, rhs) {
-    paste0(lhs, '=', rhs, ',')
+    if (is.logical(rhs))
+      rhs <- as.numeric(rhs)
+    paste0(lhs, '=', format(rhs, scientific = F), ',')
   }
 
   txt <- c('$SETUP',

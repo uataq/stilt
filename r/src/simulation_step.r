@@ -309,8 +309,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
       
       # Save output object to compressed rds file and symlink to out/particles
       saveRDS(output, output$file)
-      invisible(file.symlink(output$file, file.path(output_wd, 'particles',
-                                                    basename(output$file))))
+      
+      link <- file.path(output_wd, 'particles', basename(output$file))
+      suppressWarnings(file.symlink(output$file, link))
+
       # Exit if not performing footprint calculations
       if (!run_foot) return(invisible(output$file))
       
@@ -348,8 +350,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
     }
     
     # Symlink footprint to out/footprints
-    invisible(file.symlink(foot_file, file.path(output_wd, 'footprints',
-                                                basename(foot_file))))
+    link <- file.path(output_wd, 'footprints', basename(foot_file))
+    suppressWarnings(file.symlink(foot_file, link))
     
     invisible(gc())
     return(foot)

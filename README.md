@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.org/uataq/stilt">
-    <img src="https://travis-ci.org/uataq/stilt.svg?branch=master"/>
+  <a href="https://github.com/uataq/stilt/actions?query=branch%3Amaster">
+    <img src="https://github.com/uataq/stilt/workflows/Build%20+%20Test/badge.svg"/>
   </a>
   <a href="https://github.com/uataq/stilt/issues">
     <img src="https://img.shields.io/github/issues/uataq/stilt.svg"/>

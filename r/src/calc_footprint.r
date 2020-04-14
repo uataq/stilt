@@ -52,10 +52,18 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   time_sign <- sign(median(p$time))
   times <- times * time_sign
   
-  i <- p %>%
+  # Preserve total field prior to split-interpolating particle positions
+  aptime <- abs(p$time)
+  foot_0_10_sum <- sum(p$foot[aptime <= 10], na.rm = T)
+  foot_10_20_sum <- sum(p$foot[aptime > 10 & aptime <= 20], na.rm = T)
+  foot_20_100_sum <- sum(p$foot[aptime > 20 & aptime <= 100], na.rm = T)
+
+  # Split particle incluence along linear trajectory to sub-minute timescales
+  p <- p %>%
     dplyr::select(indx, time, long, lati, foot) %>%
     full_join(expand.grid(time = times,
-                          indx = unique(p$indx)), by = c('indx', 'time')) %>%
+                          indx = unique(p$indx)),
+              by = c('indx', 'time')) %>%
     arrange(indx, -time) %>%
     group_by(indx) %>%
     mutate(long = na_interp(long, x = time),
@@ -64,20 +72,24 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     ungroup() %>%
     na.omit() %>%
     mutate(time = round(time, 1))
-  
+
   # Scale interpolated values to retain total field
-  aitime <- abs(i$time)
-  aptime <- abs(p$time)
+  aitime <- abs(p$time)
   mi <- aitime <= 10
-  mp <- aptime <= 10
-  i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
+  p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_0_10_sum)
   mi <- aitime > 10 & aitime <= 20
-  mp <- aptime > 10 & aptime <= 20
-  i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
+  p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_10_20_sum)
   mi <- aitime > 20 & aitime <= 100
-  mp <- aptime > 20 & aptime <= 100
-  i$foot[mi] <- i$foot[mi] / (sum(i$foot[mi], na.rm = T) / sum(p$foot[mp], na.rm = T))
+  p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_20_100_sum)
   
+  # Preserve time relative to individual particle release as rtime
+  releases <- p[!duplicated(p$indx), ]
+  is_backward <- median(p$time) < 0
+  p <- p %>%
+    group_by(indx) %>%
+    mutate(rtime = time - (time_sign) * min(abs(time))) %>%
+    ungroup()
+
   # Translate x, y coordinates into desired map projection
   is_longlat <- grepl('+proj=longlat', projection, fixed = T)
   if (!is_longlat) {
@@ -95,16 +107,15 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   glati <- head(seq(ymn, ymx, by = yres), -1)
   
   # Gaussian kernel bandwidth scaling
-  kernel <- i %>%
-    group_by(time) %>%
+  kernel <- p %>%
+    group_by(rtime) %>%
     dplyr::summarize(varsum = var(long, na.rm = T) + var(lati, na.rm = T),
                      lati = mean(lati, na.rm = T)) %>%
     na.omit()
   di <- kernel$varsum^(1/4)
-  ti <- abs(kernel$time/1440)^(1/2)
+  ti <- abs(kernel$rtime/1440)^(1/2)
   grid_conv <- if (is_longlat) cos(kernel$lati * pi/180) else 1
   w <- smooth_factor * 0.06 * di * ti / grid_conv
-  
   
   # Gaussian kernel weighting calculation
   make_gauss_kernel <- function (rs, sigma, projection) {
@@ -129,27 +140,30 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   # Determine maximum kernel size
   xyres <- c(xres, yres)
   max_k <- make_gauss_kernel(xyres, max(w), projection)
+  
+  # Expand grid extent using maximum kernel size
   xbuf <- ncol(max_k)
   xbufh <- (xbuf - 1) / 2
   ybuf <- nrow(max_k)
   ybufh <- (ybuf - 1) / 2
-  
   max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
   max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
   
   # Remove zero influence particles and positions outside of domain
-  xyzt <- i %>%
-    dplyr::filter(foot > 0, long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
-           lati >= (ymn - ybufh*yres), lati < (ymx + ybufh*yres))
-  if (nrow(xyzt) == 0) return(NULL)
+  p <- p %>%
+    dplyr::filter(foot > 0,
+                  long >= (xmn - xbufh*xres), long < (xmx + xbufh*xres),
+                  lati >= (ymn - ybufh*yres), lati < (ymx + ybufh*yres))
+  if (nrow(p) == 0) return(NULL)
   
   # Pre grid particle locations
-  xyzt <- xyzt %>%
+  p <- p %>%
     transmute(loi = as.integer(findInterval(long, max_glong)),
               lai = as.integer(findInterval(lati, max_glati)),
               foot = foot,
-              time = time) %>%
-    group_by(loi, lai, time) %>%
+              time = time,
+              rtime) %>%
+    group_by(loi, lai, time, rtime) %>%
     dplyr::summarize(foot = sum(foot, na.rm = T)) %>%
     ungroup()
   
@@ -161,31 +175,33 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   # Split particle data by footprint layer
   interval <- 3600
   interval_mins <- interval / 60
-  xyzt$layer <- if (time_integrate) 0 else floor(xyzt$time / interval_mins)
-  layers <- sort(unique(xyzt$layer))
+  p$layer <- if (time_integrate) 0 else floor(p$time / interval_mins)
+  
+  layers <- sort(unique(p$layer))
   nlayers <- length(layers)
   
   # Preallocate footprint output array
   foot <- array(grd, dim = c(dim(grd), nlayers))
   for (i in 1:nlayers) {
-    xyzt_layer <- dplyr::filter(xyzt, layer == layers[i])
+    layer_subset <- dplyr::filter(p, layer == layers[i])
     
-    times <- unique(xyzt_layer$time)
-    for (j in 1:length(times)) {
-      xyzt_step <- dplyr::filter(xyzt_layer, time == times[j])
+    rtimes <- unique(layer_subset$rtime)
+    for (j in 1:length(rtimes)) {
+      step <- dplyr::filter(layer_subset, rtime == rtimes[j])
       
       # Create dispersion kernel based using nearest-in-time kernel bandwidth w
-      k <- make_gauss_kernel(xyres, w[find_neighbor(times[j], kernel$time)], projection)
+      step_w <- w[find_neighbor(rtimes[j], kernel$rtime)]
+      k <- make_gauss_kernel(xyres, step_w, projection)
       
       # Array dimensions
-      len <- nrow(xyzt_step)
+      len <- nrow(step)
       nkx <- ncol(k)
       nky <- nrow(k)
       
       # Call permute fortran subroutine to build and aggregate kernels
       out <- .Fortran('permute', ans = grd, nax = nx, nay = ny, k = k, 
-                      nkx = nkx, nky = nky, len = len, lai = xyzt_step$lai, 
-                      loi = xyzt_step$loi, foot = xyzt_step$foot)
+                      nkx = nkx, nky = nky, len = len, lai = step$lai, 
+                      loi = step$loi, foot = step$foot)
       foot[ , , i] <- foot[ , , i] + out$ans
     }
   }
