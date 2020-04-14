@@ -167,7 +167,7 @@ write_setup <- function(varsiwant,
            eq('WBBH', wbbh),
            eq('WBWF', wbwf),
            eq('WBWR', wbwr),
-           eq('WVERT', wvert),
+           eq('WVERT', as.character(as.logical(wvert))),
            eq('WINDERRTF', winderrtf),
            eq('ZICONTROLTF', zicontroltf),
            '$END')
