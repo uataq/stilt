@@ -19,10 +19,13 @@ jobs:
       run: |
         sudo apt-get update -yq \
         && sudo apt-get install -yq --no-install-recommends \
+          libgfortran3 \
           libhdf5-serial-dev \
           libnetcdf-dev \
           netcdf-bin \
           unzip
+    - name: Check gfortran
+      run: which gfortran
     - name: Install R
       uses: r-lib/actions/setup-r@v1
     - name: Install STILT
