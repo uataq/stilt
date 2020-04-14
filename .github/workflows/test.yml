@@ -1,0 +1,27 @@
+name: Build + Test
+
+on: 
+  push:
+    branches-ignore:
+      - gh-pages
+  pull_request:
+    branches-ignore:
+      - gh-pages
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -yq --no-install-recommends \
+          libhdf5-serial-dev \
+          libnetcdf-dev \
+          netcdf-bin \
+          unzip
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Run simulation test
+      run: bash .test
+      
