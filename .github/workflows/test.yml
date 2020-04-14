@@ -17,13 +17,16 @@ jobs:
       uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get install -yq --no-install-recommends \
+        sudo apt-get update -yq \
+        && sudo apt-get install -yq --no-install-recommends \
           libhdf5-serial-dev \
           libnetcdf-dev \
           netcdf-bin \
           unzip
     - name: Install R
       uses: r-lib/actions/setup-r@v1
+    - name: Install STILT
+      run: ./setup 3
     - name: Install R dependencies
       run: Rscript r/dependencies.r
     - name: Run simulation test

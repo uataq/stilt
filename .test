@@ -2,9 +2,6 @@
 # Ben Fasoli
 # Integration testing for STILT R wrapper
 
-# Execute setup script and fetch the ubuntu-16.04 binary (option 3)
-./setup 3
-
 # Fetch the tutorial data
 git clone https://github.com/uataq/stilt-tutorials
 
