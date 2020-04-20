@@ -56,7 +56,7 @@ calc_trajectory <- function(namelist,
       cat(msg, '\n', file = file.path(rundir, 'ERROR'))
       return()
     }
-    Sys.sleep(1)
+    Sys.sleep(0.1)
   }
   
   # Exit if running in HYSPLIT mode
