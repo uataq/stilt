@@ -127,6 +127,8 @@ write_footprint <- function(foot, output, glong, glati, projection, time_out,
     ncatt_put(nc, 0, 'documentation', 'github.com/uataq/stilt')
     ncatt_put(nc, 0, 'title', 'STILT Footprint')
     ncatt_put(nc, 0, 'time_created', format(Sys.time(), tz = 'UTC'))
+    
+    nc_close(nc)
     return(output)
   }
   
