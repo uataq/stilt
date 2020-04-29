@@ -55,7 +55,7 @@ n_met_min       <- 1
 
 # Model control
 n_hours    <- -24
-numpar     <- 200
+numpar     <- 1000
 rm_dat     <- T
 run_foot   <- T
 run_trajec <- T
@@ -104,7 +104,7 @@ kspl        <- 1
 kwet        <- 1
 kzmix       <- 0
 maxdim      <- 1
-maxpar      <- min(10000, numpar)
+maxpar      <- numpar
 mgmin       <- 10
 mhrs        <- 9999
 nbptyp      <- 1
