@@ -60,10 +60,8 @@ rm_dat     <- T
 run_foot   <- T
 run_trajec <- T
 timeout    <- 3600
-varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
-                'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
-                'rhfr', 'sphu', 'lcld', 'zloc', 'dswf', 'wout', 'mlht', 'rain',
-                'crai', 'pres')
+varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens',
+                'samt', 'sigw', 'tlgr')
 
 # Transport and dispersion settings
 capemin     <- -1
