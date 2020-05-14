@@ -75,7 +75,6 @@ stilt_args <- list(
     ichem = as.numeric(args$ichem),
     idsp = as.numeric(args$idsp),
     initd = as.numeric(args$initd),
-    isot = as.numeric(args$isot),
     k10m = as.numeric(args$k10m),
     kagl = as.numeric(args$kagl),
     kbls = as.numeric(args$kbls),

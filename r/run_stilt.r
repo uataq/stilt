@@ -84,7 +84,6 @@ hscale      <- 10800
 ichem       <- 8
 idsp        <- 2
 initd       <- 0
-isot        <- -99
 k10m        <- 1
 kagl        <- 1
 kbls        <- 1
@@ -223,7 +222,6 @@ stilt_apply(FUN = simulation_step,
             ichem = ichem,
             idsp = idsp,
             initd = initd,
-            isot = isot,
             k10m = k10m,
             kagl = kagl,
             kbls = kbls,
