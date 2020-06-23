@@ -27,7 +27,7 @@ jobs:
     - name: Install R
       uses: r-lib/actions/setup-r@v1
     - name: Install STILT
-      run: ./setup 3
+      run: ./setup 2
     - name: Install R dependencies
       run: Rscript r/dependencies.r
     - name: Run simulation test

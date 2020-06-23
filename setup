@@ -8,8 +8,8 @@
 set -e
 
 # Check if ./setup is run from the top level of the project
-dircnt=$(ls -d */ | grep -x -e exe/ -e r/ -e fortran/ | wc -l)
-if [ $dircnt -lt 3 ]; then
+dircnt=$(ls -d */ | grep -x -e exe/ -e r/ | wc -l)
+if [ $dircnt -lt 2 ]; then
   echo "./setup must be run from the top level directory of the STILT project"
   exit 1
 fi
@@ -27,10 +27,8 @@ if [ -z $1 ]; then
   echo "
   STILT hymodelc installation options:
   1 - Compile hymodelc from source
-  2 - hymodelc-centos-7.4
-  3 - hymodelc-ubuntu-16.04
-  4 - hymodelc-ubuntu-14.04
-  5 - hymodelc-macos-10.13
+  2 - hymodelc-linux-x64
+  3 - hymodelc-macos-x64
   "
   echo -n "Install option (number from above): "
   read -n 1 install
@@ -62,42 +60,36 @@ if [[ $install -eq 1 ]]; then
     fortran/
   # Compile STILT trajectory calculation binary
   echo "Compiling STILT trajectory calculation binary (hymodelc)..."
-  (cd fortran && make)
+  sed -i.bak -e 's/FC =.*/FC = gfortran/' fortran/Makefile
+	sed -i.bak -e 's/CFLAGS =.*/CFLAGS = $(GFOR)/' fortran/Makefile
+  make -C fortran
   if [ ! -s fortran/hymodelc ]; then
     echo "Problem compiling fortran/hymodelc."
     echo "You may need to edit settings in fortran/makefile to compile manually."
     exit 1
   fi
+  
+  # Move hymodelc to shared exe/ directory
+  mv fortran/hymodelc exe/hymodelc
 
 # Fetch binary from GitHub release
 elif [[ $install -eq 2 ]]; then
-  wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-centos-7.4.zip
-  unzip -p fortran/hymodelc-centos-7.4.zip hymodelc > fortran/hymodelc
+  wget -O exe/hymodelc \
+    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-linux-x64
 elif [[ $install -eq 3 ]]; then
-  wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-ubuntu-16.04.zip
-  unzip -p fortran/hymodelc-ubuntu-16.04.zip hymodelc > fortran/hymodelc
-elif [[ $install -eq 4 ]]; then
-  wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-ubuntu-14.04.zip
-  unzip -p fortran/hymodelc-ubuntu-14.04.zip hymodelc > fortran/hymodelc
-elif [[ $install -eq 5 ]]; then
-  wget --directory-prefix=fortran/ \
-    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-macos-10.13.zip
-  unzip -p fortran/hymodelc-macos-10.13.zip hymodelc > fortran/hymodelc
+  wget -O exe/hymodelc \
+    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-macos-x64
 else
   echo "Invalid install option."
   exit 1
 fi
 
 # Check that hymodelc was created from methods above
-if [ ! -s fortran/hymodelc ]; then
-  echo "Problem creating fortran/hymodelc."
+if [ ! -s exe/hymodelc ]; then
+  echo "Problem creating hymodelc."
   exit 1
 fi
-# Move hymodelc to shared exe/ directory
-mv fortran/hymodelc exe/hymodelc
+
 # Ensure hymodelc, run_stilt.r, and stilt_cli.r are executable
 chmod +x exe/hymodelc r/run_stilt.r r/stilt_cli.r
 

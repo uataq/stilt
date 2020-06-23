@@ -2,11 +2,10 @@
 out/*
 _rslurm*
 
-# Distributions of pre-compiled binaries
-fortran/*
-!fortran/makefile
-
 # System compilation outputs
+fortran/*
+*.bak
+*.a
 *.o
 *.so
 exe/hymodelc
