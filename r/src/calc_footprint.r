@@ -74,16 +74,15 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     mutate(time = round(time, 1))
 
   # Scale interpolated values to retain total field
-  aitime <- abs(p$time)
-  mi <- aitime <= 10
+  aptime <- abs(p$time)
+  mi <- aptime <= 10
   p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_0_10_sum)
-  mi <- aitime > 10 & aitime <= 20
+  mi <- aptime > 10 & aptime <= 20
   p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_10_20_sum)
-  mi <- aitime > 20 & aitime <= 100
+  mi <- aptime > 20 & aptime <= 100
   p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_20_100_sum)
   
   # Preserve time relative to individual particle release as rtime
-  releases <- p[!duplicated(p$indx), ]
   is_backward <- median(p$time) < 0
   p <- p %>%
     group_by(indx) %>%
@@ -94,7 +93,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   is_longlat <- grepl('+proj=longlat', projection, fixed = T)
   if (!is_longlat) {
     require(proj4)
-    i[, c('long', 'lati')] <- project(i[, c('long', 'lati')], projection)
+    p[, c('long', 'lati')] <- project(p[, c('long', 'lati')], projection)
     grid_lims <- project(list(c(xmn, xmx), c(ymn, ymx)), projection)
     xmn <- min(grid_lims$x)
     xmx <- max(grid_lims$x)
