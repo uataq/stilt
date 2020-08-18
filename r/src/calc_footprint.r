@@ -43,52 +43,62 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   require(dplyr)
   require(raster)
   
+  p <- p[ , c('time', 'indx', 'long', 'lati', 'foot')]
+  
   np <- length(unique(p$indx))
-  
-  # Interpolate particle locations during initial time steps
-  times <- c(seq(0, 10, by = 0.1),
-             seq(10.2, 20, by = 0.2),
-             seq(20.5, 100, by = 0.5))
   time_sign <- sign(median(p$time))
-  times <- times * time_sign
   
-  # Preserve total field prior to split-interpolating particle positions
-  aptime <- abs(p$time)
-  foot_0_10_sum <- sum(p$foot[aptime <= 10], na.rm = T)
-  foot_10_20_sum <- sum(p$foot[aptime > 10 & aptime <= 20], na.rm = T)
-  foot_20_100_sum <- sum(p$foot[aptime > 20 & aptime <= 100], na.rm = T)
-
-  # Split particle incluence along linear trajectory to sub-minute timescales
-  p <- p %>%
-    dplyr::select(indx, time, long, lati, foot) %>%
-    full_join(expand.grid(time = times,
-                          indx = unique(p$indx)),
-              by = c('indx', 'time')) %>%
-    arrange(indx, -time) %>%
+  # Interpolate particle locations during first 100 minutes of simulation if
+  # median distance travelled per time step is larger than grid resolution
+  distances <- p %>%
+    dplyr::filter(abs(time) < 100) %>%
     group_by(indx) %>%
-    mutate(long = na_interp(long, x = time),
-           lati = na_interp(lati, x = time),
-           foot = na_interp(foot, x = time)) %>%
-    ungroup() %>%
-    na.omit() %>%
-    mutate(time = round(time, 1))
-
-  # Scale interpolated values to retain total field
-  aptime <- abs(p$time)
-  mi <- aptime <= 10
-  p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_0_10_sum)
-  mi <- aptime > 10 & aptime <= 20
-  p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_10_20_sum)
-  mi <- aptime > 20 & aptime <= 100
-  p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_20_100_sum)
+    summarize(dx = median(abs(diff(long))),
+              dy = median(abs(diff(lati)))) %>%
+    ungroup()
+  
+  should_interpolate <- (median(distances$dx) > xres) || (median(distances$dy) > yres)
+  if (should_interpolate) {
+    times <- c(seq(0, 10, by = 0.1),
+               seq(10.2, 20, by = 0.2),
+               seq(20.5, 100, by = 0.5)) * time_sign
+    
+    # Preserve total field prior to split-interpolating particle positions
+    aptime <- abs(p$time)
+    foot_0_10_sum <- sum(p$foot[aptime <= 10], na.rm = T)
+    foot_10_20_sum <- sum(p$foot[aptime > 10 & aptime <= 20], na.rm = T)
+    foot_20_100_sum <- sum(p$foot[aptime > 20 & aptime <= 100], na.rm = T)
+    
+    # Split particle influence along linear trajectory to sub-minute timescales
+    p <- p %>%
+      full_join(expand.grid(time = times,
+                            indx = unique(p$indx)),
+                by = c('indx', 'time')) %>%
+      arrange(indx, -time) %>%
+      group_by(indx) %>%
+      mutate(long = na_interp(long, x = time),
+             lati = na_interp(lati, x = time),
+             foot = na_interp(foot, x = time)) %>%
+      ungroup() %>%
+      na.omit() %>%
+      mutate(time = round(time, 1))
+    
+    # Scale interpolated values to retain total field
+    aptime <- abs(p$time)
+    mi <- aptime <= 10
+    p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_0_10_sum)
+    mi <- aptime > 10 & aptime <= 20
+    p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_10_20_sum)
+    mi <- aptime > 20 & aptime <= 100
+    p$foot[mi] <- p$foot[mi] / (sum(p$foot[mi], na.rm = T) / foot_20_100_sum)
+  }
   
   # Preserve time relative to individual particle release as rtime
-  is_backward <- median(p$time) < 0
   p <- p %>%
     group_by(indx) %>%
     mutate(rtime = time - (time_sign) * min(abs(time))) %>%
     ungroup()
-
+  
   # Translate x, y coordinates into desired map projection
   is_longlat <- grepl('+proj=longlat', projection, fixed = T)
   if (!is_longlat) {
@@ -105,12 +115,15 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   glong <- head(seq(xmn, xmx, by = xres), -1)
   glati <- head(seq(ymn, ymx, by = yres), -1)
   
-  # Gaussian kernel bandwidth scaling
+  # Gaussian kernel bandwidth scaling by summed variances, elapsed time, and
+  # average latitude of the ensemble
   kernel <- p %>%
     group_by(rtime) %>%
-    dplyr::summarize(varsum = var(long, na.rm = T) + var(lati, na.rm = T),
-                     lati = mean(lati, na.rm = T)) %>%
+    dplyr::summarize(varsum = var(long) + var(lati),
+                     lati = mean(lati)) %>%
+    ungroup() %>%
     na.omit()
+  
   di <- kernel$varsum^(1/4)
   ti <- abs(kernel$rtime/1440)^(1/2)
   grid_conv <- if (is_longlat) cos(kernel$lati * pi/180) else 1

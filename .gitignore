@@ -3,6 +3,9 @@ out/*
 _rslurm*
 
 # System compilation outputs
+fortran/*
+*.bak
+*.a
 *.o
 *.so
 exe/hymodelc
