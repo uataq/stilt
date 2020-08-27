@@ -186,15 +186,6 @@ for (d in c('by-id', 'particles', 'footprints')) {
 }
 
 
-# Met path symlink -------------------------------------------------------------
-# Auto symlink the meteorological data path to the user's home directory to
-# eliminate issues with long (>80 char) paths in fortran
-# if ((nchar(paste0(met_path, met_file_format)) + 2) > 80) {
-#   met_path <- file.path(path.expand('~'), paste0('m', project))
-#   if (!file.exists(met_path)) invisible(file.symlink(met_path, met_path))
-# } else met_path <- met_path
-
-
 # Run trajectory simulations ---------------------------------------------------
 stilt_apply(FUN = simulation_step,
             slurm = slurm, 
