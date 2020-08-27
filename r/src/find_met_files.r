@@ -10,12 +10,12 @@
 #'   indicated by \code{t_start} and \code{n_hours}
 #' @param n_hours number of hours to run each simulation; negative indicates
 #'   backward in time
-#' @param met_loc directory to find meteorological data
+#' @param met_path directory to find meteorological data
 #'
 #' @import dplyr
 #' @export
 
-find_met_files <- function(t_start, met_file_format, n_hours, met_loc) {
+find_met_files <- function(t_start, met_file_format, n_hours, met_path) {
   require(dplyr)
   
   is_backward <- n_hours < 0
@@ -26,7 +26,7 @@ find_met_files <- function(t_start, met_file_format, n_hours, met_loc) {
     (function(x) seq(x[1], x[2], by = 'hour')) %>%
     strftime(tz = 'UTC', format = met_file_format)
   
-  available <- dir(met_loc, full.names = T)
+  available <- dir(met_path, full.names = T)
   
   idx <- do.call(c, lapply(request, function(pattern) {
     grep(pattern = pattern, x = available)

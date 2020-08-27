@@ -49,9 +49,12 @@ xres <- 0.01
 yres <- xres
 
 # Meteorological data input
-met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'
-met_file_format <- '%Y%m%d.%Hz.hrrra'
-n_met_min       <- 1
+met_path           <- '<path_to_arl_meteorological_data>'
+met_file_format    <- '%Y%m%d.%Hz.hrrra'
+met_subgrid_buffer <- 0.1
+met_subgrid_enable <- F
+met_subgrid_levels <- NA
+n_met_min          <- 1
 
 # Model control
 n_hours    <- -24
@@ -149,6 +152,7 @@ horcorzierr <- NA
 sigzierr    <- NA
 tlzierr     <- NA
 
+
 # Interface to mutate the output object with user defined functions
 before_trajec <- function() {output}
 before_footprint <- function() {output}
@@ -172,6 +176,7 @@ source('r/dependencies.r')
 system(paste0('rm -r ', output_wd, '/footprints'), ignore.stderr = T)
 if (run_trajec) {
   system(paste0('rm -r ', output_wd, '/by-id'), ignore.stderr = T)
+  system(paste0('rm -r ', output_wd, '/met'), ignore.stderr = T)
   system(paste0('rm -r ', output_wd, '/particles'), ignore.stderr = T)
 }
 for (d in c('by-id', 'particles', 'footprints')) {
@@ -184,10 +189,10 @@ for (d in c('by-id', 'particles', 'footprints')) {
 # Met path symlink -------------------------------------------------------------
 # Auto symlink the meteorological data path to the user's home directory to
 # eliminate issues with long (>80 char) paths in fortran
-if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
-  met_loc <- file.path(path.expand('~'), paste0('m', project))
-  if (!file.exists(met_loc)) invisible(file.symlink(met_directory, met_loc))
-} else met_loc <- met_directory
+# if ((nchar(paste0(met_path, met_file_format)) + 2) > 80) {
+#   met_path <- file.path(path.expand('~'), paste0('m', project))
+#   if (!file.exists(met_path)) invisible(file.symlink(met_path, met_path))
+# } else met_path <- met_path
 
 
 # Run trajectory simulations ---------------------------------------------------
@@ -241,7 +246,10 @@ stilt_apply(FUN = simulation_step,
             maxdim = maxdim,
             maxpar = maxpar,
             met_file_format = met_file_format,
-            met_loc = met_loc,
+            met_path = met_path,
+            met_subgrid_buffer = met_subgrid_buffer,
+            met_subgrid_enable = met_subgrid_enable,
+            met_subgrid_levels = met_subgrid_levels,
             mgmin = mgmin,
             n_hours = n_hours,
             n_met_min = n_met_min,

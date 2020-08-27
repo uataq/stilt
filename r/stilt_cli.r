@@ -9,7 +9,7 @@
 #     r_lati=40.5 \
 #     r_long=-112.0 \
 #     r_zagl=5 \
-#     met_loc=/tmp/stilt-tutorials/01-wbb/met/ \
+#     met_path=/tmp/stilt-tutorials/01-wbb/met/ \
 #     met_file_format=%Y%m%d.%H \
 #     xmn=-112.3 \
 #     xmx=-111.52 \
@@ -29,11 +29,11 @@ for (arg in strsplit(arg_strings, '=', fixed = T)) {
 }
 
 # Validate required arguments exist
-req_args <- c('met_file_format', 'met_loc', 'r_run_time', 'r_lati', 'r_long',
+req_args <- c('met_file_format', 'met_path', 'r_run_time', 'r_lati', 'r_long',
               'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
 if (!all(req_args %in% names(args))) {
     stop(paste('Not all arguments supplied:', 
-                paste(req_args, collapse=',')))
+               paste(req_args, collapse=',')))
 }
 
 # Ensure script is executed from the correct place
@@ -95,7 +95,10 @@ stilt_args <- list(
     maxdim = as.numeric(args$maxdim),
     maxpar = as.numeric(args$maxpar),
     met_file_format = as.character(args$met_file_format),
-    met_loc = as.character(args$met_loc),
+    met_path = as.character(args$met_path),
+    met_subgrid_buffer = as.numeric(args$met_subgrid_buffer),
+    met_subgrid_enable = as.boolean(args$met_subgrid_enable),
+    met_subgrid_levels = as.numeric(args$met_subgrid_levels),
     mgmin = as.numeric(args$mgmin),
     n_hours = as.numeric(args$n_hours),
     n_met_min = as.numeric(args$n_met_min),

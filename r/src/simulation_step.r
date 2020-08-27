@@ -53,7 +53,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             maxdim = 1,
                             maxpar = numpar,
                             met_file_format, 
-                            met_loc,
+                            met_path,
+                            met_subgrid_buffer = 0.1,
+                            met_subgrid_enable = F,
+                            met_subgrid_levels = NA,
                             mgmin = 10,
                             mhrs = 9999,
                             n_hours = -24,
@@ -246,13 +249,30 @@ simulation_step <- function(before_footprint = list(function() {output}),
       # Ensure necessary files and directory structure are established in the
       # current rundir
       if (!dir.exists(rundir)) dir.create(rundir)
-      link_files <- dir(file.path(stilt_wd, 'exe'))
-      suppressWarnings(
-        file.symlink(file.path(stilt_wd, 'exe', link_files), rundir)
-      )
+      
+      exe <- file.path(stilt_wd, 'exe')
+      link_files(exe, rundir)
       
       # Find necessary met files
-      met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_loc)
+      met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_path)
+      if (length(met_files) < n_met_min) {
+        msg <- paste('Insufficient number of meteorological files found. Check',
+                     'specifications in run_stilt.r')
+        warning(msg)
+        cat(msg, '\n', file = file.path(rundir, 'ERROR'))
+        return()
+      }
+      
+      if (met_subgrid_enable) {
+        met_path <- file.path(output_wd, 'met')
+        calc_met_subgrids(met_files, met_path, exe,
+                          projection, xmn, xmx, ymn, ymx,
+                          levels = met_subgrid_levels,
+                          met_subgrid_buffer = met_subgrid_buffer)
+      }
+      
+      # Find necessary met files
+      met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_path)
       if (length(met_files) < n_met_min) {
         msg <- paste('Insufficient number of meteorological files found. Check',
                      'specifications in run_stilt.r')
@@ -307,9 +327,6 @@ simulation_step <- function(before_footprint = list(function() {output}),
       
       link <- file.path(output_wd, 'particles', basename(output$file))
       suppressWarnings(file.symlink(output$file, link))
-
-      # Exit if not performing footprint calculations
-      if (!run_foot) return(invisible(output$file))
       
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
@@ -317,11 +334,14 @@ simulation_step <- function(before_footprint = list(function() {output}),
       # simulation step. If none exists, report an error and proceed
       if (!file.exists(output$file)) {
         warning('simulation_step(): No _traj.rds file found in ', rundir,
-                '\n    skipping this receptor and trying the next...')
+                '\n  skipping this receptor and trying the next...')
         return()
       }
       output <- readRDS(output$file)
     }
+    
+    # Exit if not performing footprint calculations
+    if (!run_foot) return(invisible(output$file))
     
     # User defined function to mutate the output object
     output <- before_footprint()

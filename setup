@@ -22,7 +22,7 @@ if [ ! -s r/src/permute.so ]; then
   exit 1
 fi
 
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [[ "$OSTYPE" == "linux"* ]]; then
   install="1"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   install="2"
@@ -39,9 +39,9 @@ else
 fi
 
 if [[ $install -eq 1 ]]; then
-  cp bin/linux_x64/hycs_std exe/
+  cp bin/linux_x64/* exe/
 elif [[ $install -eq 2 ]]; then
-  cp bin/macos_x64/hycs_std exe/
+  cp bin/macos_x64/* exe/
 else
   echo "Invalid install option."
   exit 1

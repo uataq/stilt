@@ -17,8 +17,8 @@ sed -i'.bak' -e 's|xmx <- NA|xmx <- -111|g' r/run_stilt.r
 sed -i'.bak' -e 's|ymn <- NA|ymn <- 39.5|g' r/run_stilt.r
 sed -i'.bak' -e 's|ymx <- NA|ymx <- 41.5|g' r/run_stilt.r
 
-# Set met_directory
-sed -i'.bak' -e "s|'/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'|file.path(stilt_wd, 'stilt-tutorials/01-wbb/met')|g" r/run_stilt.r
+# Set met_path
+sed -i'.bak' -e "s|'<path_to_arl_meteorological_data>'|file.path(stilt_wd, 'stilt-tutorials/01-wbb/met')|g" r/run_stilt.r
 
 # Minimize run duration
 sed -i'.bak' -e 's|n_hours    <- -24|n_hours <- -6|g' r/run_stilt.r
