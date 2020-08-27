@@ -97,7 +97,7 @@ stilt_args <- list(
     met_file_format = as.character(args$met_file_format),
     met_path = as.character(args$met_path),
     met_subgrid_buffer = as.numeric(args$met_subgrid_buffer),
-    met_subgrid_enable = as.boolean(args$met_subgrid_enable),
+    met_subgrid_enable = as.logical(args$met_subgrid_enable),
     met_subgrid_levels = as.numeric(args$met_subgrid_levels),
     mgmin = as.numeric(args$mgmin),
     n_hours = as.numeric(args$n_hours),
