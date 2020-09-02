@@ -353,6 +353,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     foot_file <- file.path(rundir, paste0(basename(rundir), '_foot.nc'))
     foot <- calc_footprint(output$particle, output = foot_file,
                            r_run_time = r_run_time,
+                           projection = projection,
                            smooth_factor = smooth_factor,
                            time_integrate = time_integrate,
                            xmn = xmn, xmx = xmx, xres = xres,
