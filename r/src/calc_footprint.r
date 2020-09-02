@@ -35,6 +35,37 @@
 #' @import dplyr, proj4, raster
 #' @export
 
+# Gaussian kernel weighting calculation
+make_gauss_kernel <- function (rs, sigma, projection) {
+  # Modified from raster:::.Gauss.weight()
+  require(raster)
+  d <- 3 * sigma
+  nx <- 1 + 2 * floor(d/rs[1])
+  ny <- 1 + 2 * floor(d/rs[2])
+  m <- matrix(ncol = nx, nrow = ny)
+  xr <- (nx * rs[1])/2
+  yr <- (ny * rs[2])/2
+  r <- raster(m, xmn = -xr[1], xmx = xr[1], ymn = -yr[1], ymx = yr[1],
+              crs = projection)
+  p <- xyFromCell(r, 1:ncell(r))^2
+  m <- 1/(2 * pi * sigma^2) * exp(-(p[, 1] + p[, 2])/(2 * sigma^2))
+  m <- matrix(m, ncol = nx, nrow = ny, byrow = TRUE)
+  w <- m/sum(m)
+  w[is.na(w)] <- 1
+  w
+}
+
+# Wrap longitudes into -180:180 range
+wrap_longitude_meridian <- function(x) {
+  (x %% 360 + 540) %% 360 - 180
+}
+
+# Wrap longitudes into 0:360 range
+wrap_longitude_antimeridian <- function(x) {
+  x <- wrap_longitude_meridian(x)
+  ifelse(x < 0, x + 360, x)
+}
+
 calc_footprint <- function(p, output = NULL, r_run_time,
                            projection = '+proj=longlat',
                            smooth_factor = 1, time_integrate = F,
@@ -48,8 +79,22 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   np <- length(unique(p$indx))
   time_sign <- sign(median(p$time))
   
+  # Determine longitude wrapping behavior for grid extents containing anti
+  # meridian, including partial wraps (e.g. 20deg from 170:-170) and global
+  # coverage (e.g. 360deg from -180:180)
+  xdist <- ((180 - xmn) - (-180 - xmx)) %% 360
+  if (xdist == 0) {
+    xdist <- 360
+    xmn <- -180
+    xmx <- 180
+  } else if (xmx < xmn) {
+    p$long <- wrap_longitude_antimeridian(p$long)
+    xmn <- wrap_longitude_antimeridian(xmn)
+    xmx <- wrap_longitude_antimeridian(xmx)
+  }
+  
   # Interpolate particle locations during first 100 minutes of simulation if
-  # median distance travelled per time step is larger than grid resolution
+  # median distance traveled per time step is larger than grid resolution
   distances <- p %>%
     dplyr::filter(abs(time) < 100) %>%
     group_by(indx) %>%
@@ -57,7 +102,8 @@ calc_footprint <- function(p, output = NULL, r_run_time,
               dy = median(abs(diff(lati)))) %>%
     ungroup()
   
-  should_interpolate <- (median(distances$dx) > xres) || (median(distances$dy) > yres)
+  should_interpolate <- (median(distances$dx) > xres) || 
+    (median(distances$dy) > yres)
   if (should_interpolate) {
     times <- c(seq(0, 10, by = 0.1),
                seq(10.2, 20, by = 0.2),
@@ -111,7 +157,7 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     ymx <- max(grid_lims$y)
   }
   
-  # Set footprint grid
+  # Set footprint grid breaks using lower left corner of each cell
   glong <- head(seq(xmn, xmx, by = xres), -1)
   glati <- head(seq(ymn, ymx, by = yres), -1)
   
@@ -129,26 +175,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   grid_conv <- if (is_longlat) cos(kernel$lati * pi/180) else 1
   w <- smooth_factor * 0.06 * di * ti / grid_conv
   
-  # Gaussian kernel weighting calculation
-  make_gauss_kernel <- function (rs, sigma, projection) {
-    # Modified from raster:::.Gauss.weight()
-    require(raster)
-    d <- 3 * sigma
-    nx <- 1 + 2 * floor(d/rs[1])
-    ny <- 1 + 2 * floor(d/rs[2])
-    m <- matrix(ncol = nx, nrow = ny)
-    xr <- (nx * rs[1])/2
-    yr <- (ny * rs[2])/2
-    r <- raster(m, xmn = -xr[1], xmx = xr[1], ymn = -yr[1], ymx = yr[1],
-                crs = projection)
-    p <- xyFromCell(r, 1:ncell(r))^2
-    m <- 1/(2 * pi * sigma^2) * exp(-(p[, 1] + p[, 2])/(2 * sigma^2))
-    m <- matrix(m, ncol = nx, nrow = ny, byrow = TRUE)
-    w <- m/sum(m)
-    w[is.na(w)] <- 1
-    w
-  }
-  
   # Determine maximum kernel size
   xyres <- c(xres, yres)
   max_k <- make_gauss_kernel(xyres, max(w), projection)
@@ -158,8 +184,9 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   xbufh <- (xbuf - 1) / 2
   ybuf <- nrow(max_k)
   ybufh <- (ybuf - 1) / 2
-  max_glong <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
-  max_glati <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
+  
+  glong_buf <- seq(xmn - (xbuf*xres), xmx + ((xbuf - 1)*xres), by = xres)
+  glati_buf <- seq(ymn - (ybuf*yres), ymx + ((ybuf - 1)*yres), by = yres)
   
   # Remove zero influence particles and positions outside of domain
   p <- p %>%
@@ -170,8 +197,8 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   
   # Pre grid particle locations
   p <- p %>%
-    transmute(loi = as.integer(findInterval(long, max_glong)),
-              lai = as.integer(findInterval(lati, max_glati)),
+    transmute(loi = as.integer(findInterval(long, glong_buf)),
+              lai = as.integer(findInterval(lati, glati_buf)),
               foot = foot,
               time = time,
               rtime) %>%
@@ -180,16 +207,19 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     ungroup()
   
   # Dimensions in accordance with CF convention (x, y, t)
-  nx <- length(max_glati)
-  ny <- length(max_glong)
+  nx <- length(glati_buf)
+  ny <- length(glong_buf)
   grd <- matrix(0, nrow = ny, ncol = nx)
   
   # Split particle data by footprint layer
-  p$layer <- if (time_integrate) 0 else floor(p$time / 60)
+  interval <- 3600
+  interval_mins <- interval / 60
+  p$layer <- if (time_integrate) 0 else floor(p$time / interval_mins)
+  
   layers <- sort(unique(p$layer))
   nlayers <- length(layers)
   
-  # Preallocate footprint output array
+  # Allocate and fill footprint output array
   foot <- array(grd, dim = c(dim(grd), nlayers))
   for (i in 1:nlayers) {
     layer_subset <- dplyr::filter(p, layer == layers[i])
@@ -215,15 +245,27 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     }
   }
   
+  # Sum grid cells that wrap global domain 
+  x_idx <- findInterval(wrap_longitude_meridian(glong_buf), glong)
+  for (i in x_idx) {
+    mask <- i == x_idx
+    count <- sum(mask)
+    if (count > 1) {
+      foot[xbuf + i, , ] <- colSums(foot[mask, , ])
+    } else {
+      foot[xbuf + i, , ] <- foot[mask, , ]
+    }
+  }
+  
   # Remove spatial buffer around domain used in kernel aggregation
   size <- dim(foot)
   foot <- foot[(xbuf+1):(size[1]-xbuf), (ybuf+1):(size[2]-ybuf), ] / np
   
-  # Determine timestamp to use in output files
+  # Determine time to use in output files
   if (time_integrate) {
     time_out <- as.numeric(r_run_time) 
   } else {
-    time_out <- as.numeric(r_run_time + layers * 3600)
+    time_out <- as.numeric(r_run_time + layers * interval)
   }
   
   # Set footprint metadata and write to file
