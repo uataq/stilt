@@ -150,4 +150,4 @@ Arg | Description
 ## Next steps
 
 - [Execution](execution.md) for details on how to run your STILT simulations
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

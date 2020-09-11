@@ -36,4 +36,4 @@ Here we detail a generalized workflow for executing STILT simulations and applyi
 ## Next steps
 
 - [Configuration](meteorological-data.md) to source necessary input data
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

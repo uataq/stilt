@@ -154,4 +154,4 @@ nc
 
 ## Next steps
 
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

@@ -99,4 +99,4 @@ Edit the configuration in `myproject/r/run_stilt.r` and be sure to specify the p
 ## Next steps
 
 - [Project structure](project-structure.md) for an overview of the files in your STILT project
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

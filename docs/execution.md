@@ -71,4 +71,4 @@ Get in touch to discuss cloud native options for managing large distributed work
 ## Next steps
 
 - [Output files](output-files.md) for details about the particle trajectory and footprint files output by STILT
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

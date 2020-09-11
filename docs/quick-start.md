@@ -62,4 +62,4 @@ Rscript r/run_stilt.r
 ## Next steps
 
 - [Install](install.md) for expanded documentation for installation with required dependencies
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

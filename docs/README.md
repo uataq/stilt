@@ -118,4 +118,4 @@ If you're interested in detailed differences between versions or to learn more a
 Dive straight into the model documentation or start with a tutorial.
 
 - [Quick start](quick-start.md)
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)

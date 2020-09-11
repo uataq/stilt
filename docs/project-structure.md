@@ -89,4 +89,4 @@ Contains the bulk of the source code for the control layer and footprint griddin
 ## Next steps
 
 - [Best practices](best-practices.md) for your STILT workflow
-- [Tutorial: Stationary simulations](stationary-simulations)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)
