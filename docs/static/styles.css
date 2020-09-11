@@ -1,0 +1,58 @@
+:root {
+  --theme-color: #4299E1;
+}
+
+/* text helpers */
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #718096;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.color-primary {
+  color: var(--theme-color);
+}
+
+/* basic grid system */
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .row {
+    display: block;
+  }
+}
+
+.col {
+  flex: 1;
+  margin: auto 1rem;
+}
+
+/* design elements */
+.image-circle {
+  border-radius: 50%;
+  margin: 1rem;
+}
+
+.image-150 {
+  height: 150px;
+  width: 150px;
+}
+
+.sidebar-footer {
+  position: absolute;
+  left: 100px;
+  bottom: 5px;
+}
+
+.markdown-section p.tip, .markdown-section tr:nth-child(2n) {
+  background-color: #fcfcfc;
+}
