@@ -44,9 +44,8 @@ Initially nonexistant and configurable with the `output_wd` parameter, this fold
 
 Contains simulation files by simulation id, with the naming convention `yyyymmddHHMM_lati_long_zagl`.
 
-
 Abbreviation |	Value
--|-
+-------------|-------
 yyyy | Year (start)
 mm | Month (start)
 dd | Day (start)
