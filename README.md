@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://uataq.github.io/stilt/">
-    <img src="https://uataq.github.io/stilt/img/footprint-circle.png" width=300/>
+    <img src="https://uataq.github.io/stilt/static/img/footprint-circle.png" width=300/>
   </a>
 </p>
 
