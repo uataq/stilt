@@ -91,9 +91,13 @@ calc_trajectory <- function(namelist,
   
   # For column trajectories, preserve release height as xhgt
   if (length(output$receptor$zagl) > 1) {
-    x_heights <- output$receptor$zagl
-    px <- data.frame(indx = 1:numpar)
-    px$xhgt <- rep(x_heights, each = length(px$indx) / length(x_heights))
+    xhgt_min <- min(output$receptor$zagl)
+    xhgt_max <- max(output$receptor$zagl)
+    xhgt_rng <- xhgt_max - xhgt_min
+    xhgt_step <- xhgt_rng / numpar
+
+    px <- data.frame(indx = 1:numpar)    
+    px$xhgt <- (px$indx - 0.5) * xhgt_step + xhgt_min
     p <- merge(p, px, by = 'indx', sort = F)
   }
   
