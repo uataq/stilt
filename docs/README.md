@@ -27,7 +27,7 @@ If your analysis requires a large number of simulations of chemically inert trac
 
 ### What is STILT
 
-<video autoplay loop muted style="max-width:100%;">
+<video autoplay loop muted playsinline style="max-width:100%;">
   <source src="static/img/animation-example.webm" type="video/webm">
   <source src="static/img/animation-example.mp4" type="video/mp4">
   Your browser does not support this animation.
