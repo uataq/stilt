@@ -70,7 +70,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
                            projection = '+proj=longlat',
                            smooth_factor = 1, time_integrate = F,
                            xmn, xmx, xres, ymn, ymx, yres = xres) {
-  
   require(dplyr)
   require(raster)
   
@@ -78,19 +77,22 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   
   np <- length(unique(p$indx))
   time_sign <- sign(median(p$time))
+  is_longlat <- grepl('+proj=longlat', projection, fixed = T)
   
   # Determine longitude wrapping behavior for grid extents containing anti
   # meridian, including partial wraps (e.g. 20deg from 170:-170) and global
   # coverage (e.g. 360deg from -180:180)
-  xdist <- ((180 - xmn) - (-180 - xmx)) %% 360
-  if (xdist == 0) {
-    xdist <- 360
-    xmn <- -180
-    xmx <- 180
-  } else if (xmx < xmn) {
-    p$long <- wrap_longitude_antimeridian(p$long)
-    xmn <- wrap_longitude_antimeridian(xmn)
-    xmx <- wrap_longitude_antimeridian(xmx)
+  if (is_longlat) {
+    xdist <- ((180 - xmn) - (-180 - xmx)) %% 360
+    if (xdist == 0) {
+      xdist <- 360
+      xmn <- -180
+      xmx <- 180
+    } else if ((xmx < xmn) || (xmx > 180)){
+      p$long <- wrap_longitude_antimeridian(p$long)
+      xmn <- wrap_longitude_antimeridian(xmn)
+      xmx <- wrap_longitude_antimeridian(xmx)
+    }
   }
   
   # Interpolate particle locations during first 100 minutes of simulation if
@@ -146,7 +148,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
     ungroup()
   
   # Translate x, y coordinates into desired map projection
-  is_longlat <- grepl('+proj=longlat', projection, fixed = T)
   if (!is_longlat) {
     require(proj4)
     p[, c('long', 'lati')] <- project(p[, c('long', 'lati')], projection)
@@ -242,18 +243,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
                       nkx = nkx, nky = nky, len = len, lai = step$lai, 
                       loi = step$loi, foot = step$foot)
       foot[ , , i] <- foot[ , , i] + out$ans
-    }
-  }
-  
-  # Sum grid cells that wrap global domain 
-  x_idx <- findInterval(wrap_longitude_meridian(glong_buf), glong)
-  for (i in x_idx) {
-    mask <- i == x_idx
-    count <- sum(mask)
-    if (count > 1) {
-      foot[xbuf + i, , ] <- colSums(foot[mask, , ])
-    } else {
-      foot[xbuf + i, , ] <- foot[mask, , ]
     }
   }
   
