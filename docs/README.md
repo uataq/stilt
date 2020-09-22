@@ -92,7 +92,7 @@ If your analysis requires a large number of simulations of chemically inert trac
 
 ---
 
-## Version 2 improvements
+## Version 2 changes
 
 This distribution contains a completely redesigned R codebase and proposes a centralized, collaborative platform for documentation and future model development.
 

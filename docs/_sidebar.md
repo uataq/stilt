@@ -9,7 +9,7 @@
   
   - [Best practices](best-practices.md)
   - [Meteorological data](https://www.ready.noaa.gov/archives.php)
-  - [Configuration](configuration.md)
+  - [**Configuration**](configuration.md)
   - [Execution](execution.md)
   - [Output files](output-files.md)
   
