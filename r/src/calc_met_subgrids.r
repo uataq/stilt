@@ -55,7 +55,7 @@ calc_met_subgrids <- function (met_files,
     lock <- paste0(subgrid, '.lock')
     if (dir.exists(lock)) {
       if (i == len) {
-        sleep(0.1)
+        Sys.sleep(0.1)
       }
       next
     }
