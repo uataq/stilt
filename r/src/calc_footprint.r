@@ -104,8 +104,8 @@ calc_footprint <- function(p, output = NULL, r_run_time,
               dy = median(abs(diff(lati)))) %>%
     ungroup()
   
-  should_interpolate <- (median(distances$dx) > xres) || 
-    (median(distances$dy) > yres)
+  should_interpolate <- (median(distances$dx, na.rm = T) > xres) || 
+    (median(distances$dy, na.rm = T) > yres)
   if (should_interpolate) {
     times <- c(seq(0, 10, by = 0.1),
                seq(10.2, 20, by = 0.2),
