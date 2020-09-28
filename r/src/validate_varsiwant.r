@@ -10,7 +10,7 @@ validate_varsiwant <- function(varsiwant) {
   valid <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
              'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
              'rhfr', 'sphu', 'lcld', 'zloc', 'dswf', 'wout', 'mlht', 'rain',
-             'crai', 'pres', 'whtf', 'temz', 'zfx1')
+             'crai', 'pres', 'whtf', 'temz', 'zcfx')
   invalid <- setdiff(varsiwant, valid)
 
   if (length(invalid) > 0)
