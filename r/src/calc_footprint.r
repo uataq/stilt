@@ -38,6 +38,9 @@
 # Gaussian kernel weighting calculation
 make_gauss_kernel <- function (rs, sigma, projection) {
   # Modified from raster:::.Gauss.weight()
+  if (sigma == 0) {
+    return(array(1, c(1, 1)))
+  }
   require(raster)
   d <- 3 * sigma
   nx <- 1 + 2 * floor(d/rs[1])
