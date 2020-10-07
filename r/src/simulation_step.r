@@ -246,6 +246,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
     
     # User defined function to mutate the output object
     output <- before_footprint()
+
+    # Unload unnecessary varsiwant columns from memory
+    footprint_varsiwant <- c('time', 'indx', 'long', 'lati', 'foot')
+    output$particle <- output$particle[ , footprint_varsiwant]
     
     # Produce footprint --------------------------------------------------------
     # Aggregate the particle trajectory into surface influence footprints. This
@@ -270,7 +274,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
     link <- file.path(output_wd, 'footprints', basename(foot_file))
     suppressWarnings(file.symlink(foot_file, link))
     
+    # Unload trajectories from memory and trigger garbage collection
+    rm(output)
     invisible(gc())
+
     return(foot)
   })
 }
