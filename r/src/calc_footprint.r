@@ -76,8 +76,6 @@ calc_footprint <- function(p, output = NULL, r_run_time,
   require(dplyr)
   require(raster)
   
-  p <- p[ , c('time', 'indx', 'long', 'lati', 'foot')]
-  
   np <- length(unique(p$indx))
   time_sign <- sign(median(p$time))
   is_longlat <- grepl('+proj=longlat', projection, fixed = T)
