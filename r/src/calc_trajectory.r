@@ -103,11 +103,10 @@ calc_trajectory <- function(varsiwant,
   eval_start <- Sys.time()
   cmd <- paste('(cd', rundir, '&& (./hymodelc > hymodelc.out & echo $!))')
   pid <- system(cmd, intern = T)
-  on.exit(tools::pskill(pid))
+  on.exit(tools::pskill(pid, tools::SIGKILL))
   repeat {
     elapsed <- as.double.difftime(Sys.time() - eval_start, units = 'secs')
-    if (!pid_is_active(pid)) {
-      on.exit()
+    if (!tools::pskill(pid, signal = 0)) {
       break
     } else if (elapsed > timeout) {
       msg <- paste('hymodelc timeout after', elapsed, ' seconds\n')
