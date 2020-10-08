@@ -362,6 +362,11 @@ simulation_step <- function(before_footprint = list(function() {output}),
                            time_integrate = time_integrate,
                            xmn = xmn, xmx = xmx, xres = xres,
                            ymn = ymn, ymx = ymx, yres = yres)
+    
+    # Unload trajectories from memory and trigger garbage collection
+    rm(output)
+    invisible(gc())
+    
     if (is.null(foot)) {
       msg <- 'No non-zero footprint values found within the footprint domain.'
       warning(msg)
@@ -372,10 +377,6 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # Symlink footprint to out/footprints
     link <- file.path(output_wd, 'footprints', basename(foot_file))
     suppressWarnings(file.symlink(foot_file, link))
-    
-    # Unload trajectories from memory and trigger garbage collection
-    rm(output)
-    invisible(gc())
 
     return(foot)
   })
