@@ -58,12 +58,18 @@ stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
     # dynamic load balancing
     message('Single node parallelization. Dispatching worker processes...')
     load_libs('parallel')
-    out <- do.call(parallel::mcmapply, c(
-      FUN = FUN, 
-      Y,
-      mc.cores = n_cores,
-      mc.preschedule = F,
-      SIMPLIFY = F))
+    # out <- do.call(parallel::mcmapply, c(
+    #   FUN = FUN, 
+    #   Y,
+    #   mc.cores = n_cores,
+    #   mc.preschedule = T,
+    #   SIMPLIFY = F))
+    cl <- setDefaultCluster(makeForkCluster(n_cores, outfile = ''))
+    on.exit(stopCluster(cl))
+    out <- do.call(clusterMap,
+                   c(fun = FUN,
+                     .scheduling = 'dynamic',
+                     Y))
     return(invisible(out))
   }
   
