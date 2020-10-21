@@ -10,7 +10,34 @@ set -e
 # Check if ./setup is run from the top level of the project
 dircnt=$(ls -d */ | grep -x -e exe/ -e r/ | wc -l)
 if [ $dircnt -lt 2 ]; then
-  echo "./setup must be run from the top level directory of the STILT project"
+  echo "./setup must be run from the top level directory of the STILT project" > /dev/stderr
+  exit 1
+fi
+
+# Check dependency versions
+if ! command -v Rscript &> /dev/null; then
+  echo "Rscript not found" > /dev/stderr
+  exit 1
+fi
+
+if ! command -v bc &> /dev/null; then
+  echo "bc not found, continuing without checking R version"
+else
+  R_VERSION=$(Rscript --version &> /dev/stdout | cut -d " " -f 5 | cut -d "." -f 1-2)
+  if (( $(echo "$R_VERSION <= 3.5" | bc -l > /dev/null) )); then
+    echo "R version $R_VERSION must be 3.5 or higher" > /dev/stderr
+    exit 1
+  fi
+fi
+
+if ! command -v nc-config &> /dev/null; then
+  echo "NetCDF library (nc-config) not found" > /dev/stderr
+  exit 1
+fi
+
+NC_VERSION=$(nc-config --version | cut -d " " -f 2 | cut -d "." -f 1)
+if [ "$NC_VERSION" -lt 4 ]; then
+  echo "NetCDF library (nc-config) version must be 4.0 or higher" > /dev/stderr
   exit 1
 fi
 
@@ -18,7 +45,7 @@ fi
 echo "Compiling footprint kernel aggregation subroutine..."
 R CMD SHLIB r/src/permute.f90
 if [ ! -s r/src/permute.so ]; then
-  echo "Problem compiling r/src/permute.so."
+  echo "Problem compiling r/src/permute.so." > /dev/stderr
   exit 1
 fi
 

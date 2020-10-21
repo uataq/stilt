@@ -95,27 +95,8 @@ calc_trajectory <- function(varsiwant,
   # Simulation timeout ---------------------------------------------------------
   # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hymodelc and moves on to next simulation
-  #
-  # TODO: as of R 3.5, system() and system2() have introduced a timout arg that
-  # may enable this to be depracated in the future. For now, most linux package
-  # libraries are not up to date so waiting to implement edge requirements
-  of <- file.path(rundir, 'hymodelc.out')
-  eval_start <- Sys.time()
-  cmd <- paste('(cd', rundir, '&& (./hymodelc > hymodelc.out & echo $!))')
-  pid <- system(cmd, intern = T)
-  on.exit(tools::pskill(pid, tools::SIGKILL))
-  repeat {
-    elapsed <- as.double.difftime(Sys.time() - eval_start, units = 'secs')
-    if (!tools::pskill(pid, signal = 0)) {
-      break
-    } else if (elapsed > timeout) {
-      msg <- paste('hymodelc timeout after', elapsed, ' seconds\n')
-      warning(msg)
-      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
-      return()
-    }
-    Sys.sleep(1)
-  }
+  cmd <- paste0('cd ', rundir, ' && ./hymodelc > hymodelc.out')
+  system(cmd, timeout=timeout)
 
   # Error check hymodelc output
   pf <- file.path(rundir, 'PARTICLE.DAT')
