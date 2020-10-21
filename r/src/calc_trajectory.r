@@ -35,29 +35,11 @@ calc_trajectory <- function(namelist,
                 file.path(rundir, 'CONTROL'))
   
   # Simulation timeout ---------------------------------------------------------
-  # Monitors time elapsed running hysplit. If elapsed time exceeds timeout
-  # specified in run_stilt.r, kills hysplit and moves on to next simulation
-  #
-  # TODO: as of R 3.5, system() and system2() have introduced a timout arg that
-  # may enable this to be depracated in the future. For now, most linux package
-  # libraries are not up to date so waiting to implement edge requirements
-  eval_start <- Sys.time()
-  cmd <- paste('(cd', rundir, '&& (./hycs_std &> log.txt & echo $!))')
-  pid <- system(cmd, intern = T)
-  on.exit(tools::pskill(pid, tools::SIGKILL))
-  repeat {
-    elapsed <- as.double.difftime(Sys.time() - eval_start, units = 'secs')
-    if (!tools::pskill(pid, signal = 0)) {
-      break
-    } else if (elapsed > timeout) {
-      msg <- paste('timeout after', elapsed, ' seconds\n')
-      warning(msg)
-      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
-      return()
-    }
-    Sys.sleep(0.1)
-  }
-  
+  # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
+  # specified in run_stilt.r, kills hymodelc and moves on to next simulation
+  cmd <- paste0('cd ', rundir, ' && ./hymodelc > hymodelc.out')
+  system(cmd, timeout = timeout)
+
   # Exit if running in HYSPLIT mode
   if (namelist[['ichem']] != 8) return()
 
