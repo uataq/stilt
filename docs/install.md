@@ -2,13 +2,14 @@
 
 STILT has been compiled to run on UNIX platforms (Mac, Linux). Required software includes
 
-- [R (v >= 3.25)](https://www.r-project.org/)
+- [R (version >= 3.5.0)](https://www.r-project.org/)
   - `dplyr` package for data manipulation
   - `parallel` package for single node parallelism
   - `rslurm` package for multi node parallelism
   - `raster` package for gridded spatial analysis tools
   - `uataq` package for STILT project initiation workflow
 - [Git](https://git-scm.com/) for fetching STILT source code from GitHub
+- [NetCDF (version >= 4.0)](https://www.unidata.ucar.edu/software/netcdf/) for storage libraries
 
 ## Fair use policy
 
