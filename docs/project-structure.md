@@ -12,7 +12,7 @@ out/
     yyyymmddHH_lati_long_zagl/
       yyyymmddHH_lati_long_zagl_traj.rds
       yyyymmddHH_lati_long_zagl_foot.nc
-      hymodelc
+      hycs_std
       SETUP.CFG
       CONTROL
       ...
@@ -44,18 +44,18 @@ Initially nonexistant and configurable with the `output_wd` parameter, this fold
 
 Contains simulation files by simulation id, with the naming convention `yyyymmddHHMM_lati_long_zagl`.
 
-Abbreviation |	Value
--------------|-------
-yyyy | Year (start)
-mm | Month (start)
-dd | Day (start)
-HH | Hour (start)
-MM | Minute (start)
-lati | Receptor latitude (deg)
-long | Receptor longitude (deg)
-zagl | Receptor height above ground (m)
+| Abbreviation | Value                            |
+| ------------ | -------------------------------- |
+| yyyy         | Year (start)                     |
+| mm           | Month (start)                    |
+| dd           | Day (start)                      |
+| HH           | Hour (start)                     |
+| MM           | Minute (start)                   |
+| lati         | Receptor latitude (deg)          |
+| long         | Receptor longitude (deg)         |
+| zagl         | Receptor height above ground (m) |
 
-This becomes the working directory for each unique simulation, containing symbolic links to all of the shared files in `exe/` as well as simulation specific `CONTROL`, `SETUP.CFG`, and output files. 
+This becomes the working directory for each unique simulation, containing symbolic links to all of the shared files in `exe/` as well as simulation specific `CONTROL`, `SETUP.CFG`, and output files.
 
 STILT outputs two files for analysis. The trajectories of the particle ensemble are saved to a `<simulation_id>_traj.rds` file. Gridded footprints are saved to a `<simulation_id>_foot.nc` file. For guidance on working with these output files, see [output files](output-files.md).
 
