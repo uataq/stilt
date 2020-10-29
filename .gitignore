@@ -9,6 +9,7 @@ fortran/*
 *.o
 *.so
 exe/hymodelc
+exe/hycs_std
 
 # R history and environment
 .RData
@@ -19,3 +20,7 @@ exe/hymodelc
 
 # MacOS folder attributes
 .DS_Store
+
+# Test inputs
+stilt-tutorials
+*.bak

@@ -9,7 +9,7 @@
 #     r_lati=40.5 \
 #     r_long=-112.0 \
 #     r_zagl=5 \
-#     met_loc=/tmp/stilt-tutorials/01-wbb/met/ \
+#     met_path=/tmp/stilt-tutorials/01-wbb/met/ \
 #     met_file_format=%Y%m%d.%H \
 #     xmn=-112.3 \
 #     xmx=-111.52 \
@@ -29,18 +29,18 @@ for (arg in strsplit(arg_strings, '=', fixed = T)) {
 }
 
 # Validate required arguments exist
-req_args <- c('met_file_format', 'met_loc', 'r_run_time', 'r_lati', 'r_long',
+req_args <- c('met_file_format', 'met_path', 'r_run_time', 'r_lati', 'r_long',
               'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
 if (!all(req_args %in% names(args))) {
     stop(paste('Not all arguments supplied:', 
-                paste(req_args, collapse=',')))
+               paste(req_args, collapse=',')))
 }
 
 # Ensure script is executed from the correct place
 for (i in 1:99) {
     if ('stilt_wd' %in% names(args)) break
     cwd <- dir()
-    is_stilt <- all(c('exe', 'r', 'README.md', 'setup') %in% cwd)
+    is_stilt <- all(c('bin', 'exe', 'r', 'README.md', 'setup') %in% cwd)
     if (is_stilt) {
         args$stilt_wd <- getwd()
     } else {
@@ -53,11 +53,14 @@ if (i == 99) {
 
 # Set argument types
 stilt_args <- list(
+    capemin <- as.numeric(args$capemin),
+    cmass <- as.numeric(args$cmass),
     conage = as.numeric(args$conage),
     cpack = as.numeric(args$cpack),
     dxf = as.numeric(args$dxf),
     dyf = as.numeric(args$dyf),
     dzf = as.numeric(args$dzf),
+    efile = as.character(args$efile),
     emisshrs = as.numeric(args$emisshrs),
     frhmax = as.numeric(args$frhmax),
     frhs = as.numeric(args$frhs),
@@ -66,41 +69,53 @@ stilt_args <- list(
     frts = as.numeric(args$frts),
     frvs = as.numeric(args$frvs),
     hnf_plume = as.logical(args$hnf_plume),
-    hscale = as.numeric(args$hscale),
     horcoruverr = as.numeric(args$horcoruverr),
     horcorzierr = as.numeric(args$horcorzierr),
+    hscale = as.numeric(args$hscale),
     ichem = as.numeric(args$ichem),
-    iconvect = as.numeric(args$iconvect),
+    idsp = as.numeric(args$idsp),
     initd = as.numeric(args$initd),
-    isot = as.numeric(args$isot),
+    k10m = as.numeric(args$k10m),
+    kagl = as.numeric(args$kagl),
     kbls = as.numeric(args$kbls),
     kblt = as.numeric(args$kblt),
     kdef = as.numeric(args$kdef),
+    khinp = as.numeric(args$khinp),
     khmax = as.numeric(args$khmax),
     kmix0 = as.numeric(args$kmix0),
     kmixd = as.numeric(args$kmixd),
     kmsl = as.numeric(args$kmsl),
     kpuff = as.numeric(args$kpuff),
+    krand = as.numeric(args$krand),
     krnd = as.numeric(args$krnd),
     kspl = as.numeric(args$kspl),
+    kwet = as.numeric(args$kwet),
     kzmix = as.numeric(args$kzmix),
     lib.loc = as.character(args$lib.loc),
     maxdim = as.numeric(args$maxdim),
     maxpar = as.numeric(args$maxpar),
     met_file_format = as.character(args$met_file_format),
-    met_loc = as.character(args$met_loc),
+    met_path = as.character(args$met_path),
+    met_subgrid_buffer = as.numeric(args$met_subgrid_buffer),
+    met_subgrid_enable = as.logical(args$met_subgrid_enable),
+    met_subgrid_levels = as.numeric(args$met_subgrid_levels),
     mgmin = as.numeric(args$mgmin),
     n_hours = as.numeric(args$n_hours),
     n_met_min = as.numeric(args$n_met_min),
     ncycl = as.numeric(args$ncycl),
     ndump = as.numeric(args$ndump),
     ninit = as.numeric(args$ninit),
+    nstr = as.numeric(args$nstr),
     nturb = as.numeric(args$nturb),
     numpar = as.numeric(args$numpar),
+    nver = as.numeric(args$nver),
     outdt = as.numeric(args$outdt),
     outfrac = as.numeric(args$outfrac),
     output_wd = as.character(args$output_wd),
     p10f = as.numeric(args$p10f),
+    pinbc = as.character(args$pinbc),
+    pinpf = as.character(args$pinpf),
+    poutf = as.character(args$poutf),
     projection = as.character(args$projection),
     qcycle = as.numeric(args$qcycle),
     r_run_time = as.POSIXct(args$r_run_time,
@@ -110,6 +125,8 @@ stilt_args <- list(
     r_long = as.numeric(args$r_long),
     r_zagl = as.numeric(args$r_zagl),
     random = as.numeric(args$random),
+    rhb = as.numeric(args$rhb),
+    rht = as.numeric(args$rht),
     rm_dat = as.logical(args$rm_dat),
     run_foot = as.logical(args$run_foot),
     run_trajec = as.logical(args$run_trajec),
@@ -125,12 +142,19 @@ stilt_args <- list(
     tlfrac = as.numeric(args$tlfrac),
     tluverr = as.numeric(args$tluverr),
     tlzierr = as.numeric(args$tlzierr),
+    tout = as.numeric(args$tout),
     tratio = as.numeric(args$tratio),
     tvmix = as.numeric(args$tvmix),
     varsiwant = as.character(args$varsiwant),
     veght = as.numeric(args$veght),
     vscale = as.numeric(args$vscale),
+    vscaleu = as.numeric(args$vscaleu),
+    vscales = as.numeric(args$vscales),
     w_option = as.numeric(args$w_option),
+    wbbh = as.numeric(args$wbbh),
+    wbwf = as.numeric(args$wbwf),
+    wbwr = as.numeric(args$wbwr),
+    wvert = as.logical(args$wvert),
     xmn = as.numeric(args$xmn),
     xmx = as.numeric(args$xmx),
     xres = as.numeric(args$xres),

@@ -46,7 +46,9 @@ stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
     load_libs('rslurm')
     sjob <- rslurm::slurm_apply(FUN, Y,
                                 jobname = basename(getwd()), pkgs = 'base',
-                                nodes = n_nodes, cpus_per_node = n_cores,
+                                nodes = n_nodes,
+                                cpus_per_node = n_cores,
+                                preschedule_cores = F,
                                 slurm_options = slurm_options)
     return(invisible(sjob))
   }
@@ -56,12 +58,12 @@ stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
     # dynamic load balancing
     message('Single node parallelization. Dispatching worker processes...')
     load_libs('parallel')
-    cl <- setDefaultCluster(makeForkCluster(n_cores, outfile = ''))
-    out <- do.call(clusterMap,
-                   c(fun = FUN,
-                     .scheduling = 'dynamic',
-                     Y))
-    stopCluster(cl)
+    out <- do.call(parallel::mcmapply, c(
+      FUN = FUN, 
+      Y,
+      mc.cores = n_cores,
+      mc.preschedule = F,
+      SIMPLIFY = F))
     return(invisible(out))
   }
   

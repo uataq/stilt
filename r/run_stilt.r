@@ -20,8 +20,8 @@ slurm_options <- list(
 )
 
 # Simulation timing, yyyy-mm-dd HH:MM:SS (UTC)
-t_start <- '2015-06-18 22:00:00'
-t_end   <- '2015-06-18 22:00:00'
+t_start <- '2015-12-10 00:00:00'
+t_end   <- '2015-12-10 00:00:00'
 run_times <- seq(from = as.POSIXct(t_start, tz = 'UTC'),
                  to   = as.POSIXct(t_end, tz = 'UTC'),
                  by   = 'hour')
@@ -49,75 +49,97 @@ xres <- 0.01
 yres <- xres
 
 # Meteorological data input
-met_directory   <- '/uufs/chpc.utah.edu/common/home/lin-group6/hrrr/data/utah'
-met_file_format <- '%Y%m%d.%Hz.hrrra'
-n_met_min       <- 1
+met_path           <- '<path_to_arl_meteorological_data>'
+met_file_format    <- '%Y%m%d.%Hz.hrrra'
+met_subgrid_buffer <- 0.1
+met_subgrid_enable <- F
+met_subgrid_levels <- NA
+n_met_min          <- 1
 
 # Model control
 n_hours    <- -24
-numpar     <- 200
+numpar     <- 1000
 rm_dat     <- T
 run_foot   <- T
 run_trajec <- T
 timeout    <- 3600
-varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'sigw', 'tlgr', 'zsfc',
-                'icdx', 'temp', 'samt', 'foot', 'shtf', 'tcld', 'dmas', 'dens',
-                'rhfr', 'sphu', 'solw', 'lcld', 'zloc', 'dswf', 'wout', 'mlht',
-                'rain', 'crai', 'pres')
+varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens',
+                'samt', 'sigw', 'tlgr')
 
 # Transport and dispersion settings
+capemin     <- -1
+cmass       <- 0
 conage      <- 48
 cpack       <- 1
-delt        <- 0
+delt        <- 1
 dxf         <- 1
 dyf         <- 1
-dzf         <- 0.1
+dzf         <- 0.01
+efile       <- ''
 emisshrs    <- 0.01
 frhmax      <- 3
 frhs        <- 1
 frme        <- 0.1
 frmr        <- 0
 frts        <- 0.1
-frvs        <- 0.1
+frvs        <- 0.01
 hscale      <- 10800
-ichem       <- 0
-iconvect    <- 0
+ichem       <- 8
+idsp        <- 2
 initd       <- 0
-isot        <- 0
+k10m        <- 1
+kagl        <- 1
 kbls        <- 1
-kblt        <- 1
-kdef        <- 1
+kblt        <- 5
+kdef        <- 0
+khinp       <- 0
 khmax       <- 9999
 kmix0       <- 250
 kmixd       <- 3
 kmsl        <- 0
 kpuff       <- 0
+krand       <- 4
 krnd        <- 6
 kspl        <- 1
-kzmix       <- 1
+kwet        <- 1
+kzmix       <- 0
 maxdim      <- 1
-maxpar      <- min(10000, numpar)
-mgmin       <- 2000
+maxpar      <- numpar
+mgmin       <- 10
+mhrs        <- 9999
+nbptyp      <- 1
 ncycl       <- 0
 ndump       <- 0
 ninit       <- 1
+nstr        <- 0
 nturb       <- 0
+nver        <- 0
 outdt       <- 0
-outfrac     <- 0.9
 p10f        <- 1
+pinbc       <- ''
+pinpf       <- ''
+poutf       <- ''
 qcycle      <- 0
-random      <- 1
+rhb         <- 80
+rht         <- 60
 splitf      <- 1
 tkerd       <- 0.18
 tkern       <- 0.18
 tlfrac      <- 0.1
-tratio      <- 0.9
+tout        <- 0
+tratio      <- 0.75
 tvmix       <- 1
 veght       <- 0.5
 vscale      <- 200
+vscaleu     <- 200
+vscales     <- -1
+wbbh        <- 0
+wbwf        <- 0
+wbwr        <- 0
+wvert       <- FALSE
 w_option    <- 0
 zicontroltf <- 0
-ziscale     <- rep(list(rep(0.8, 24)), nrow(receptors))
+ziscale     <- rep(list(rep(1, 24)), nrow(receptors))
 z_top       <- 25000
 
 # Transport error settings
@@ -129,6 +151,7 @@ zcoruverr   <- NA
 horcorzierr <- NA
 sigzierr    <- NA
 tlzierr     <- NA
+
 
 # Interface to mutate the output object with user defined functions
 before_trajec <- function() {output}
@@ -153,6 +176,7 @@ source('r/dependencies.r')
 system(paste0('rm -r ', output_wd, '/footprints'), ignore.stderr = T)
 if (run_trajec) {
   system(paste0('rm -r ', output_wd, '/by-id'), ignore.stderr = T)
+  system(paste0('rm -r ', output_wd, '/met'), ignore.stderr = T)
   system(paste0('rm -r ', output_wd, '/particles'), ignore.stderr = T)
 }
 for (d in c('by-id', 'particles', 'footprints')) {
@@ -160,15 +184,6 @@ for (d in c('by-id', 'particles', 'footprints')) {
   if (!file.exists(d))
     dir.create(d, recursive = T)
 }
-
-
-# Met path symlink -------------------------------------------------------------
-# Auto symlink the meteorological data path to the user's home directory to
-# eliminate issues with long (>80 char) paths in fortran
-if ((nchar(paste0(met_directory, met_file_format)) + 2) > 80) {
-  met_loc <- file.path(path.expand('~'), paste0('m', project))
-  if (!file.exists(met_loc)) invisible(file.symlink(met_directory, met_loc))
-} else met_loc <- met_directory
 
 
 # Run trajectory simulations ---------------------------------------------------
@@ -179,9 +194,16 @@ stilt_apply(FUN = simulation_step,
             n_nodes = n_nodes,
             before_footprint = list(before_footprint),
             before_trajec = list(before_trajec),
+            lib.loc = lib.loc,
+            capemin = capemin,
+            cmass = cmass,
             conage = conage,
             cpack = cpack,
             delt = delt,
+            dxf = dxf,
+            dyf = dyf,
+            dzf = dzf,
+            efile = efile,
             emisshrs = emisshrs,
             frhmax = frhmax,
             frhs = frhs,
@@ -192,45 +214,57 @@ stilt_apply(FUN = simulation_step,
             hnf_plume = hnf_plume,
             horcoruverr = horcoruverr,
             horcorzierr = horcorzierr,
+            hscale = hscale,
             ichem = ichem,
-            iconvect = iconvect,
+            idsp = idsp,
             initd = initd,
-            isot = isot,
+            k10m = k10m,
+            kagl = kagl,
             kbls = kbls,
             kblt = kblt,
             kdef = kdef,
+            khinp = khinp,
             khmax = khmax,
             kmix0 = kmix0,
             kmixd = kmixd,
             kmsl = kmsl,
             kpuff = kpuff,
+            krand = krand,
             krnd = krnd,
             kspl = kspl,
+            kwet = kwet,
             kzmix = kzmix,
             maxdim = maxdim,
             maxpar = maxpar,
-            lib.loc = lib.loc,
             met_file_format = met_file_format,
-            met_loc = met_loc,
+            met_path = met_path,
+            met_subgrid_buffer = met_subgrid_buffer,
+            met_subgrid_enable = met_subgrid_enable,
+            met_subgrid_levels = met_subgrid_levels,
             mgmin = mgmin,
             n_hours = n_hours,
             n_met_min = n_met_min,
             ncycl = ncycl,
             ndump = ndump,
             ninit = ninit,
+            nstr = nstr,
             nturb = nturb,
             numpar = numpar,
+            nver = nver,
             outdt = outdt,
-            outfrac = outfrac,
             output_wd = output_wd,
             p10f = p10f,
+            pinbc = pinbc,
+            pinpf = pinpf,
+            poutf = poutf,
             projection = projection,
             qcycle = qcycle,
             r_run_time = receptors$run_time,
             r_lati = receptors$lati,
             r_long = receptors$long,
             r_zagl = receptors$zagl,
-            random = random,
+            rhb = rhb,
+            rht = rht,
             rm_dat = rm_dat,
             run_foot = run_foot,
             run_trajec = run_trajec,
@@ -241,16 +275,24 @@ stilt_apply(FUN = simulation_step,
             stilt_wd = stilt_wd,
             time_integrate = time_integrate,
             timeout = timeout,
-            tkerd = tkerd, tkern = tkern,
+            tkerd = tkerd,
+            tkern = tkern,
             tlfrac = tlfrac,
             tluverr = tluverr,
             tlzierr = tlzierr,
+            tout = tout,
             tratio = tratio,
             tvmix = tvmix,
             varsiwant = list(varsiwant),
             veght = veght,
             vscale = vscale,
+            vscaleu = vscaleu,
+            vscales = vscales,
             w_option = w_option,
+            wbbh = wbbh,
+            wbwf = wbwf,
+            wbwr = wbwr,
+            wvert = wvert,
             xmn = xmn,
             xmx = xmx,
             xres = xres,

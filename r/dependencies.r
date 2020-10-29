@@ -31,3 +31,6 @@ if ('varsiwant' %in% ls())
   validate_varsiwant(varsiwant)
 if (all(c('xmn', 'xmx', 'ymn', 'ymx') %in% ls()))
   validate_footprint_extent(xmn, xmx, ymn, ymx)
+
+# Disable grouping message from dplyr >=1.0.0
+options(dplyr.summarise.inform = F)

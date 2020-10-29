@@ -1,10 +1,10 @@
-#' read_particle parses the hymodelc PARTICLE.DAT output file
+#' read_particle parses the hysplit PARTICLE.DAT output file
 #' @author Ben Fasoli
 #'
-#' Reads PARTICLE.DAT hymodelc output file into data frame
+#' Reads PARTICLE.DAT hysplit output file into data frame
 #'
 #' @param file location of PARTICLE.DAT file
-#' @param varsiwant character vector of 4-letter hymodelc variables
+#' @param varsiwant character vector of 4-letter hysplit variables
 #'
 #' @import dplyr
 #' @export

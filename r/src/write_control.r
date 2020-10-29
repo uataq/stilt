@@ -33,7 +33,7 @@ write_control <- function(receptor, emisshrs, n_hour, w_option = 0,
   receptor$print <- with(receptor, paste(lati, long, zagl))
 
   txt = c(
-    strftime(receptor$run_time[1], tz = 'UTC', format = '%y %m %d %H'),
+    strftime(receptor$run_time[1], tz = 'UTC', format = '%y %m %d %H %M'),
     nrow(receptor),
     receptor$print,
     n_hour,

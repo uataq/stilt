@@ -31,7 +31,7 @@
 #     r_lati=40.5 \
 #     r_long=-112.0 \
 #     r_zagl=5 \
-#     met_loc=/app/met \
+#     met_path=/app/met \
 #     met_file_format=%Y%m%d.%H \
 #     xmn=-112.3 \
 #     xmx=-111.52 \
@@ -77,5 +77,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 VOLUME ["/app/met", "/app/out"]
 
 ENTRYPOINT ["/app/r/stilt_cli.r", \
-                "met_loc=/app/met", \
+                "met_path=/app/met", \
                 "output_wd=/app/out"]

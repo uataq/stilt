@@ -8,8 +8,8 @@
 set -e
 
 # Check if ./setup is run from the top level of the project
-dircnt=$(ls -d */ | grep -x -e exe/ -e r/ | wc -l)
-if [ $dircnt -lt 2 ]; then
+dircnt=$(ls -d */ | grep -x -e bin/ -e r/ -e exe/ | wc -l)
+if [ $dircnt -lt 3 ]; then
   echo "./setup must be run from the top level directory of the STILT project" > /dev/stderr
   exit 1
 fi
@@ -49,76 +49,38 @@ if [ ! -s r/src/permute.so ]; then
   exit 1
 fi
 
-# Prompt user for binary/compile installation
-if [ -z $1 ]; then
+if [[ "$OSTYPE" == "linux"* ]]; then
+  install="1"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  install="2"
+else
   echo "
-  STILT hymodelc installation options:
-  1 - Compile hymodelc from source
-  2 - hymodelc-linux-x64
-  3 - hymodelc-macos-x64
+  STILT hycs_std installation options:
+  1 - linux_x64
+  2 - macos_x64
+  9 - Compile hycs_std from source (unavailable)
   "
   echo -n "Install option (number from above): "
   read -n 1 install
   echo
-else
-  install=$1
 fi
 
 if [[ $install -eq 1 ]]; then
-  # Prompt user for jena SVN username
-  echo "
-  STILT is built on top of the HYSPLIT model. Registration is required to access
-  the fortran trajectory calculations.
-
-  Registration: https://mail.bgc-jena.mpg.de/mailman/listinfo/stilt_user
-  Username is email prefix: user@email.com -> user
-  Password is sent to your email address after registration
-  "
-  echo -n "Username: "
-  read username
-  if [ -z $username ]; then
-    echo "No username input. Exiting."
-    exit 1
-  fi
-  # Checkout merged_stilt_hysplit contents into fortran/
-  # Compilers prioritize fortran/makefile over fortran/Makefile
-  svn --username $username checkout \
-    https://projects.bgc-jena.mpg.de/STILT/svn/trunk/merged_stilt_hysplit/ \
-    fortran/
-  # Compile STILT trajectory calculation binary
-  echo "Compiling STILT trajectory calculation binary (hymodelc)..."
-  sed -i.bak -e 's/FC =.*/FC = gfortran/' fortran/Makefile
-	sed -i.bak -e 's/CFLAGS =.*/CFLAGS = $(GFOR)/' fortran/Makefile
-  make -C fortran
-  if [ ! -s fortran/hymodelc ]; then
-    echo "Problem compiling fortran/hymodelc."
-    echo "You may need to edit settings in fortran/makefile to compile manually."
-    exit 1
-  fi
-  
-  # Move hymodelc to shared exe/ directory
-  mv fortran/hymodelc exe/hymodelc
-
-# Fetch binary from GitHub release
+  cp bin/linux_x64/* exe/
 elif [[ $install -eq 2 ]]; then
-  wget -O exe/hymodelc \
-    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-linux-x64
-elif [[ $install -eq 3 ]]; then
-  wget -O exe/hymodelc \
-    https://github.com/uataq/stilt/releases/download/v1.2/hymodelc-macos-x64
+  cp bin/macos_x64/* exe/
 else
-  echo "Invalid install option."
+  echo "Invalid install option." > /dev/stderr
   exit 1
 fi
 
-# Check that hymodelc was created from methods above
-if [ ! -s exe/hymodelc ]; then
-  echo "Problem creating hymodelc."
+# Check that hycs_std was created from methods above
+if [ ! -s exe/hycs_std ]; then
+  echo "Problem installing hycs_std" > /dev/stderr
   exit 1
 fi
-
-# Ensure hymodelc, run_stilt.r, and stilt_cli.r are executable
-chmod +x exe/hymodelc r/run_stilt.r r/stilt_cli.r
+# Ensure hysplit, run_stilt.r, and stilt_cli.r are executable
+chmod +x exe/hycs_std r/run_stilt.r r/stilt_cli.r
 
 
 echo "
