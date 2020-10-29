@@ -35,9 +35,9 @@ calc_trajectory <- function(namelist,
                 file.path(rundir, 'CONTROL'))
   
   # Simulation timeout ---------------------------------------------------------
-  # Monitors time elapsed running hymodelc. If elapsed time exceeds timeout
-  # specified in run_stilt.r, kills hymodelc and moves on to next simulation
-  cmd <- paste0('cd ', rundir, ' && ./hymodelc > hymodelc.out')
+  # Monitors time elapsed running hycs_std If elapsed time exceeds timeout
+  # specified in run_stilt.r, kills hycs_std and moves on to next simulation
+  cmd <- paste0('cd ', rundir, ' && ./hycs_std > hycs_std.out')
   system(cmd, timeout = timeout)
 
   # Exit if running in HYSPLIT mode
