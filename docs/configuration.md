@@ -149,4 +149,4 @@ This is an advanced option that can be used to inject user code into the simulat
 ## Next steps
 
 - [Execution](execution.md) for details on how to run your STILT simulations
-- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/main/01-wbb)

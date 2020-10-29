@@ -1,34 +1,34 @@
 name: Build + Test
 
-on: 
+on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-18.04
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        sudo apt-get update -yq
-        sudo apt-get install -yq --no-install-recommends \
-          libgfortran3 \
-          libhdf5-serial-dev \
-          libnetcdf-dev \
-          netcdf-bin \
-          unzip
-    - name: Install R
-      uses: r-lib/actions/setup-r@v1
-    - name: Install STILT
-      run: bash test/test_setup.sh
-    - name: Run simulation test
-      run: bash test/test_run_stilt.sh
-    - name: Run CLI test
-      run: bash test/test_stilt_cli.sh
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -yq
+          sudo apt-get install -yq --no-install-recommends \
+            libgfortran3 \
+            libhdf5-serial-dev \
+            libnetcdf-dev \
+            netcdf-bin \
+            unzip
+      - name: Install R
+        uses: r-lib/actions/setup-r@v1
+      - name: Install STILT
+        run: bash test/test_setup.sh
+      - name: Run simulation test
+        run: bash test/test_run_stilt.sh
+      - name: Run CLI test
+        run: bash test/test_stilt_cli.sh

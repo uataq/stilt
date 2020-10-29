@@ -15,7 +15,6 @@ STILT has been compiled to run on UNIX platforms (Mac, Linux). Required software
 
 STILT is freely available and we encourage others to use it. Kindly keep us informed of how you are using the model and of any publication plans. Please acknowledge the source as a citation. STILT is continuously updated and improved by the development consortium, and in some cases (as when new elements are used for the first time) we may suggest that one or more of the developers be offered participation as authors. If your work directly competes with our analysis that uses unpublished features, we may ask that we have the opportunity to submit a manuscript first. The software is updated from time to time and it is your responsibility to ensure that your publication is consistent with the most recent version.
 
-
 ## Installing with R
 
 The preferred method uses R to initialize a new project and requires the `uataq` R package, which is open source and can be installed using `devtools`.
@@ -28,7 +27,7 @@ devtools::install_github('benfasoli/uataq')
 A STILT project can then be initialized in plain R code. A project name other than `stilt` should be chosen for projects to avoid naming conflicts with the repository.
 
 ```r
-uataq::stilt_init('myproject', branch='hysplit-merge')
+uataq::stilt_init('myproject')
 # Cloning into 'myproject'...
 # remote: Enumerating objects: 60, done.
 # remote: Counting objects: 100% (60/60), done.
@@ -40,15 +39,15 @@ uataq::stilt_init('myproject', branch='hysplit-merge')
 # STILT installation successful.
 #
 # Relevant manuscripts:
-# 1. Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.: 
-#    Simulating atmospheric tracer concentrations for spatially distributed 
-#    receptors: updates to the Stochastic Time-Inverted Lagrangian Transport 
-#    model's R interface (STILT-R version 2), Geosci. Model Dev., 11, 2813-2824, 
+# 1. Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.:
+#    Simulating atmospheric tracer concentrations for spatially distributed
+#    receptors: updates to the Stochastic Time-Inverted Lagrangian Transport
+#    model's R interface (STILT-R version 2), Geosci. Model Dev., 11, 2813-2824,
 #    [10.5194/gmd-11-2813-2018](https://doi.org/10.5194/gmd-11-2813-2018), 2018.
 # 2. Lin, J. C., Gerbig, C., Wofsy, S. C., Andrews, A. E., Daube, B. C., Davis,
-#    K. J. and Grainger, C. A.: A near-field tool for simulating the upstream 
+#    K. J. and Grainger, C. A.: A near-field tool for simulating the upstream
 #    influence of atmospheric observations: The Stochastic Time-Inverted Lagrangian
-#    Transport (STILT) model, J. Geophys. Res., 108(D16), ACH 2-1-ACH 2-17, 
+#    Transport (STILT) model, J. Geophys. Res., 108(D16), ACH 2-1-ACH 2-17,
 #    [10.1029/2002JD003161](https://doi.org/10.1029/2002JD003161), 2003.
 #
 # We strongly suggest you subscribe to the critical update notifications at
@@ -68,7 +67,7 @@ To compile the `hycs_std` and `xtrct_grid` binaries using `gfortran` (recommende
 
 ```bash
 cp Makefile.inc.gfortran Makefile.inc
-make library/libhysplit.a library/liblbfgsb.a 
+make library/libhysplit.a library/liblbfgsb.a
 (cd exec && make hycs_std xtrct_grid)
 ```
 
@@ -77,7 +76,7 @@ make library/libhysplit.a library/liblbfgsb.a
 If compilation is successful, you'll find binaries at `exec/hycs_std` and `exec/xtrct_grid` within the HYSPLIT source code. We now need to create a new STILT project, include these binaries, and compile the `permute.f90` DLL used by the footprint kernel algorithm.
 
 ```bash
-git clone -b hysplit-merge --depth=1 https://github.com/uataq/stilt myproject
+git clone --depth=1 https://github.com/uataq/stilt myproject
 # Cloning into 'myproject'...
 # remote: Enumerating objects: 60, done.
 # remote: Counting objects: 100% (60/60), done.
@@ -100,4 +99,4 @@ Edit the configuration in `myproject/r/run_stilt.r` and be sure to specify the p
 ## Next steps
 
 - [Project structure](project-structure.md) for an overview of the files in your STILT project
-- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/main/01-wbb)

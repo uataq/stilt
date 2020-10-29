@@ -1,7 +1,7 @@
 ## Stochastic Time-Inverted Lagrangian Transport Model <small>v2.x</small>
 
-<a href="https://github.com/uataq/stilt/actions?query=branch%3Amaster">
-  <img src="https://img.shields.io/github/workflow/status/uataq/stilt/Build + Test/master?logo=github&style=for-the-badge"/>
+<a href="https://github.com/uataq/stilt/actions?query=branch%3Amain">
+  <img src="https://img.shields.io/github/workflow/status/uataq/stilt/Build + Test/main?logo=github&style=for-the-badge"/>
 </a>
 <a href="https://github.com/uataq/stilt/issues">
   <img src="https://img.shields.io/github/issues/uataq/stilt?logo=github&style=for-the-badge"/>
@@ -16,7 +16,7 @@ STILT is an open source lagrangian particle dispersion model which is widely use
 
 - improves estimates of boundary layer height and vertical mixing
 - adds parametrizations to improve simulation accuracy in the hyper near field
-- uses a Gaussian weighted influence function to generate a realistic gridded *footprint*
+- uses a Gaussian weighted influence function to generate a realistic gridded _footprint_
 - provides a higher level control layer to orchestrate large batches of simulations
 - includes parallelization methods for distributed workloads in HPC and cloud environments
 - runs slightly slower per simulation, depending on configuration
@@ -99,17 +99,19 @@ This distribution contains a completely redesigned R codebase and proposes a cen
 If you're interested in detailed differences between versions or to learn more about the factors that necessitated the development of this modeling framework, see [Simulating atmospheric tracer concentrations for spatially distributed receptors: updates to the Stochastic Time-Inverted Lagrangian Transport model's R interface (STILT-R version 2)](https://doi.org/10.5194/gmd-11-2813-2018).
 
 1. Kernel density based gridding algorithm
-> Influence of particles is spatially distributed using smooth gaussian kernels. This method agrees more closely with realistic idealized brute-force cases over prior dynamic grid coarsening techniques.
 
-1. Hyper-local dilution depth correction
-> Nested gaussian plume model rescales the effective dilution depth for fluxes in the hyper near field. This increases the influence of fluxes originating close to the receptor.
+   > Influence of particles is spatially distributed using smooth gaussian kernels. This method agrees more closely with realistic idealized brute-force cases over prior dynamic grid coarsening techniques.
 
-1. Multiple simulations in parallel
-> High level methods for single and multi-node parallelism to run your workload at scale, enabling total simulation time to decrease linearly with the number of parallel processes. A single-shot CLI enables programatic simulations in multiple environments.
+2. Hyper-local dilution depth correction
 
-1. End-to-end modeling framework
-> Simple controls for transport settings, distributed workloads, and footprint calculations enable a systematic, well-documented workflow for atmospheric dispersion modeling.
+   > Nested gaussian plume model rescales the effective dilution depth for fluxes in the hyper near field. This increases the influence of fluxes originating close to the receptor.
 
+3. Multiple simulations in parallel
+
+   > High level methods for single and multi-node parallelism to run your workload at scale, enabling total simulation time to decrease linearly with the number of parallel processes. A single-shot CLI enables programatic simulations in multiple environments.
+
+4. End-to-end modeling framework
+   > Simple controls for transport settings, distributed workloads, and footprint calculations enable a systematic, well-documented workflow for atmospheric dispersion modeling.
 
 ---
 
@@ -118,4 +120,4 @@ If you're interested in detailed differences between versions or to learn more a
 Dive straight into the model documentation or start with a tutorial.
 
 - [Quick start](quick-start.md)
-- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/main/01-wbb)

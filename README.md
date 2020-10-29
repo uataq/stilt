@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/uataq/stilt/actions?query=branch%3Amaster">
+  <a href="https://github.com/uataq/stilt/actions?query=branch%3Amain">
     <img src="https://github.com/uataq/stilt/workflows/Build%20+%20Test/badge.svg"/>
   </a>
   <a href="https://github.com/uataq/stilt/issues">

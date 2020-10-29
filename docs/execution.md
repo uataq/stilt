@@ -31,7 +31,6 @@ Rscript r/run_stilt.r
 
 If `slurm = FALSE` and `n_cores > 1`, STILT will fork `n_cores` worker processes and execute the simulations in parallel.
 
-
 ```bash
 Rscript r/run_stilt.r
 
@@ -71,4 +70,4 @@ Get in touch to discuss cloud native options for managing large distributed work
 ## Next steps
 
 - [Output files](output-files.md) for details about the particle trajectory and footprint files output by STILT
-- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/main/01-wbb)

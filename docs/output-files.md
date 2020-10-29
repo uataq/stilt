@@ -38,11 +38,11 @@ str(traj)
 # ..$ foot_no_hnf_dilution: num [1:11712136] 0.00224 0.00224 0.00224 0.00224 0.00224 ...
 ```
 
-The `traj$receptor` object is a named list with the time and location of the release point for the simulation. The `traj$particle` object is a data frame containing each particle's position and characteristics over time. 
+The `traj$receptor` object is a named list with the time and location of the release point for the simulation. The `traj$particle` object is a data frame containing each particle's position and characteristics over time.
 
 ## Gridded footprints
 
-Footprints are packaged and saved in a compressed NetCDF file using [Climate and Forecast (CF)](http://cfconventions.org) compliant metadata with the naming convention `<simulation_id>_foot.nc`. This object contains information about the model domain, the grid resolution, and footprint values. This object is typically a three dimensional array with dimensions ordered (*x*, *y*, *t*). However, the object will only have dimensions (*x*, *y*) for time integrated footprints.
+Footprints are packaged and saved in a compressed NetCDF file using [Climate and Forecast (CF)](http://cfconventions.org) compliant metadata with the naming convention `<simulation_id>_foot.nc`. This object contains information about the model domain, the grid resolution, and footprint values. This object is typically a three dimensional array with dimensions ordered (_x_, _y_, _t_). However, the object will only have dimensions (_x_, _y_) for time integrated footprints.
 
 ```bash
 ncdump -h <simulation_id>_foot.nc
@@ -84,7 +84,6 @@ variables:
 
 For those familiar with raster datasets, the footprint adheres to the [CF-1.4 metadata conventions](http://cfconventions.org/) which is inherently compatible compatible with the R `raster` package. For more information about raster manipulation, the [Raster R package](https://geoscripting-wur.github.io/IntroToRaster/) is a great place to start.
 
-
 ## Interfacing with Raster R package
 
 The footprint NetCDF files can be read direactly into raster (2d) and brick (3d) objects in R using the `raster` package. The POSIX time (UTC seconds since 1970-01-01) is stored in the Z dimension and can be easily accessed with `getZ(footprint)`.
@@ -119,14 +118,14 @@ library(ncdf4)
 nc <- nc_open('<simulation_id>_foot.nc')
 nc
 # File <simulation_id>_foot.nc (NC_FORMAT_NETCDF4):
-# 
+#
 #      1 variables (excluding dimension variables):
-#         float foot[lon,lat,time]   (Contiguous storage)  
+#         float foot[lon,lat,time]   (Contiguous storage)
 #             units: ppm (umol-1 m2 s)
 #             _FillValue: -1
 #             standard_name: footprint
 #             long_name: stilt surface influence footprint
-# 
+#
 #      3 dimensions:
 #         lon  Size:1320
 #             units: degrees_east
@@ -141,7 +140,7 @@ nc
 #             standard_name: time
 #             long_name: utc time
 #             calendar: standard
-# 
+#
 #     5 global attributes:
 #         crs: +proj=longlat
 #         crs_format: PROJ.4
@@ -154,4 +153,4 @@ nc
 
 ## Next steps
 
-- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/master/01-wbb)
+- [Tutorial: Stationary simulations](https://github.com/uataq/stilt-tutorials/tree/main/01-wbb)
