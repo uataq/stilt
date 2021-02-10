@@ -29,8 +29,8 @@ model_output=$(ls out/by-id/201512100000_-112_40.5_5/201512100000_-112_40.5_5* |
 if [ $model_output -lt 2 ]; then
   echo "Model output not found."
 
-  echo "log.txt:"
-  cat out/by-id/201512100000_-112_40.5_5/log.txt
+  echo "stilt.log:"
+  cat out/by-id/201512100000_-112_40.5_5/stilt.log
   exit 1
 fi
 
