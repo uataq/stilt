@@ -20,8 +20,10 @@ find_met_files <- function(t_start, met_file_format, n_hours, met_path) {
   
   is_backward <- n_hours < 0
   
+  # TODO: implement n_hours_per_met_file to better determine file names at
+  # varying time resolutions
   request <- as.POSIXct(t_start, tz='UTC') %>%
-    c(. + c(n_hours, is_backward * n_hours - 5) * 3600) %>%
+    c(. + c(1, -1, n_hours, is_backward * (n_hours - 5)) * 3600) %>%
     range() %>%
     (function(x) seq(x[1], x[2], by = 'hour')) %>%
     strftime(tz = 'UTC', format = met_file_format)
