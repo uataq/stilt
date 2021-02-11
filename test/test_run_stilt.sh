@@ -33,9 +33,9 @@ if [ $model_output -lt 2 ]; then
 
   echo "run_stilt.r configuration:"
   cat r/run_stilt.r
-  
-  echo "log.txt:"
-  cat out/by-id/201512100000_-112_40.5_5/log.txt
+
+  echo "stilt.log:"
+  cat out/by-id/201512100000_-112_40.5_5/stilt.log
   exit 1
 fi
 

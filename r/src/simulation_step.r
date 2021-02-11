@@ -259,7 +259,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
         msg <- paste('Insufficient number of meteorological files found. Check',
                      'specifications in run_stilt.r')
         warning(msg)
-        cat(msg, '\n', file = file.path(rundir, 'ERROR'))
+        cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
         return()
       }
       
@@ -277,7 +277,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
         msg <- paste('Insufficient number of meteorological files found. Check',
                      'specifications in run_stilt.r')
         warning(msg)
-        cat(msg, '\n', file = file.path(rundir, 'ERROR'))
+        cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
         return()
       }
       
@@ -370,7 +370,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     if (is.null(foot)) {
       msg <- 'No non-zero footprint values found within the footprint domain.'
       warning(msg)
-      cat(msg, '\n', file = file.path(rundir, 'ERROR'))
+      cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
       return()
     }
     

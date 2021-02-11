@@ -37,7 +37,7 @@ calc_trajectory <- function(namelist,
   # Simulation timeout ---------------------------------------------------------
   # Monitors time elapsed running hycs_std If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hycs_std and moves on to next simulation
-  cmd <- paste0('cd ', rundir, ' && ./hycs_std > hycs_std.out')
+  cmd <- paste0('cd ', rundir, ' && ./hycs_std >> stilt.log 2>&1')
   system(cmd, timeout = timeout)
 
   # Exit if running in HYSPLIT mode
@@ -45,18 +45,17 @@ calc_trajectory <- function(namelist,
 
   pf <- file.path(rundir, 'PARTICLE_STILT.DAT')
   if (!file.exists(pf)) {
-    msg <- paste('Failed to output ', pf, ' check for errors in log.txt')
+    msg <- paste('Failed to output ', pf)
     warning(msg)
-    cat(msg, '\n', file = file.path(rundir, 'ERROR'))
+    cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
     return()
   }
   
   n_lines <- count_lines(pf)
   if (n_lines < 2) {
-    msg <- paste(pf, 'does not contain any trajectory data.',
-                 'Check for errors in log.txt')
+    msg <- paste(pf, 'does not contain any trajectory data.')
     warning(msg)
-    cat(msg, '\n', file = file.path(rundir, 'ERROR'))
+    cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
     return()
   }
   
