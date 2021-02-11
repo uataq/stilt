@@ -37,7 +37,7 @@ calc_trajectory <- function(namelist,
   # Simulation timeout ---------------------------------------------------------
   # Monitors time elapsed running hycs_std If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hycs_std and moves on to next simulation
-  cmd <- paste0('cd ', rundir, ' && ./hycs_std &>> stilt.log')
+  cmd <- paste0('cd ', rundir, ' && ./hycs_std >> stilt.log 2>&1')
   system(cmd, timeout = timeout)
 
   # Exit if running in HYSPLIT mode
