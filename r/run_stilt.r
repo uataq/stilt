@@ -158,12 +158,6 @@ before_trajec <- function() {output}
 before_footprint <- function() {output}
 
 
-# Startup messages -------------------------------------------------------------
-message('Initializing STILT')
-message('Number of receptors: ', nrow(receptors))
-message('Number of parallel threads: ', n_nodes * n_cores)
-
-
 # Source dependencies ----------------------------------------------------------
 setwd(stilt_wd)
 source('r/dependencies.r')

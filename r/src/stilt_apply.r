@@ -32,6 +32,11 @@ stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
   # adding a new column) but tibble retains list classed objects
   Y <- tibble(...)
 
+  message('Initializing STILT')
+  message('Commit ID: ', find_git_commit_id())
+  message('Number of receptors: ', nrow(Y))
+  message('Number of parallel workers: ', n_nodes * n_cores)
+
   if (slurm) {
     # Confirm availability of sbatch executable and dispatch simulation
     # configurations to SLURM
