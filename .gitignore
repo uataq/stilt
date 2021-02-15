@@ -10,6 +10,8 @@ fortran/*
 *.so
 exe/hymodelc
 exe/hycs_std
+exe/arw2arl
+exe/xtrct_grid
 
 # R history and environment
 .RData
