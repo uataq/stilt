@@ -47,7 +47,7 @@ calc_trajectory <- function(namelist,
   if (!file.exists(pf)) {
     msg <- paste('Failed to output ', pf)
     warning(msg)
-    cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
+    cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
     return()
   }
   
@@ -55,7 +55,7 @@ calc_trajectory <- function(namelist,
   if (n_lines < 2) {
     msg <- paste(pf, 'does not contain any trajectory data.')
     warning(msg)
-    cat(msg, '\n', file = file.path(rundir, 'stilt.log'))
+    cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
     return()
   }
   
