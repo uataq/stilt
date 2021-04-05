@@ -55,6 +55,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
                 libhdf5-serial-dev \
                 libnetcdf-dev \
                 libssl-dev \
+                libxml2-dev \
                 locales \
                 netcdf-bin \
                 procps \
