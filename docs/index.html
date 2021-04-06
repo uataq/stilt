@@ -34,5 +34,12 @@
     <!-- prism langugages -->
     <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-bash.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-r.min.js"></script>
+
+    <!-- register service worker for offline pwa -->
+    <script>
+      if (typeof navigator.serviceWorker !== 'undefined') {
+        navigator.serviceWorker.register('serviceworker.js');
+      }
+    </script>
   </body>
 </html>
