@@ -37,7 +37,10 @@
 
     <!-- register service worker for offline pwa -->
     <script>
-      if (typeof navigator.serviceWorker !== 'undefined') {
+      if (
+        window.location.hostname !== 'localhost' &&
+        typeof navigator.serviceWorker !== 'undefined'
+      ) {
         navigator.serviceWorker.register('serviceworker.js');
       }
     </script>
