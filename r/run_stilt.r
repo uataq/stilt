@@ -94,7 +94,7 @@ kblt        <- 5
 kdef        <- 0
 khinp       <- 0
 khmax       <- 9999
-kmix0       <- 250
+kmix0       <- 150
 kmixd       <- 3
 kmsl        <- 0
 kpuff       <- 0
