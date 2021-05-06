@@ -57,14 +57,15 @@ met_subgrid_levels <- NA
 n_met_min          <- 1
 
 # Model control
-n_hours    <- -24
-numpar     <- 1000
-rm_dat     <- T
-run_foot   <- T
-run_trajec <- T
-timeout    <- 3600
-varsiwant  <- c('time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens',
-                'samt', 'sigw', 'tlgr')
+n_hours       <- -24
+numpar        <- 1000
+rm_dat        <- T
+run_foot      <- T
+run_trajec    <- T
+simulation_id <- NA
+timeout       <- 3600
+varsiwant     <- c('time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens',
+                   'samt', 'sigw', 'tlgr')
 
 # Transport and dispersion settings
 capemin     <- -1
@@ -182,6 +183,7 @@ for (d in c('by-id', 'particles', 'footprints')) {
 
 # Run trajectory simulations ---------------------------------------------------
 stilt_apply(FUN = simulation_step,
+            simulation_id = simulation_id,
             slurm = slurm, 
             slurm_options = slurm_options,
             n_cores = n_cores,
