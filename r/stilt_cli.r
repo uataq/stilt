@@ -132,6 +132,7 @@ stilt_args <- list(
     run_trajec = as.logical(args$run_trajec),
     siguverr = as.numeric(args$siguverr),
     sigzierr = as.numeric(args$sigzierr),
+    simulation_id = as.character(args$simulation_id),
     smooth_factor = as.numeric(args$smooth_factor),
     splitf = as.numeric(args$splitf),
     stilt_wd = as.character(args$stilt_wd),

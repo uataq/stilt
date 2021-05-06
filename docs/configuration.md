@@ -72,15 +72,16 @@ str(receptors)
 
 ### Model control
 
-| Arg          | Description                                                                                                                                                                                                                                        |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `n_hours`    | Number of hours to run each simulation; negative indicates backward in time                                                                                                                                                                        |
-| `numpar`     | number of particles to be run; defaults to 200                                                                                                                                                                                                     |
-| `rm_dat`     | Logical indicating whether to delete `PARTICLE.DAT` after each simulation. Default to TRUE to reduce disk space since all of the trajectory information is also stored in `STILT_OUTPUT.rds` alongside the calculated upstream influence footprint |
-| `run_foot`   | Logical indicating whether to produce footprints. If FALSE, `run_trajec` must be TRUE. This can be useful when calculating trajectories separate from footprints                                                                                   |
-| `run_trajec` | Logical indicating whether to produce new trajectories with `hycs_std`. If FALSE, will try to load the previous trajectory outputs. This is often useful for regridding purposes                                                                   |
-| `timeout`    | number of seconds to allow `hycs_std` to complete before sending SIGTERM and moving to the next simulation; defaults to 3600 (1 hour)                                                                                                              |
-| `varsiwant`  | character vector of 4-letter `hycs_std` variables. Defaults to the minimum required variables including `'time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens', 'samt', 'sigw', 'tlgr'`. Can optionally include options listed below.     |
+| Arg             | Description                                                                                                                                                                                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `n_hours`       | Number of hours to run each simulation; negative indicates backward in time                                                                                                                                                                        |
+| `numpar`        | number of particles to be run; defaults to 200                                                                                                                                                                                                     |
+| `rm_dat`        | Logical indicating whether to delete `PARTICLE.DAT` after each simulation. Default to TRUE to reduce disk space since all of the trajectory information is also stored in `STILT_OUTPUT.rds` alongside the calculated upstream influence footprint |
+| `run_foot`      | Logical indicating whether to produce footprints. If FALSE, `run_trajec` must be TRUE. This can be useful when calculating trajectories separate from footprints                                                                                   |
+| `run_trajec`    | Logical indicating whether to produce new trajectories with `hycs_std`. If FALSE, will try to load the previous trajectory outputs. This is often useful for regridding purposes                                                                   |
+| `simulation_id` | Unique identifier for each simulation; defaults to NA which determines a unique identifier for each simulation by hashing the time and receptor location                                                                                           |
+| `timeout`       | number of seconds to allow `hycs_std` to complete before sending SIGTERM and moving to the next simulation; defaults to 3600 (1 hour)                                                                                                              |
+| `varsiwant`     | character vector of 4-letter `hycs_std` variables. Defaults to the minimum required variables including `'time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens', 'samt', 'sigw', 'tlgr'`. Can optionally include options listed below.     |
 
 #### Optional `varsiwant` arguments
 

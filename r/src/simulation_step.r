@@ -10,6 +10,7 @@
 
 simulation_step <- function(before_footprint = list(function() {output}),
                             before_trajec = list(function() {output}),
+                            simulation_id = NA,
                             capemin = -1,
                             cmass = 0,
                             conage = 48,
@@ -230,20 +231,22 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # Creates subdirectories in out for each model run time. Each of these
     # subdirectories is populated with symbolic links to the shared datasets
     # below and a run-specific SETUP.CFG and CONTROL
-    rundir_format <- paste0('%Y%m%d%H%M_', r_long, '_', r_lati, '_', 
-                            ifelse(length(r_zagl) > 1, 'X', r_zagl))
-    rundir  <- file.path(output_wd, 'by-id',
-                         strftime(r_run_time, rundir_format, 'UTC'))
+    if (is.na(simulation_id)) {
+      simulation_id_format <- paste0('%Y%m%d%H%M_', r_long, '_', r_lati, '_', 
+                                     ifelse(length(r_zagl) > 1, 'X', r_zagl))
+      simulation_id <- strftime(r_run_time, simulation_id_format, 'UTC')
+    }
+    rundir  <- file.path(output_wd, 'by-id', simulation_id)
     dir.create(rundir, showWarnings = F, recursive = T)
     dir.create(file.path(output_wd, 'particles'), showWarnings = F, recursive = T)
     dir.create(file.path(output_wd, 'footprints'), showWarnings = F, recursive = T)
-    message(paste('Running simulation ID:  ', basename(rundir)))
+    message(paste('Running simulation ID:  ', simulation_id))
     
     # Calculate particle trajectories ------------------------------------------
     # run_trajec determines whether to try using existing trajectory files or to
     # recycle existing files
     output <- list()
-    output$file <- file.path(rundir, paste0(basename(rundir), '_traj.rds'))
+    output$file <- file.path(rundir, paste0(simulation_id, '_traj.rds'))
     
     if (run_trajec) {
       # Ensure necessary files and directory structure are established in the
@@ -354,7 +357,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # Aggregate the particle trajectory into surface influence footprints. This
     # outputs a .rds file, which can be read with readRDS() containing the
     # resultant footprint and various attributes
-    foot_file <- file.path(rundir, paste0(basename(rundir), '_foot.nc'))
+    foot_file <- file.path(rundir, paste0(simulation_id, '_foot.nc'))
     foot <- calc_footprint(output$particle, output = foot_file,
                            r_run_time = r_run_time,
                            projection = projection,
