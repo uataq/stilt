@@ -10,6 +10,7 @@ STILT has been compiled to run on UNIX platforms (Mac, Linux). Required software
   - `uataq` package for STILT project initiation workflow
 - [Git](https://git-scm.com/) for fetching STILT source code from GitHub
 - [NetCDF (version >= 4.0)](https://www.unidata.ucar.edu/software/netcdf/) for storage libraries
+- [GDAL](https://gdal.org) for geospatial transformations
 
 ## Fair use policy
 
