@@ -140,10 +140,10 @@ str(receptors)
 
 This is an advanced option that can be used to inject user code into the simulation flow. This can be used to add custom logic at key points in the code, such as correcting for [mass violation in the input wind fields](https://github.com/uataq/stilt/issues/41#issuecomment-656174491).
 
-| Arg                | Description                                                                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `before_trajec`    | function that returns the `output` object and is executed prior to calculating the ensemble particle trajectories                                             |
-| `before_footprint` | function that returns the `output` object and is executed prior to calculating the gridded fotprint but after calculating the ensmble's particle trajectories |
+| Arg                | Description                                                                                                                                                                                                                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `before_trajec`    | function that returns the `output` object and is executed prior to calculating the ensemble particle trajectories                                                                                                                                                                                 |
+| `before_footprint` | function that returns the `output` object and is executed prior to calculating the gridded fotprint but after calculating the ensmble's particle trajectories; see [correcting for meteorological mass violation](https://github.com/uataq/stilt/issues/41#issuecomment-656174491) for an example |
 
 ---
 
