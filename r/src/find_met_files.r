@@ -28,7 +28,7 @@ find_met_files <- function(t_start, met_file_format, n_hours, met_path) {
     (function(x) seq(x[1], x[2], by = 'hour')) %>%
     strftime(tz = 'UTC', format = met_file_format)
   
-  available <- dir(met_path, full.names = T)
+  available <- dir(met_path, full.names = T, recursive = T)
   available <- available[!grepl('\\.lock$', available)]
   
   idx <- do.call(c, lapply(request, function(pattern) {
