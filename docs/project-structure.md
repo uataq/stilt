@@ -4,8 +4,10 @@ The STILT project framework contains an initial scaffolding with a number of dir
 
 ```
 exe/
+  arw2arl
   hycs_std
   xtrct_grid
+  xtrct_time
   ...
 out/
   by-id/
@@ -34,7 +36,7 @@ r/
 
 Files here are shared across all model runs. Each file stored within exe/ is symbolically linked to each simulation directory in out/by-id/.
 
-This is where you will find the compiled `hycs_std` and `xtrct_grid` executables as well as global model configuration files such as `ASCDATA.CFG`, `CONC.CFG`, `LANDUSE.ASC`, and `ROUGLEN.ASC`.
+This is where you will find the compiled `hycs_std`, `xtrct_grid`, `xtrct_time`, and `arw2arl` executables as well as global model configuration files such as `ASCDATA.CFG`, `CONC.CFG`, `LANDUSE.ASC`, and `ROUGLEN.ASC`.
 
 ### out/
 
