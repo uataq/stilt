@@ -22,18 +22,6 @@ Rscript -e "uataq::stilt_init('myproject')"
 #
 # STILT installation successful.
 #
-# Relevant manuscripts:
-# 1. Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.:
-#    Simulating atmospheric tracer concentrations for spatially distributed
-#    receptors: updates to the Stochastic Time-Inverted Lagrangian Transport
-#    model's R interface (STILT-R version 2), Geosci. Model Dev., 11, 2813-2824,
-#    [10.5194/gmd-11-2813-2018](https://doi.org/10.5194/gmd-11-2813-2018), 2018.
-# 2. Lin, J. C., Gerbig, C., Wofsy, S. C., Andrews, A. E., Daube, B. C., Davis,
-#    K. J. and Grainger, C. A.: A near-field tool for simulating the upstream
-#    influence of atmospheric observations: The Stochastic Time-Inverted Lagrangian
-#    Transport (STILT) model, J. Geophys. Res., 108(D16), ACH 2-1-ACH 2-17,
-#    [10.1029/2002JD003161](https://doi.org/10.1029/2002JD003161), 2003.
-#
 # We strongly suggest you subscribe to the critical update notifications at
 # https://uataq.github.io/stilt/
 # to be notified if important STILT model updates updates.

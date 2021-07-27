@@ -39,24 +39,12 @@ uataq::stilt_init('myproject')
 #
 # STILT installation successful.
 #
-# Relevant manuscripts:
-# 1. Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.:
-#    Simulating atmospheric tracer concentrations for spatially distributed
-#    receptors: updates to the Stochastic Time-Inverted Lagrangian Transport
-#    model's R interface (STILT-R version 2), Geosci. Model Dev., 11, 2813-2824,
-#    [10.5194/gmd-11-2813-2018](https://doi.org/10.5194/gmd-11-2813-2018), 2018.
-# 2. Lin, J. C., Gerbig, C., Wofsy, S. C., Andrews, A. E., Daube, B. C., Davis,
-#    K. J. and Grainger, C. A.: A near-field tool for simulating the upstream
-#    influence of atmospheric observations: The Stochastic Time-Inverted Lagrangian
-#    Transport (STILT) model, J. Geophys. Res., 108(D16), ACH 2-1-ACH 2-17,
-#    [10.1029/2002JD003161](https://doi.org/10.1029/2002JD003161), 2003.
-#
 # We strongly suggest you subscribe to the critical update notifications at
 # https://uataq.github.io/stilt/
 # to be notified if important STILT model updates updates.
 ```
 
-This method sources statically compiled `hycs_std` and `xtrct_grid` binaries for 64-bit Intel and AMD systems. These binaries provide the same functionality as those compiled from source but their use with forecast data to model future scenarios has been disabled.
+This method sources statically compiled `hycs_std`, `xtrct_grid`, `xtrct_time`, and `arw2arl` binaries for 64-bit Intel and AMD systems. These binaries provide the same functionality as those compiled from source but their use with forecast data to model future scenarios has been disabled.
 
 ## Installing from source
 
@@ -64,17 +52,17 @@ This method sources statically compiled `hycs_std` and `xtrct_grid` binaries for
 
 Compiling from source requires user [registration with NOAA ARL](https://www.ready.noaa.gov/HYSPLIT_register.php) to access the HYSPLIT source code. HYSPLIT version 5.0 or newer is required.
 
-To compile the `hycs_std` and `xtrct_grid` binaries using `gfortran` (recommended) from the root directory of the HYSPLIT source code -
+To compile the `hycs_std`, `xtrct_grid`, and `xtrct_time` binaries using `gfortran` (recommended) from the root directory of the HYSPLIT source code -
 
 ```bash
 cp Makefile.inc.gfortran Makefile.inc
 make library/libhysplit.a library/liblbfgsb.a
-(cd exec && make hycs_std xtrct_grid)
+(cd exec && make hycs_std xtrct_grid xtrct_time)
 ```
 
 > Versions 10.0 and newer of `gfortran` require modifying `Makefile.inc` to specify `FFLAGS=-fallow-argument-mismatch <other_fflags>`
 
-If compilation is successful, you'll find binaries at `exec/hycs_std` and `exec/xtrct_grid` within the HYSPLIT source code. We now need to create a new STILT project, include these binaries, and compile the `permute.f90` DLL used by the footprint kernel algorithm.
+If compilation is successful, you'll find binaries at `exec/` within the HYSPLIT source code. We now need to create a new STILT project, include these binaries, and compile the `permute.f90` DLL used by the footprint kernel algorithm.
 
 ```bash
 git clone --depth=1 https://github.com/uataq/stilt myproject
@@ -88,7 +76,7 @@ git clone --depth=1 https://github.com/uataq/stilt myproject
 ls myproject
 # Dockerfile  README.md  bin/  exe/  r/  setup  test/
 
-cp hysplit/exec/hycs_std hysplit/exec/xtrct_grid myproject/exe/
+cp hysplit/exec/hycs_std hysplit/exec/xtrct_grid hysplit/exec/xtrct_time myproject/exe/
 
 R CMD SHLIB myproject/r/src/permute.f90
 ```

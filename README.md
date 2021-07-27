@@ -35,6 +35,10 @@ STILT would not be possible without the strong community of developers behind it
 
 ### Relevant manuscripts
 
-Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.: Simulating atmospheric tracer concentrations for spatially distributed receptors: updates to the Stochastic Time-Inverted Lagrangian Transport model's R interface (STILT-R version 2), Geosci. Model Dev., 11, 2813-2824, [10.5194/gmd-11-2813-2018](https://doi.org/10.5194/gmd-11-2813-2018), 2018.
+Loughner, C. P., Fasoli, B., Stein, A. F., Lin, J. C.: Incorporating features from the Stochastic Time-Inverted Lagrangian Transport (STILT) model into the Hybrid Single-Particle Lagrangian Integrated Trajectory (HYSPLIT) model: a unified dispersion model for time-forward and time-reversed applications, J. Appl. Meteorol. Climatol., [10.1175/JAMC-D-20-0158.1](https://doi.org/10.1175/JAMC-D-20-0158.1), 2021.
 
-Lin, J. C., Gerbig, C., Wofsy, S. C., Andrews, A. E., Daube, B. C., Davis, K. J. and Grainger, C. A.: A near-field tool for simulating the upstream influence of atmospheric observations: The Stochastic Time-Inverted Lagrangian Transport (STILT) model, J. Geophys. Res., 108(D16), ACH 2-1-ACH 2-17, [10.1029/2002JD003161](https://doi.org/10.1029/2002JD003161), 2003.
+Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.: Simulating atmospheric tracer concentrations for spatially distributed receptors: updates to the Stochastic Time-Inverted Lagrangian Transport model's R interface (STILT-R version 2), Geosci. Model Dev., [10.5194/gmd-11-2813-2018](https://doi.org/10.5194/gmd-11-2813-2018), 2018.
+
+Stein, A. R., Draxler, R. R., Rolph, G. D., Stunder, B. J. B., and Cohen M. D.: NOAA’s HYSPLIT atmospheric transport and dispersion modeling system. Bull. Amer. Meteor. Soc., [10.1175/BAMS-D-14-00110.1](https://doi.org/10.1175/BAMS-D-14-00110.1), 2015.
+
+Lin, J. C., Gerbig, C., Wofsy, S. C., Andrews, A. E., Daube, B. C., Davis, K. J. and Grainger, C. A.: A near-field tool for simulating the upstream influence of atmospheric observations: The Stochastic Time-Inverted Lagrangian Transport (STILT) model, J. Geophys. Res., [10.1029/2002JD003161](https://doi.org/10.1029/2002JD003161), 2003.
