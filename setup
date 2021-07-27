@@ -10,34 +10,34 @@ set -e
 # Check if ./setup is run from the top level of the project
 dircnt=$(ls -d */ | grep -x -e bin/ -e r/ -e exe/ | wc -l)
 if [ $dircnt -lt 3 ]; then
-  echo "./setup must be run from the top level directory of the STILT project" > /dev/stderr
+  echo "./setup must be run from the top level directory of the STILT project" >/dev/stderr
   exit 1
 fi
 
 # Check dependency versions
-if ! command -v Rscript &> /dev/null; then
-  echo "Rscript not found" > /dev/stderr
+if ! command -v Rscript &>/dev/null; then
+  echo "Rscript not found" >/dev/stderr
   exit 1
 fi
 
-if ! command -v bc &> /dev/null; then
+if ! command -v bc &>/dev/null; then
   echo "bc not found, continuing without checking R version"
 else
-  R_VERSION=$(Rscript --version &> /dev/stdout | cut -d " " -f 5 | cut -d "." -f 1-2)
-  if (( $(echo "$R_VERSION <= 3.5" | bc -l > /dev/null) )); then
-    echo "R version $R_VERSION must be 3.5 or higher" > /dev/stderr
+  R_VERSION=$(Rscript --version &>/dev/stdout | cut -d " " -f 5 | cut -d "." -f 1-2)
+  if (($(echo "$R_VERSION <= 3.5" | bc -l >/dev/null))); then
+    echo "R version $R_VERSION must be 3.5 or higher" >/dev/stderr
     exit 1
   fi
 fi
 
-if ! command -v nc-config &> /dev/null; then
-  echo "NetCDF library (nc-config) not found" > /dev/stderr
+if ! command -v nc-config &>/dev/null; then
+  echo "NetCDF library (nc-config) not found" >/dev/stderr
   exit 1
 fi
 
 NC_VERSION=$(nc-config --version | cut -d " " -f 2 | cut -d "." -f 1)
 if [ "$NC_VERSION" -lt 4 ]; then
-  echo "NetCDF library (nc-config) version must be 4.0 or higher" > /dev/stderr
+  echo "NetCDF library (nc-config) version must be 4.0 or higher" >/dev/stderr
   exit 1
 fi
 
@@ -45,7 +45,7 @@ fi
 echo "Compiling footprint kernel aggregation subroutine..."
 R CMD SHLIB r/src/permute.f90
 if [ ! -s r/src/permute.so ]; then
-  echo "Problem compiling r/src/permute.so." > /dev/stderr
+  echo "Problem compiling r/src/permute.so." >/dev/stderr
   exit 1
 fi
 
@@ -70,33 +70,20 @@ if [[ $install -eq 1 ]]; then
 elif [[ $install -eq 2 ]]; then
   cp bin/macos_x64/* exe/
 else
-  echo "Invalid install option." > /dev/stderr
+  echo "Invalid install option." >/dev/stderr
   exit 1
 fi
 
 # Check that hycs_std was created from methods above
 if [ ! -s exe/hycs_std ]; then
-  echo "Problem installing hycs_std" > /dev/stderr
+  echo "Problem installing hycs_std" >/dev/stderr
   exit 1
 fi
 # Ensure hysplit, run_stilt.r, and stilt_cli.r are executable
 chmod +x exe/hycs_std r/run_stilt.r r/stilt_cli.r
 
-
 echo "
 STILT installation successful.
-
-Relevant manuscripts:
-1. Fasoli, B., Lin, J. C., Bowling, D. R., Mitchell, L., and Mendoza, D.: 
-   Simulating atmospheric tracer concentrations for spatially distributed 
-   receptors: updates to the Stochastic Time-Inverted Lagrangian Transport 
-   model's R interface (STILT-R version 2), Geosci. Model Dev., 11, 2813-2824, 
-   [10.5194/gmd-11-2813-2018](https://doi.org/10.5194/gmd-11-2813-2018), 2018.
-2. Lin, J. C., Gerbig, C., Wofsy, S. C., Andrews, A. E., Daube, B. C., Davis,
-   K. J. and Grainger, C. A.: A near-field tool for simulating the upstream 
-   influence of atmospheric observations: The Stochastic Time-Inverted Lagrangian
-   Transport (STILT) model, J. Geophys. Res., 108(D16), ACH 2-1-ACH 2-17, 
-   [10.1029/2002JD003161](https://doi.org/10.1029/2002JD003161), 2003.
 
 We strongly suggest you subscribe to the mailing list at
 https://uataq.github.io/stilt/
