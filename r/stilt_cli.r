@@ -120,7 +120,7 @@ stilt_args <- list(
     qcycle = as.numeric(args$qcycle),
     r_run_time = as.POSIXct(args$r_run_time,
                             tz = 'UTC',
-                            format = '%Y-%m-%dT%H:%M:%SZ'),
+                            format = '%Y-%m-%dT%H:%M:%S'),
     r_lati = as.numeric(args$r_lati),
     r_long = as.numeric(args$r_long),
     r_zagl = as.numeric(args$r_zagl),
