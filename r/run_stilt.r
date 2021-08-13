@@ -51,7 +51,7 @@ yres <- xres
 # Meteorological data input
 met_path           <- '<path_to_arl_meteorological_data>'
 met_file_format    <- '%Y%m%d.%Hz.hrrra'
-met_subgrid_buffer <- 0.1
+met_subgrid_buffer <- 0.2
 met_subgrid_enable <- F
 met_subgrid_levels <- NA
 n_met_min          <- 1
