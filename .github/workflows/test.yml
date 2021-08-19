@@ -32,5 +32,7 @@ jobs:
         run: bash test/test_run_stilt.sh
       - name: Run CLI test
         run: bash test/test_stilt_cli.sh
+      - name: Run CLI column receptor test
+        run: bash test/test_stilt_cli.sh
       - name: Run WRF test
         run: bash test/test_wrf_converter.sh

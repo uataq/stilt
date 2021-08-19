@@ -51,6 +51,30 @@ if (i == 99) {
     stop('Could not identify STILT project directory - specify stilt_wd manually')
 }
 
+# Conditionally configure point vs line receptors
+if (grepl(',', args$r_lati, fixed=T)) {
+    lati_parts <- strsplit(args$r_lati, ',', fixed=T)[[1]]
+    r_lati <- lapply(lati_parts, function(x) as.numeric(x))
+} else {
+    r_lati <- as.numeric(args$r_lati)
+}
+if (grepl(',', args$r_long, fixed=T)) {
+    long_parts <- strsplit(args$r_long, ',', fixed=T)[[1]]
+    r_long <- lapply(long_parts, function(x) as.numeric(x))
+} else {
+    r_long <- as.numeric(args$r_long)
+}
+if (grepl(',', args$r_zagl, fixed=T)) {
+    zagl_parts <- strsplit(args$r_zagl, ',', fixed=T)[[1]]
+    r_zagl <- lapply(zagl_parts, function(x) as.numeric(x))
+} else {
+    r_zagl <- as.numeric(args$r_zagl)
+}
+
+if ((length(r_lati) > 1) && (length(r_long) > 1) && (is.na(args$simulation_id))) {
+    stop('Must specify simulation_id for slant column releases.')
+}
+
 # Set argument types
 stilt_args <- list(
     capemin <- as.numeric(args$capemin),
@@ -121,9 +145,9 @@ stilt_args <- list(
     r_run_time = as.POSIXct(args$r_run_time,
                             tz = 'UTC',
                             format = '%Y-%m-%dT%H:%M:%S'),
-    r_lati = as.numeric(args$r_lati),
-    r_long = as.numeric(args$r_long),
-    r_zagl = as.numeric(args$r_zagl),
+    r_lati = r_lati,
+    r_long = r_long,
+    r_zagl = r_zagl,
     random = as.numeric(args$random),
     rhb = as.numeric(args$rhb),
     rht = as.numeric(args$rht),
@@ -168,7 +192,5 @@ stilt_args <- list(
     zcoruverr = as.numeric(args$zcoruverr)
 )
 stilt_args <- stilt_args[sapply(stilt_args, function(x) length(x) > 0)]
-
 source(file.path(stilt_args$stilt_wd, 'r', 'src', 'simulation_step.r'))
-res <- do.call(simulation_step, stilt_args)
-q('no')
+result <- do.call(simulation_step, stilt_args)

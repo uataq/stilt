@@ -28,11 +28,14 @@ write_control <- function(receptor, emisshrs, n_hour, w_option = 0,
     stop('write_control(): file argument must end with CONTROL')
 
   receptor <- with(receptor, 
-                   data.frame(run_time, lati, long, zagl = unlist(zagl), 
+                   data.frame(run_time,
+                              lati=unlist(lati),
+                              long=unlist(long),
+                              zagl = unlist(zagl), 
                               stringsAsFactors = F))
   receptor$print <- with(receptor, paste(lati, long, zagl))
 
-  txt = c(
+  txt <- c(
     strftime(receptor$run_time[1], tz = 'UTC', format = '%y %m %d %H %M'),
     nrow(receptor),
     receptor$print,
