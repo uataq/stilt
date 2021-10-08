@@ -22,7 +22,7 @@ The preferred method uses R to initialize a new project and requires the `uataq`
 
 ```r
 if (!require('devtools')) install.packages('devtools')
-devtools::install_github('benfasoli/uataq')
+devtools::install_github('uataq/uataq')
 ```
 
 A STILT project can then be initialized in plain R code. A project name other than `stilt` should be chosen for projects to avoid naming conflicts with the repository.
