@@ -15,6 +15,7 @@ exe/xtrct_grid
 exe/xtrct_time
 
 # R history and environment
+.Rpackages
 .RData
 .Rapp.history
 .Rhistory
