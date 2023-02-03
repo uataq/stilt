@@ -40,44 +40,37 @@
 #     ymx=40.95 \
 #     yres=0.01
 
-FROM debian:stretch-slim
+FROM debian:bullseye-slim
 
 WORKDIR /app
-
-COPY . /app
 
 ENV TZ UTC
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-                build-essential \
-                git \
-                libgdal-dev \
-                libhdf5-serial-dev \
-                libnetcdf-dev \
-                libssl-dev \
-                libxml2-dev \
-                locales \
-                netcdf-bin \
-                procps \
-                r-base \
-                r-base-dev \
-                unzip \
-                wget \
-        && locale-gen en_US.UTF-8 \
-        && update-locale \
-        && bash setup 3 \
-        && Rscript r/dependencies.r \
-        && apt-get remove --purge -y \
-                build-essential \
-                git \
-                locales \
-                wget \
-        && apt-get autoremove -y \
-        && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -yq \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        git \
+        libgdal-dev \
+        libhdf5-serial-dev \
+        libnetcdf-dev \
+        libssl-dev \
+        libxml2-dev \
+        locales \
+        netcdf-bin \
+        procps \
+        r-base \
+        r-base-dev \
+        unzip \
+        wget \
+    && locale-gen en_US.UTF-8 \
+    && update-locale
+
+COPY . /app
+
+RUN bash setup 3
+RUN Rscript r/dependencies.r
 
 VOLUME ["/app/met", "/app/out"]
 
-ENTRYPOINT ["/app/r/stilt_cli.r", \
-                "met_path=/app/met", \
-                "output_wd=/app/out"]
+ENTRYPOINT ["/app/r/stilt_cli.r", "met_path=/app/met", "output_wd=/app/out"]
