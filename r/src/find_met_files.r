@@ -18,6 +18,7 @@
 find_met_files <- function(t_start, met_file_format, n_hours, met_path) {
   require(dplyr)
   
+  n_hours_per_met_file <- 6
   is_backward <- n_hours < 0
   
   # TODO: implement n_hours_per_met_file to better determine file names at
@@ -27,7 +28,16 @@ find_met_files <- function(t_start, met_file_format, n_hours, met_path) {
     range() %>%
     (function(x) seq(x[1], x[2], by = 'hour')) %>%
     strftime(tz = 'UTC', format = met_file_format)
-  
+  # patch to retrieve correct met files for forward simulations
+  if(!is_backward){
+    request <- seq(
+      as.POSIXct(t_start, tz='UTC')-as.difftime(n_hours_per_met_file,units="hours")
+      , as.POSIXct(t_start, tz='UTC')+as.difftime(n_hours,units="hours")
+      , by = 60*60
+    ) %>%
+    strftime(tz = 'UTC', format = met_file_format)
+  }#end if(n_hours>0)
+
   available <- dir(met_path, full.names = T, recursive = T)
   available <- available[!grepl('.lock', available)]
   
