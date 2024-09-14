@@ -254,7 +254,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
       if (!dir.exists(rundir)) dir.create(rundir)
       
       exe <- file.path(stilt_wd, 'exe')
-      link_files(exe, rundir)
+      link_files(exe, rundir, stilt_wd)
       
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_path)
@@ -327,9 +327,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
       
       # Save output object to compressed rds file and symlink to out/particles
       saveRDS(output, output$file)
-      
-      link <- file.path(output_wd, 'particles', basename(output$file))
-      suppressWarnings(file.symlink(output$file, link))
+      link_files(output$file, file.path(output_wd, 'particles'))
       
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
@@ -378,8 +376,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     }
     
     # Symlink footprint to out/footprints
-    link <- file.path(output_wd, 'footprints', basename(foot_file))
-    suppressWarnings(file.symlink(foot_file, link))
+    link_files(foot_file, file.path(output_wd, 'footprints'))
 
     return(foot)
   })
