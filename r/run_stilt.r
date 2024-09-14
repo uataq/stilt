@@ -12,6 +12,7 @@ lib.loc <- .libPaths()[1]
 # Parallel simulation settings
 n_cores <- 1
 n_nodes <- 1
+processes_per_node <- n_cores
 slurm   <- n_nodes > 1
 slurm_options <- list(
   time      = '300:00:00',
@@ -188,6 +189,7 @@ stilt_apply(FUN = simulation_step,
             slurm_options = slurm_options,
             n_cores = n_cores,
             n_nodes = n_nodes,
+            processes_per_node = processes_per_node,
             before_footprint = list(before_footprint),
             before_trajec = list(before_trajec),
             lib.loc = lib.loc,
