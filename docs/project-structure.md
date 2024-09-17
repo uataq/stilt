@@ -12,7 +12,7 @@ exe/
 out/
   by-id/
     yyyymmddHH_lati_long_zagl/
-      yyyymmddHH_lati_long_zagl_traj.rds
+      yyyymmddHH_lati_long_zagl_traj.traject_fmt
       yyyymmddHH_lati_long_zagl_foot.nc
       hycs_std
       SETUP.CFG
@@ -23,7 +23,7 @@ out/
     yyyymmddHH_lati_long_zagl_foot.nc
     ...
   particles/
-    yyyymmddHH_lati_long_zagl_traj.rds
+    yyyymmddHH_lati_long_zagl_traj.traject_fmt
     ...
 r/
   src/
@@ -59,7 +59,7 @@ Contains simulation files by simulation id, with the naming convention `yyyymmdd
 
 This becomes the working directory for each unique simulation, containing symbolic links to all of the shared files in `exe/` as well as simulation specific `CONTROL`, `SETUP.CFG`, and output files.
 
-STILT outputs two files for analysis. The trajectories of the particle ensemble are saved to a `<simulation_id>_traj.rds` file. Gridded footprints are saved to a `<simulation_id>_foot.nc` file. For guidance on working with these output files, see [output files](output-files.md).
+STILT outputs two files for analysis. The trajectories of the particle ensemble are saved to a `<simulation_id>_traj.<trajec_fmt>` file. Gridded footprints are saved to a `<simulation_id>_foot.nc` file. For guidance on working with these output files, see [output files](output-files.md).
 
 #### out/footprints/
 

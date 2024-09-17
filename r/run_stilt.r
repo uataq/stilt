@@ -62,6 +62,7 @@ numpar        <- 1000
 rm_dat        <- T
 run_foot      <- T
 run_trajec    <- T
+trajec_fmt    <- 'rds'
 simulation_id <- NA
 timeout       <- 3600
 varsiwant     <- c('time', 'indx', 'long', 'lati', 'zagl', 'foot', 'mlht', 'dens',
@@ -277,6 +278,7 @@ stilt_apply(FUN = simulation_step,
             tluverr = tluverr,
             tlzierr = tlzierr,
             tout = tout,
+            trajec_fmt = trajec_fmt,
             tratio = tratio,
             tvmix = tvmix,
             varsiwant = list(varsiwant),

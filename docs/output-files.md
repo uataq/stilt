@@ -2,22 +2,30 @@
 
 The model outputs can be found in the directory configured with `output_wd` (defaults to `<stilt_wd>/out/`, see [project structure](http://localhost:3000/#/project-structure)). STILT outputs two files for analysis -
 
-- a `<simulation_id>_traj.rds` file containing the trajectories of the particle ensemble
+- a `<simulation_id>_traj.<trajec_fmt>` file containing the trajectories of the particle ensemble
 - a `<simulation_id>_foot.nc` file containing gridded footprint values and metadata
 
 Simulation identifiers follow a `yyyymmddHHMM_lati_long_zagl` convention, see [project structure](project-structure.md?id=outby-id).
 
 ## Particle trajectories
 
-Particle trajectories and simulation configuration information are packaged and saved in a compressed `.rds` file ([serialized single R object](https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html)) with the naming convention with the naming convention `<simulation_id>_traj.rds`. Preserving the particle trajectories enables regridding the footprints at a later time without the computational cost of recalculating particle trajectories.
+Particle trajectories and simulation configuration information are packaged and saved in the format specified by `trajec_fmt` (defaults to `rds`). Options include
 
-This object can be loaded with `readRDS(<path>)` and is structured as
+ - `rds` - [serialized R data](https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html)
+ - `h5` - [HDF5](https://www.hdfgroup.org/solutions/hdf5/)
+
+>  Formats other than `rds` will be less efficient, but `h5` offers the advantage of being a widely supported format by other software packages.
+
+Trajectories are saved with the naming convention `<simulation_id>_traj.<trajec_fmt>`. Preserving the particle trajectories enables regridding the footprints at a later time without the computational cost of recalculating particle trajectories.
+
+This object can be loaded with `read_traj(<path>)` and is structured as
 
 ```r
-traj <- readRDS('<simulation_id>_traj.rds')
+source('r/dependencies.r')
+traj <- read_traj('<simulation_id>_traj.<trajec_fmt>')
 str(traj)
 # List of 4
-# $ file    : chr "<stilt_wd>/out/by-id/<simulation_id>/<simulation_id>_traj.rds
+# $ file    : chr "<stilt_wd>/out/by-id/<simulation_id>/<simulation_id>_traj.<trajec_fmt>"
 # $ receptor:List of 4
 # ..$ run_time: POSIXct[1:1], format: "1983-09-18 21:00:00"
 # ..$ lati    : num 39.6
@@ -39,6 +47,44 @@ str(traj)
 ```
 
 The `traj$receptor` object is a named list with the time and location of the release point for the simulation. The `traj$particle` object is a data frame containing each particle's position and characteristics over time.
+
+The `h5` output can be read using python using a combination of pandas and pytables:
+
+```python
+import numpy as np
+import pandas as pd
+import tables as tb
+
+# Read the particle data as a pandas dataframe
+particle = pd.read_hdf('<simulation_id>_traj.h5', 'particle')
+
+# Function to get group attributes
+def get_group_attrs(h5file: tb.File, group: str) -> dict:
+	'Get the attributes of a group in an h5 file'
+    root = h5file.root
+	roots = ['', '/', 'root']
+    group = root if group in roots else getattr(root, group)
+
+    attrs = {}
+    keys = group._v_attrs._v_attrnamesuser
+    for k in keys:
+        val = group._v_attrs[k]
+        if val is not None:
+            val = val[0]  # values are stored as arrays
+            if np.issubdtype(val.dtype, np.bytes_):
+                val = val.decode()  # convert bytes to string
+                val = None if val == 'NA' else val
+        attrs[k] = val
+    return attrs  # dictionary output
+
+# Open the h5 file with pytables
+h5file = tb.open_file('<simulation_id>_traj.h5')
+
+# Read group attributes
+file = get_group_attrs(h5file, '/')['file']
+receptor = get_group_attrs(h5file, 'receptor')
+params = get_group_attrs(h5file, 'params')
+```
 
 ## Gridded footprints
 
