@@ -13,12 +13,13 @@ The following parameters are found in `r/run_stilt.r` and are used to configure 
 
 ### Parallel simulation settings
 
-| Arg             | Description                                                                                                                                                                               |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `n_nodes`       | If using SLURM for job submission, number of nodes to utilize                                                                                                                             |
-| `n_cores`       | Number of cores per node to parallelize simulations by receptor locations and times                                                                                                       |
-| `slurm`         | Logical indicating the use of rSLURM to submit job(s). When using SLURM, a `<stilt_wd>/_rslurm` directory is created to contain the SLURM submission scripts and node-specific log files. |
-| `slurm_options` | Named list of options passed to `sbatch` using `rslurm::slurm_apply()`. This typically includes `time`, `account`, and `partition` values                                                 |
+| Arg                  | Description                                                                                                                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `n_nodes`            | If using SLURM for job submission, number of nodes to utilize                                                                                                                             |
+| `n_cores`            | Number of cores per node to parallelize simulations by receptor locations and times                                                                                                       |
+| `processes_per_node` | Number of processes to run on each node. Can be set higher than n_cores for nodes which support [hyperthreading](https://scicomp.ethz.ch/wiki/Using_hyperthreading)                       |
+| `slurm`              | Logical indicating the use of rSLURM to submit job(s). When using SLURM, a `<stilt_wd>/_rslurm` directory is created to contain the SLURM submission scripts and node-specific log files. |
+| `slurm_options`      | Named list of options passed to `sbatch` using `rslurm::slurm_apply()`. This typically includes `time`, `account`, and `partition` values                                                 |
 
 ### Receptor placement
 
