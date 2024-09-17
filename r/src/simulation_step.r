@@ -254,7 +254,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
       if (!dir.exists(rundir)) dir.create(rundir)
       
       exe <- file.path(stilt_wd, 'exe')
-      link_files(exe, rundir, stilt_wd)
+      link_files(exe, rundir)
       
       # Find necessary met files
       met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_path)
