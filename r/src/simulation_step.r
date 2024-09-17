@@ -61,6 +61,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             mgmin = 10,
                             mhrs = 9999,
                             n_hours = -24,
+                            n_hours_per_met_file = 6,
                             n_met_min = 1,
                             ncycl = 0,
                             ndump = 0,
@@ -257,7 +258,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
       link_files(exe, rundir)
       
       # Find necessary met files
-      met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_path)
+      met_files <- find_met_files(r_run_time, n_hours, n_hours_per_met_file,
+                                  met_file_format, met_path)
       if (length(met_files) < n_met_min) {
         msg <- paste('Insufficient number of meteorological files found. Check',
                      'specifications in run_stilt.r')
@@ -275,7 +277,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
       }
       
       # Find necessary met files
-      met_files <- find_met_files(r_run_time, met_file_format, n_hours, met_path)
+      met_files <- find_met_files(r_run_time, n_hours, n_hours_per_met_file, 
+                                  met_file_format, met_path)
       if (length(met_files) < n_met_min) {
         msg <- paste('Insufficient number of meteorological files found. Check',
                      'specifications in run_stilt.r')
