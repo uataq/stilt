@@ -267,26 +267,26 @@ simulation_step <- function(before_footprint = list(function() {output}),
         cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
         return()
       }
-      
+
       if (met_subgrid_enable) {
         met_path <- file.path(output_wd, 'met')
         calc_met_subgrids(met_files, met_path, exe,
                           projection, xmn, xmx, ymn, ymx,
                           levels = met_subgrid_levels,
                           met_subgrid_buffer = met_subgrid_buffer)
+
+        # Find necessary met files for subgrids
+        met_files <- find_met_files(r_run_time, n_hours, n_hours_per_met_file, 
+                                    met_file_format, met_path)
+        if (length(met_files) < n_met_min) {
+          msg <- paste('Insufficient number of meteorological files found. Check',
+                      'specifications in run_stilt.r')
+          warning(msg)
+          cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
+          return()
+        }
       }
-      
-      # Find necessary met files
-      met_files <- find_met_files(r_run_time, n_hours, n_hours_per_met_file, 
-                                  met_file_format, met_path)
-      if (length(met_files) < n_met_min) {
-        msg <- paste('Insufficient number of meteorological files found. Check',
-                     'specifications in run_stilt.r')
-        warning(msg)
-        cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
-        return()
-      }
-      
+
       # Execute particle trajectory simulation, and read results into data frame
       output$receptor <- list(run_time = r_run_time,
                               lati = r_lati,
