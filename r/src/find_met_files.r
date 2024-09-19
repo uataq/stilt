@@ -22,15 +22,26 @@ find_met_files <- function(t_start, n_hours, n_hours_per_met_file,
   require(dplyr)
 
   ts <- as.POSIXct(t_start, tz = 'UTC')
-  is_backward <- as.numeric(n_hours < 0)
-  ib <- ifelse(is_backward, 1, -1)
+  is_backward <- n_hours < 0
+  met_bracket <- n_hours_per_met_file - 1  # ts can be in the middle of a met file
 
-  # Generate the list of files to search for
-  request <- seq(
-    ts - (ib * as.difftime(abs(n_hours) + ib, units = 'hours')),
-    ts + (ib * as.difftime(n_hours_per_met_file - is_backward, units = 'hours')),
-    by = ib * 3600
-  ) %>%
+  # Generate the hours to search for
+  if (is_backward) {
+    met_hours <- seq(
+      ts - as.difftime(abs(n_hours) + met_bracket, units = 'hours'),
+      ts,
+      by = 3600
+    )
+  } else {
+    met_hours <- seq(
+      ts - as.difftime(met_bracket, units = 'hours'),
+      ts + as.difftime(n_hours, units = 'hours'),
+      by = 3600
+    )
+  }
+
+  # Format the request and remove duplicates
+  request <- met_hours %>%
     strftime(tz = 'UTC', format = met_file_format) %>%
     unique()
 
