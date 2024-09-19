@@ -57,5 +57,5 @@ find_met_files <- function(t_start, n_hours, n_hours_per_met_file,
   if (any(idx < 1))
     return()
 
-  available[idx]  # Available files that match the request
+  unique(available[idx])  # Available files that match the request
 }
