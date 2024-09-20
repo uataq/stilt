@@ -4,12 +4,12 @@
 #' @param traj output created during simulation_step
 #' @param file filename argument. Must end with .rds (for serialized R data
 #'   output, preferred), .h5 (for Hierarchical Data Format output),
-#'   or NULL to return the footprint object for programatic use.
+#'   or .parquet (for Apache Parquet output).
 #'   rds files do not require any additional libraries and have
-#'   better compression. The \code{rhdf5} package is required for .h5 output.
-#'   HDF5 output is slightly less efficient than .rds output, but is more
-#'   portable and can be read by other languages.
+#'   better compression. Alternative output formats require additional
+#'   libraries.
 #'
+#' @import arrow
 #' @import rhdf5
 #' @export
 
@@ -22,10 +22,10 @@ write_traj <- function(traj, file) {
   # .rds output (preferred)
   if (!is.null(file) && grepl('\\.rds$', file, ignore.case = T)) {
     saveRDS(traj, file)
-    return(file)
+    return(traj)
   }
 
-  # .h5 output
+  # Alternative .h5 output
   if (!is.null(file) && grepl('\\.h5$', file, ignore.case = T)) {
     # Check if rhdf5 package is installed
     if (!requireNamespace("rhdf5", quietly = TRUE)) {
@@ -83,8 +83,52 @@ write_traj <- function(traj, file) {
     # Close file
     rhdf5::H5Fclose(fid)
 
-    return(file)
+    return(traj)
   }
 
-  return(traj)
+  # Alternative .parquet output
+  if (!is.null(file) && grepl('\\.parquet$', file, ignore.case = T)) {
+    # Check if arrow package is installed
+    if (!requireNamespace("arrow", quietly = TRUE)) {
+      stop("The 'arrow' package is required for parquet output. Please install it.")
+    }
+
+    write_meta <- function(meta, prefix, obj) {
+      for (x in names(obj)) {
+        key <- paste0(prefix, ':', x)
+        meta[[key]] <- as.character(obj[[x]])
+      }
+    }
+
+    # Convert particle dataframe to arrow table
+    particle <- arrow::arrow_table(traj$particle)
+
+    # Write receptor metadata
+    write_meta(particle$metadata, 'receptor', traj$receptor)
+
+    # Write params metadata
+    write_meta(particle$metadata, 'param', traj$params)
+
+    if ('particle_error' %in% names(traj)) {
+      # Add '_err' suffix to particle_error columns
+      names(traj$particle_error) <- paste0(names(traj$particle_error), '_err')
+
+      # Convert particle_error dataframe to arrow table
+      particle_error <- arrow::arrow_table(traj$particle_error)
+
+      # Concat particle and particle_error tables
+      particle <- arrow::concat_tables(particle, particle_error)
+
+      # Write particle_error_params metadata
+      write_meta(particle$metadata, 'err_param',
+                 traj$particle_error_params)
+    }
+
+    # Write parquet file
+    arrow::write_parquet(particle, file)
+
+    return(traj)
+  }
+
+  invisible(traj)
 }

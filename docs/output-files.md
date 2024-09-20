@@ -9,16 +9,12 @@ Simulation identifiers follow a `yyyymmddHHMM_lati_long_zagl` convention, see [p
 
 ## Particle trajectories
 
-Particle trajectories and simulation configuration information are packaged and saved in the format specified by `trajec_fmt` (defaults to `rds`). Options include
+Particle trajectories and simulation configuration information are packaged and saved with the naming convention `<simulation_id>_traj.<trajec_fmt>`. Preserving the particle trajectories enables regridding the footprints at a later time without the computational cost of recalculating particle trajectories.
 
- - `rds` - [serialized R data](https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html)
- - `h5` - [HDF5](https://www.hdfgroup.org/solutions/hdf5/)
+Different output formats are available for the particle trajectories as specified by the `trajec_fmt` parameter. The default format is `rds` which is a [serialized R data](https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html) object. Other options include `parquet` for [Apache Parquet](https://parquet.apache.org/) or an empty string `''` to disable writing trajectory outputs.
+>  Formats other than `rds` will be less efficient, but `parquet` offers the advantage of being a widely supported format by other software packages.
 
->  Formats other than `rds` will be less efficient, but `h5` offers the advantage of being a widely supported format by other software packages.
-
-Trajectories are saved with the naming convention `<simulation_id>_traj.<trajec_fmt>`. Preserving the particle trajectories enables regridding the footprints at a later time without the computational cost of recalculating particle trajectories.
-
-This object can be loaded with `read_traj(<path>)` and is structured as
+This object can be loaded using `R` with `read_traj(<path>)` and is structured as
 
 ```r
 source('r/dependencies.r')
@@ -48,42 +44,25 @@ str(traj)
 
 The `traj$receptor` object is a named list with the time and location of the release point for the simulation. The `traj$particle` object is a data frame containing each particle's position and characteristics over time.
 
-The `h5` output can be read using python using a combination of pandas and pytables:
+Or `parquet` formatted files may be read using `Python` with the `pyarrow` package.
 
 ```python
-import numpy as np
 import pandas as pd
-import tables as tb
+import pyarrow.parquet as pq
 
-# Read the particle data as a pandas dataframe
-particle = pd.read_hdf('<simulation_id>_traj.h5', 'particle')
+# Read the parquet file into a pandas DataFrame
+particle = pd.read_parquet('<simulation_id>_traj.parquet')
+particle.head()
+# |    |   time |   indx |   long |   lati |   zagl |    foot |   mlht |   dens |   samt |   sigw |   tlgr |   foot_no_hnf_dilution |
+# |---:|-------:|-------:|-------:|-------:|-------:|--------:|-------:|-------:|-------:|-------:|-------:|-----------------------:|
+# |  0 |     -1 |      1 |  -80.4 |   39.6 |   5.63 | 0.0626  |   1459 |    1.1 |      1 |   1.08 |   1.67 |              0.00224   |
+# |  1 |     -1 |      2 |  -80.4 |   39.6 |  41.37 | 0.043   |   1459 |    1.1 |      1 |   1.09 |   4.98 |              0.00224   |
+# |  2 |     -1 |      3 |  -80.4 |   39.6 |  30.95 | 0.043   |   1459 |    1.1 |      1 |   1.09 |   4.98 |              0.00224   |
+# |  3 |     -1 |      4 |  -80.4 |   39.6 |   3.32 | 0.0626  |   1459 |    1.1 |      1 |   1.08 |   1.67 |              0.00224   |
+# |  4 |     -1 |      5 |  -80.4 |   39.6 |  28.88 | 0.0627  |   1459 |    1.1 |      1 |   1.08 |   1.67 |              0.00224   |
 
-# Function to get group attributes
-def get_group_attrs(h5file: tb.File, group: str) -> dict:
-	'Get the attributes of a group in an h5 file'
-    root = h5file.root
-	roots = ['', '/', 'root']
-    group = root if group in roots else getattr(root, group)
-
-    attrs = {}
-    keys = group._v_attrs._v_attrnamesuser
-    for k in keys:
-        val = group._v_attrs[k]
-        if val is not None:
-            val = val[0]  # values are stored as arrays
-            if np.issubdtype(val.dtype, np.bytes_):
-                val = val.decode()  # convert bytes to string
-                val = None if val == 'NA' else val
-        attrs[k] = val
-    return attrs  # dictionary output
-
-# Open the h5 file with pytables
-h5file = tb.open_file('<simulation_id>_traj.h5')
-
-# Read group attributes
-file = get_group_attrs(h5file, '/')['file']
-receptor = get_group_attrs(h5file, 'receptor')
-params = get_group_attrs(h5file, 'params')
+# Receptor & config parameter metadata is stored in the parquet `FileMetaData.metadata` attribute
+metadata = pq.read_metadata('<simulation_id>_traj.parquet').metadata
 ```
 
 ## Gridded footprints
