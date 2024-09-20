@@ -328,11 +328,11 @@ simulation_step <- function(before_footprint = list(function() {output}),
                                              horcorzierr = horcorzierr,
                                              winderrtf = winderrtf)
       }
-      
-      # Save output object and symlink to out/particles
-      write_traj(output, output$file)
-      link_files(output$file, file.path(output_wd, 'particles'))
-      
+      if (traject_fmt != '') {  # Do not write trajectory file if format is empty
+        # Save output object and symlink to out/particles
+        write_traj(output, output$file)
+        link_files(output$file, file.path(output_wd, 'particles'))
+      }
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
       # file to a data frame with an adjusted timestamp and index for the
