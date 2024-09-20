@@ -12,7 +12,7 @@ exe/
 out/
   by-id/
     yyyymmddHH_lati_long_zagl/
-      yyyymmddHH_lati_long_zagl_traj.traject_fmt
+      yyyymmddHH_lati_long_zagl_traj.trajec_fmt
       yyyymmddHH_lati_long_zagl_foot.nc
       hycs_std
       SETUP.CFG
@@ -23,7 +23,7 @@ out/
     yyyymmddHH_lati_long_zagl_foot.nc
     ...
   particles/
-    yyyymmddHH_lati_long_zagl_traj.traject_fmt
+    yyyymmddHH_lati_long_zagl_traj.trajec_fmt
     ...
 r/
   src/

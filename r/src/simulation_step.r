@@ -326,7 +326,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
                                              winderrtf = winderrtf)
       }
 
-      if (traject_fmt != '') {  # Do not write trajectory file if format is empty
+      if (trajec_fmt != '') {  # Do not write trajectory file if format is empty
         # Save output object and symlink to out/particles
         write_traj(output, output$file)
 
