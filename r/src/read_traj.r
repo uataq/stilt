@@ -90,9 +90,9 @@ read_traj <- function(file) {
     # Handle particle error data
     err_cols <- grepl('_err$', names(particle))
     if (any(err_cols)) {
-      # Split particle data into particle and particle_error
-      particle <- particle[!err_cols]
+      # Split particle data into particle_error and particle
       particle_error <- particle[err_cols]
+      particle <- particle[!err_cols]
 
       # Strip '_err' from particle_error names
       names(particle_error) <- gsub('_err$', '', names(particle_error))
