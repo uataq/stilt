@@ -7,7 +7,8 @@
 project <- '{{project}}'
 stilt_wd <- file.path('{{wd}}', project)
 output_wd <- file.path(stilt_wd, 'out')
-lib.loc <- .libPaths()[1]
+# lib.loc <- .libPaths()[1]  # Use first library location
+lib.loc <- NULL  # Use default library location
 
 # Parallel simulation settings
 n_cores <- 1
