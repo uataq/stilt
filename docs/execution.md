@@ -48,7 +48,7 @@ Rscript r/run_stilt.r
 
 ![Parallel simulations with SLURM](static/img/chart-parallel.png)
 
-If `slurm = TRUE` STILT will distribute the simulations across `n_nodes` using `n_cores` on each node (total parallel worker count is `n_nodes * n_cores`). This will create a `<stilt_wd>/_rslurm` directory which contains SLURM submission scripts and logs from each node.
+If `slurm = TRUE` STILT will distribute the simulations across `n_nodes` using `n_cores` on each node (total parallel worker count is `n_nodes * n_cores`). This will create a `<stilt_wd>/_rslurm` directory which contains SLURM submission scripts and logs from each node. For nodes which support [hyperthreading](https://scicomp.ethz.ch/wiki/Using_hyperthreading), the job allocation per node can be increased beyond the number of cores per node via `processes_per_node`.
 
 ```bash
 Rscript r/run_stilt.r

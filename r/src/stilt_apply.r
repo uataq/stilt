@@ -11,6 +11,8 @@
 #'   passed to rslurm::slurm_apply()
 #' @param n_nodes number of nodes to submit SLURM jobs to using \code{sbatch}
 #' @param n_cores number of CPUs to utilize per node
+#' @param processes_per_node number of processes to run per node. Can be set
+#'   higher than n_cores for nodes which support hyperthreading
 #' @param ... arguments to FUN
 #'
 #' @return if using slurm, returns sjob information. Otherwise, will return a
@@ -19,7 +21,8 @@
 #' @export
 
 stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
-                        n_nodes = 1, n_cores = 1, ...) {
+                        n_nodes = 1, n_cores = 1, processes_per_node = n_cores,
+                        ...) {
   
   if (!slurm && n_nodes > 1) {
     stop('n_nodes > 1 but but slurm is disabled. ',
@@ -53,6 +56,7 @@ stilt_apply <- function(FUN, slurm = F, slurm_options = list(),
                                 jobname = basename(getwd()), pkgs = 'base',
                                 nodes = n_nodes,
                                 cpus_per_node = n_cores,
+                                processes_per_node = processes_per_node,
                                 preschedule_cores = F,
                                 slurm_options = slurm_options)
     return(invisible(sjob))
