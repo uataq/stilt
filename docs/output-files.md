@@ -2,22 +2,26 @@
 
 The model outputs can be found in the directory configured with `output_wd` (defaults to `<stilt_wd>/out/`, see [project structure](http://localhost:3000/#/project-structure)). STILT outputs two files for analysis -
 
-- a `<simulation_id>_traj.rds` file containing the trajectories of the particle ensemble
+- a `<simulation_id>_traj.<trajec_fmt>` file containing the trajectories of the particle ensemble
 - a `<simulation_id>_foot.nc` file containing gridded footprint values and metadata
 
 Simulation identifiers follow a `yyyymmddHHMM_lati_long_zagl` convention, see [project structure](project-structure.md?id=outby-id).
 
 ## Particle trajectories
 
-Particle trajectories and simulation configuration information are packaged and saved in a compressed `.rds` file ([serialized single R object](https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html)) with the naming convention with the naming convention `<simulation_id>_traj.rds`. Preserving the particle trajectories enables regridding the footprints at a later time without the computational cost of recalculating particle trajectories.
+Particle trajectories and simulation configuration information are packaged and saved with the naming convention `<simulation_id>_traj.<trajec_fmt>`. Preserving the particle trajectories enables regridding the footprints at a later time without the computational cost of recalculating particle trajectories.
 
-This object can be loaded with `readRDS(<path>)` and is structured as
+Different output formats are available for the particle trajectories as specified by the `trajec_fmt` parameter. The default format is `rds` which is a [serialized R data](https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html) object. Other options include `parquet` for [Apache Parquet](https://parquet.apache.org/) or an empty string `''` to disable writing trajectory outputs.
+>  Formats other than `rds` will be less efficient, but `parquet` offers the advantage of being a widely supported format by other software packages.
+
+This object can be loaded using `R` with `read_traj(<path>)` and is structured as
 
 ```r
-traj <- readRDS('<simulation_id>_traj.rds')
+source('r/dependencies.r')
+traj <- read_traj('<simulation_id>_traj.<trajec_fmt>')
 str(traj)
 # List of 4
-# $ file    : chr "<stilt_wd>/out/by-id/<simulation_id>/<simulation_id>_traj.rds
+# $ file    : chr "<stilt_wd>/out/by-id/<simulation_id>/<simulation_id>_traj.<trajec_fmt>"
 # $ receptor:List of 4
 # ..$ run_time: POSIXct[1:1], format: "1983-09-18 21:00:00"
 # ..$ lati    : num 39.6
@@ -39,6 +43,27 @@ str(traj)
 ```
 
 The `traj$receptor` object is a named list with the time and location of the release point for the simulation. The `traj$particle` object is a data frame containing each particle's position and characteristics over time.
+
+Or `parquet` formatted files may be read using `Python` with the `pyarrow` package.
+
+```python
+import pandas as pd
+import pyarrow.parquet as pq
+
+# Read the parquet file into a pandas DataFrame
+particle = pd.read_parquet('<simulation_id>_traj.parquet')
+particle.head()
+# |    |   time |   indx |   long |   lati |   zagl |    foot |   mlht |   dens |   samt |   sigw |   tlgr |   foot_no_hnf_dilution |
+# |---:|-------:|-------:|-------:|-------:|-------:|--------:|-------:|-------:|-------:|-------:|-------:|-----------------------:|
+# |  0 |     -1 |      1 |  -80.4 |   39.6 |   5.63 | 0.0626  |   1459 |    1.1 |      1 |   1.08 |   1.67 |              0.00224   |
+# |  1 |     -1 |      2 |  -80.4 |   39.6 |  41.37 | 0.043   |   1459 |    1.1 |      1 |   1.09 |   4.98 |              0.00224   |
+# |  2 |     -1 |      3 |  -80.4 |   39.6 |  30.95 | 0.043   |   1459 |    1.1 |      1 |   1.09 |   4.98 |              0.00224   |
+# |  3 |     -1 |      4 |  -80.4 |   39.6 |   3.32 | 0.0626  |   1459 |    1.1 |      1 |   1.08 |   1.67 |              0.00224   |
+# |  4 |     -1 |      5 |  -80.4 |   39.6 |  28.88 | 0.0627  |   1459 |    1.1 |      1 |   1.08 |   1.67 |              0.00224   |
+
+# Receptor & config parameter metadata is stored in the parquet `FileMetaData.metadata` attribute
+metadata = pq.read_metadata('<simulation_id>_traj.parquet').metadata
+```
 
 ## Gridded footprints
 
