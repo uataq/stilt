@@ -52,7 +52,7 @@ yres <- xres
 # Meteorological data input
 met_path           <- '<path_to_arl_meteorological_data>'
 met_file_format    <- '%Y%m%d.%Hz.hrrra'
-n_hours_per_met_file <- 6
+met_file_tres      <- '6 hours'
 met_subgrid_buffer <- 0.2
 met_subgrid_enable <- F
 met_subgrid_levels <- NA
@@ -236,13 +236,13 @@ stilt_apply(FUN = simulation_step,
             maxdim = maxdim,
             maxpar = maxpar,
             met_file_format = met_file_format,
+            met_file_tres = met_file_tres,
             met_path = met_path,
             met_subgrid_buffer = met_subgrid_buffer,
             met_subgrid_enable = met_subgrid_enable,
             met_subgrid_levels = met_subgrid_levels,
             mgmin = mgmin,
             n_hours = n_hours,
-            n_hours_per_met_file = n_hours_per_met_file,
             n_met_min = n_met_min,
             ncycl = ncycl,
             ndump = ndump,

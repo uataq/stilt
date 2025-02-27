@@ -53,7 +53,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             lib.loc = NULL,
                             maxdim = 1,
                             maxpar = numpar,
-                            met_file_format, 
+                            met_file_format,
+                            met_file_tres = '6 hours',
                             met_path,
                             met_subgrid_buffer = 0.1,
                             met_subgrid_enable = F,
@@ -61,7 +62,6 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             mgmin = 10,
                             mhrs = 9999,
                             n_hours = -24,
-                            n_hours_per_met_file = 6,
                             n_met_min = 1,
                             ncycl = 0,
                             ndump = 0,
@@ -258,8 +258,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
       link_files(exe, rundir)
       
       # Find necessary met files
-      met_files <- find_met_files(r_run_time, n_hours, n_hours_per_met_file,
-                                  met_file_format, met_path)
+      met_files <- find_met_files(r_run_time, n_hours, met_path,
+                                  met_file_format, met_file_tres)
       if (length(met_files) < n_met_min) {
         msg <- paste('Insufficient number of meteorological files found. Check',
                      'specifications in run_stilt.r')
@@ -276,8 +276,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
                           met_subgrid_buffer = met_subgrid_buffer)
 
         # Find necessary met files for subgrids
-        met_files <- find_met_files(r_run_time, n_hours, n_hours_per_met_file, 
-                                    met_file_format, met_path)
+        met_files <- find_met_files(r_run_time, n_hours, met_path,
+                                    met_file_format, met_file_tres)
         if (length(met_files) < n_met_min) {
           msg <- paste('Insufficient number of meteorological files found. Check',
                       'specifications in run_stilt.r')
