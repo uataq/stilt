@@ -4,6 +4,7 @@
 #' @param from location of files
 #' @param to location to create links
 #'
+#' @import R.utils
 #' @export
 
 link_files <- function(from, to) {
