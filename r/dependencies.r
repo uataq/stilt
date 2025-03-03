@@ -12,6 +12,7 @@ invisible(lapply(rsc, source))
 # Load external libraries
 if (!'lib.loc' %in% ls()) lib.loc <- NULL
 libs <- load_libs('dplyr',
+                  'lubridate',
                   'ncdf4',
                   'parallel',
                   'raster',
