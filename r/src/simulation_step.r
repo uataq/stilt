@@ -99,7 +99,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             tlfrac = 0.1,
                             tluverr = NA,
                             tlzierr = NA,
-                            tout = 0, 
+                            tout = 0,
+                            trajec_fmt = 'rds',
                             tratio = 0.75,
                             tvmix = 1,
                             varsiwant = c('time', 'indx', 'long', 'lati',
@@ -247,7 +248,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # run_trajec determines whether to try using existing trajectory files or to
     # recycle existing files
     output <- list()
-    output$file <- file.path(rundir, paste0(simulation_id, '_traj.rds'))
+    output$file <- file.path(rundir, paste0(simulation_id, '_traj.', trajec_fmt))
     
     if (run_trajec) {
       # Ensure necessary files and directory structure are established in the
@@ -327,21 +328,21 @@ simulation_step <- function(before_footprint = list(function() {output}),
                                              horcorzierr = horcorzierr,
                                              winderrtf = winderrtf)
       }
-      
-      # Save output object to compressed rds file and symlink to out/particles
-      saveRDS(output, output$file)
-      link_files(output$file, file.path(output_wd, 'particles'))
-      
+      if (trajec_fmt != '') {  # Do not write trajectory file if format is empty
+        # Save output object and symlink to out/particles
+        write_traj(output, output$file)
+        link_files(output$file, file.path(output_wd, 'particles'))
+      }
     } else {
       # If user opted to recycle existing trajectory files, read in the recycled
       # file to a data frame with an adjusted timestamp and index for the
       # simulation step. If none exists, report an error and proceed
       if (!file.exists(output$file)) {
-        warning('simulation_step(): No _traj.rds file found in ', rundir,
+        warning('simulation_step(): No trajectory file found in ', rundir,
                 '\n  skipping this receptor and trying the next...')
         return()
       }
-      output <- readRDS(output$file)
+      output <- read_traj(output$file)
     }
     
     # Exit if not performing footprint calculations
