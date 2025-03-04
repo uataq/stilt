@@ -20,7 +20,7 @@
     <img src="https://img.shields.io/github/issues/uataq/stilt.svg"/>
   </a>
   <a href="https://uataq.github.io/stilt/">
-    <img src="https://img.shields.io/website-up-down-green-red/http/uataq.github.io.svg?label=website"/>
+    <img src="https://img.shields.io/website-up-down-green-red/http/uataq.github.io/stilt.svg?label=website"/>
   </a>
 </p>
 
