@@ -31,7 +31,7 @@ find_met_files <- function(t_start, n_hours, met_path,
   met_end <- max(sim_start, sim_end)
   met_end_ceil <- ceiling_date(met_end, unit = met_file_tres)
   if (n_hours < 0 
-      && hour(met_end) == hour(met_end_ceil) - 1
+      && (hour(met_end) + 1) %% 24 == hour(met_end_ceil)
       && minute(met_end) > 0) {
     # If the end time is at the end of a met file,
     # add an hour to the end time to include the next file.
