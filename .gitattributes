@@ -1,0 +1,2 @@
+# Ignore .ASC files for GitHub Linguist
+*.ASC linguist-vendored
