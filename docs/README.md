@@ -1,7 +1,7 @@
 ## Stochastic Time-Inverted Lagrangian Transport Model <small>v2.x</small>
 
 <a href="https://github.com/uataq/stilt/actions?query=branch%3Amain">
-  <img src="https://img.shields.io/github/workflow/status/uataq/stilt/Build + Test/main?logo=github&style=for-the-badge"/>
+  <img src="https://github.com/uataq/stilt/workflows/Build%20+%20Test/badge.svg"/>
 </a>
 <a href="https://github.com/uataq/stilt/issues">
   <img src="https://img.shields.io/github/issues/uataq/stilt?logo=github&style=for-the-badge"/>
