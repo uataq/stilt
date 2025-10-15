@@ -47,12 +47,6 @@
   width: 150px;
 }
 
-.sidebar-footer {
-  position: absolute;
-  left: 100px;
-  bottom: 5px;
-}
-
 .markdown-section p.tip, .markdown-section tr:nth-child(2n) {
   background-color: #fcfcfc;
 }

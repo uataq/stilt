@@ -19,11 +19,7 @@
   - [Light-rail simulations](https://github.com/uataq/stilt-tutorials/tree/main/02-train)
   - [WRF compatibility](https://github.com/uataq/stilt-tutorials/tree/main/03-wrf)
 
-- [Contribute](contribute.md)
+- [Questions & Contributions](contribute.md)
 - [Critical update notifications](http://eepurl.com/dr8-k9)
 
-<div class="sidebar-footer text-bold">
-  <small>
-    © 2020 Ben Fasoli
-  </small>
-</div>
+  <small>**© 2020 Ben Fasoli**</small>
