@@ -31,6 +31,7 @@
 
 ## Questions & Contributions
 
+- Check out the [FAQ](https://uataq.github.io/stilt/#/faq) for common questions and troubleshooting tips.
 - For general discussion and questions (not bug reports), please use the [Discussions forum](https://github.com/uataq/stilt/discussions)
 - If you want to file a bug report,
   - Ensure there are no related reports by [searching open issues](https://github.com/uataq/stilt/issues)

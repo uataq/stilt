@@ -19,6 +19,7 @@
   - [Light-rail simulations](https://github.com/uataq/stilt-tutorials/tree/main/02-train)
   - [WRF compatibility](https://github.com/uataq/stilt-tutorials/tree/main/03-wrf)
 
+- [Frequently Asked Questions](faq.md)
 - [Questions & Contributions](contribute.md)
 - [Critical update notifications](http://eepurl.com/dr8-k9)
 
