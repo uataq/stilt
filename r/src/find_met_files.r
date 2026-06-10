@@ -48,6 +48,13 @@ find_met_files <- function(t_start, n_hours, met_path,
   available <- dir(met_path, full.names = T, recursive = T)
   available <- available[!grepl('.lock', available)]
 
+  # Some met archives expose the same file via multiple paths -- e.g. a
+  # top-level symlink pointing into a YYYY/MM/ subdirectory.  recursive=T
+  # finds both the symlink and the real file, and downstream grep yields
+  # duplicate entries that produce a malformed HYSPLIT CONTROL file.
+  # Dedupe by resolved path so each physical file is listed once.
+  available <- available[!duplicated(normalizePath(available, mustWork = FALSE))]
+
   # Find the files that match the request
   idx <- do.call(c, lapply(request, function(pattern) {
     grep(pattern = pattern, x = available)
