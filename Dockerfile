@@ -40,12 +40,12 @@
 #     ymx=40.95 \
 #     yres=0.01
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 WORKDIR /app
 
-ENV TZ UTC
-ENV DEBIAN_FRONTEND noninteractive
+ENV TZ=UTC
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -yq \
     && apt-get install -y --no-install-recommends \
