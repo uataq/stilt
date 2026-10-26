@@ -28,7 +28,9 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
            sigma = samt * sqrt(2) * sigw *
              sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr)-1),
            pbl_mixing = veght * mlht) %>%
-    arrange(-time) %>%
+    # Accumulate the spread in order of particle age. time is negative on a
+    # backward run and positive on a forward run, so sort on its magnitude
+    arrange(abs(time)) %>%
     group_by(indx) %>%
     mutate(plume = ifelse('xhgt' %in% names(p), xhgt, r_zagl) + cumsum(sigma),
            foot = ifelse(plume < pbl_mixing,
