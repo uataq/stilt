@@ -38,7 +38,22 @@ calc_trajectory <- function(namelist,
   # Monitors time elapsed running hycs_std If elapsed time exceeds timeout
   # specified in run_stilt.r, kills hycs_std and moves on to next simulation
   cmd <- paste0('cd ', rundir, ' && ./hycs_std >> stilt.log 2>&1')
-  system(cmd, timeout = timeout)
+  status <- system(cmd, timeout = timeout)
+
+  # A non-zero exit status means hycs_std stopped before the end of the run (a
+  # met read error, a timeout, ...). PARTICLE_STILT.DAT, if it exists, then
+  # holds only the hours reached, so skip the run rather than accept a
+  # truncated trajectory as complete. system() returns 124 on timeout.
+  if (status != 0) {
+    msg <- if (status == 124) {
+      paste('hycs_std exceeded timeout of', timeout, 'seconds')
+    } else {
+      paste('hycs_std exited with status', status)
+    }
+    warning(msg)
+    cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
+    return()
+  }
 
   # Exit if running in HYSPLIT mode
   if (namelist[['ichem']] != 8) return()
