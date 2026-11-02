@@ -28,15 +28,11 @@ find_met_files <- function(t_start, n_hours, met_path,
 
   # Generate the hours to search for
   met_start <- floor_date(min(sim_start, sim_end), unit = met_file_tres)
-  met_end <- max(sim_start, sim_end)
-  met_end_ceil <- ceiling_date(met_end, unit = met_file_tres)
-  if (n_hours < 0 
-      && (hour(met_end) + 1) %% 24 == hour(met_end_ceil)) {
-    # If the end time is at the end of a met file,
-    # add an hour to the end time to include the next file.
-    # This is necessary to interpolate the last hour of data.
-    met_end <- met_end_ceil
-  }
+  # A run that ends partway through a file may need that file's next step, which
+  # is the first step of the next file when the end is past the file's last step
+  # (after 21:00 in a daily file of 3-hourly steps). Which file holds that step
+  # depends on the met's time step, so include the next file in either direction.
+  met_end <- ceiling_date(max(sim_start, sim_end), unit = met_file_tres)
   met_times <- seq(met_start, met_end, by = met_file_tres)
 
   # Format the request and remove duplicates
