@@ -100,6 +100,7 @@ calc_trajectory <- function(namelist,
   # approximation and recalculate footprint sensitivity for cases when the
   # plume height is less than the PBL height scaled by veght
   if (hnf_plume) 
-    p <- calc_plume_dilution(p, numpar, output$receptor$zagl, namelist[['veght']])
+    p <- calc_plume_dilution(p, numpar, output$receptor$zagl, namelist[['veght']],
+                             namelist[['kmsl']])
   p
 }
