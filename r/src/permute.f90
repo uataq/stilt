@@ -5,7 +5,7 @@ subroutine permute(ans, nax, nay, k, nkx, nky, len, lai, loi, foot)
   implicit none
 
   integer,          intent(in)  :: lai(len), loi(len), nax, nay, nkx, nky, len
-  double precision, intent(in)  :: k(nkx,nky), foot(len)
+  double precision, intent(in)  :: k(nky,nkx), foot(len)
   integer                       :: lox(nkx), loy(nky)
   integer                       :: i, j, n, xs, ys
   double precision              :: ks
@@ -24,7 +24,7 @@ subroutine permute(ans, nax, nay, k, nkx, nky, len, lai, loi, foot)
 
       ! Add all footprint values to their locations in arrays
       do n = 1, len
-        ans(loi(n)+ys, lai(n)+xs) = ans(loi(n)+ys, lai(n)+xs) + foot(n)*ks
+        ans(loi(n)+xs, lai(n)+ys) = ans(loi(n)+xs, lai(n)+ys) + foot(n)*ks
       end do
     end do
   end do
