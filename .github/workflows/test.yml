@@ -50,6 +50,9 @@ jobs:
       - name: Run batch simulation test
         run: bash test/test_run_stilt.sh
 
+      - name: Run met file search test
+        run: bash test/test_find_met_files.sh
+
       - name: Run CLI test
         run: bash test/test_stilt_cli.sh
 
