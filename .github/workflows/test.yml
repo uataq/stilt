@@ -44,6 +44,9 @@ jobs:
       - name: Install STILT
         run: bash test/test_setup.sh
 
+      - name: Run footprint kernel test
+        run: bash test/test_footprint_kernel.sh
+
       - name: Run batch simulation test
         run: bash test/test_run_stilt.sh
 
