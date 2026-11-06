@@ -53,6 +53,9 @@ jobs:
       - name: Run CLI column receptor test
         run: bash test/test_stilt_cli_column.sh
 
+      - name: Run plume dilution test
+        run: bash test/test_plume_dilution.sh
+
       - name: Run WRF test
         run: bash test/test_wrf_converter.sh
 

@@ -148,6 +148,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
     # Validate arguments
     if (!run_trajec && !run_foot)
       stop('simulation_step(): Nothing to do, set run_trajec or run_foot to T')
+    if (run_trajec && hnf_plume && kmsl == 1 && !'zsfc' %in% varsiwant)
+      stop('simulation_step(): hnf_plume with kmsl = 1 requires zsfc in varsiwant')
     
     # Ensure dependencies are loaded for current node/process
     source(file.path(stilt_wd, 'r/dependencies.r'), local = T)
