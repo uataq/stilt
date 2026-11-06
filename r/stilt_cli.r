@@ -155,6 +155,7 @@ stilt_args <- list(
     rm_dat = as.logical(args$rm_dat),
     run_foot = as.logical(args$run_foot),
     run_trajec = as.logical(args$run_trajec),
+    seed = as.numeric(args$seed),
     siguverr = as.numeric(args$siguverr),
     sigzierr = as.numeric(args$sigzierr),
     simulation_id = as.character(args$simulation_id),

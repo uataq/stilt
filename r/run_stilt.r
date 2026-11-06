@@ -101,7 +101,7 @@ kmix0       <- 150
 kmixd       <- 3
 kmsl        <- 0
 kpuff       <- 0
-krand       <- 4
+krand       <- 4   # 4 = new random draw every run (default); 2 = deterministic
 krnd        <- 6
 kspl        <- 1
 kwet        <- 1
@@ -125,6 +125,7 @@ poutf       <- ''
 qcycle      <- 0
 rhb         <- 80
 rht         <- 60
+seed        <- NA  # integer for a reproducible run; requires krand = 2
 splitf      <- 1
 tkerd       <- 0.18
 tkern       <- 0.18
@@ -268,6 +269,7 @@ stilt_apply(FUN = simulation_step,
             rm_dat = rm_dat,
             run_foot = run_foot,
             run_trajec = run_trajec,
+            seed = seed,
             siguverr = siguverr,
             sigzierr = sigzierr,
             smooth_factor = smooth_factor,
