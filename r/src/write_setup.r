@@ -61,6 +61,7 @@ write_setup <- function(varsiwant,
                         qcycle = 0,
                         rhb = 80,
                         rht = 60,
+                        seed = NA,
                         splitf = 1,
                         tkerd = 0.18, 
                         tkern = 0.18,
@@ -86,6 +87,27 @@ write_setup <- function(varsiwant,
 
   ivmax <- length(varsiwant)
   varsiwant <- paste0('\'', paste(varsiwant, collapse = '\', \''), '\'')
+
+  # HYSPLIT does not check KRAND. Any value outside its documented modes falls
+  # into a code path that hangs the run (measured on v5.1.0 and v5.3.2).
+  if (!krand %in% c(0:4, 10:13)) {
+    stop('write_setup(): krand must be one of 0-4 or 10-13, got ', krand)
+  }
+
+  # HYSPLIT sets its random-number state to -1 + SEED and, under krand = 2,
+  # re-initializes the generator only from a negative state, collapsing every
+  # state >= -1 onto one stream (so a positive SEED is silently inert).
+  # Writing SEED = -(|seed| + 1) keeps every seed distinct and off the unseeded
+  # default. krand = 4 (the default) discards SEED in favour of a clock draw
+  # and krand = 1 uses it only for the initial turbulent velocity, so a seed
+  # requires krand = 2.
+  if (!is.na(seed)) {
+    if (krand != 2) {
+      stop('write_setup(): seed requires krand = 2 (got krand = ', krand,
+           '): HYSPLIT ignores SETUP.CFG SEED under the other modes')
+    }
+    seed <- -(abs(seed) + 1)
+  }
 
   eq <- function(lhs, rhs) {
     if (is.logical(rhs))
@@ -150,6 +172,7 @@ write_setup <- function(varsiwant,
            eq('QCYCLE', qcycle),
            eq('RHB', rhb),
            eq('RHT', rht),
+           if (!is.na(seed)) eq('SEED', seed),
            eq('SPLITF', splitf),
            eq('TKERD', tkerd),
            eq('TKERN', tkern),
