@@ -28,17 +28,19 @@ find_met_files <- function(t_start, n_hours, met_path,
 
   # Generate the hours to search for
   met_start <- floor_date(min(sim_start, sim_end), unit = met_file_tres)
+  met_end <- max(sim_start, sim_end)
+  needed <- seq(met_start, met_end, by = met_file_tres) %>%
+    strftime(tz = 'UTC', format = met_file_format) %>%
+    unique()
+
   # A run that ends partway through a file may need that file's next step, which
   # is the first step of the next file when the end is past the file's last step
   # (after 21:00 in a daily file of 3-hourly steps). Which file holds that step
-  # depends on the met's time step, so include the next file in either direction.
-  met_end <- ceiling_date(max(sim_start, sim_end), unit = met_file_tres)
-  met_times <- seq(met_start, met_end, by = met_file_tres)
-
-  # Format the request and remove duplicates
-  request <- met_times %>%
-    strftime(tz = 'UTC', format = met_file_format) %>%
-    unique()
+  # depends on the met's time step, so include the next file in either direction
+  # when it exists, without requiring it.
+  next_file <- ceiling_date(met_end, unit = met_file_tres) %>%
+    strftime(tz = 'UTC', format = met_file_format)
+  request <- unique(c(needed, next_file))
 
   # Find the available files
   available <- dir(met_path, full.names = T, recursive = T)
@@ -52,12 +54,19 @@ find_met_files <- function(t_start, n_hours, met_path,
   available <- available[!duplicated(normalizePath(available, mustWork = FALSE))]
 
   # Find the files that match the request
-  idx <- do.call(c, lapply(request, function(pattern) {
+  matches <- lapply(request, function(pattern) {
     grep(pattern = pattern, x = available)
-  }))
+  })
 
-  if (any(idx < 1))
+  # HYSPLIT stops its particles where the met runs out, so a run with a file
+  # missing from its span would come out short with no error
+  missing <- request[lengths(matches) == 0 & request %in% needed]
+  if (length(missing) > 0) {
+    warning('No met file in ', met_path, ' matching ',
+            paste(missing, collapse = ', '))
     return()
+  }
 
+  idx <- do.call(c, matches)
   unique(available[idx])  # Available files that match the request
 }
