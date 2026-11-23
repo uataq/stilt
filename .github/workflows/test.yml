@@ -44,14 +44,20 @@ jobs:
       - name: Install STILT
         run: bash test/test_setup.sh
 
+      - name: Run footprint kernel test
+        run: bash test/test_footprint_kernel.sh
+
       - name: Run batch simulation test
         run: bash test/test_run_stilt.sh
+
+      - name: Run met file search test
+        run: bash test/test_find_met_files.sh
 
       - name: Run CLI test
         run: bash test/test_stilt_cli.sh
 
       - name: Run CLI column receptor test
-        run: bash test/test_stilt_cli.sh
+        run: bash test/test_stilt_cli_column.sh
 
       - name: Run plume dilution test
         run: bash test/test_plume_dilution.sh
