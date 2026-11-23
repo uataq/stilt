@@ -110,6 +110,23 @@ stopifnot(
                                     '24 hours')), days[2:3])
 )
 message('file boundary: ok')
+
+# A file missing from a run's span stops the search; only the next file is optional
+for (day in days[2:3]) {
+  met <- tempfile('missing')
+  dir.create(met)
+  file.create(file.path(met, setdiff(days, day)))
+  files <- suppressWarnings(find_met_files('2016-10-09 12:00:00', -36, met,
+                                           '%Y%m%d', '24 hours'))
+  stopifnot(is.null(files))
+}
+met <- tempfile('last')
+dir.create(met)
+file.create(file.path(met, days[1:2]))
+stopifnot(identical(
+  basename(find_met_files('2016-10-08 12:00:00', -6, met, '%Y%m%d', '24 hours')),
+  days[2]))
+message('missing files: ok')
 REOF
 
 echo "met file search test successful"

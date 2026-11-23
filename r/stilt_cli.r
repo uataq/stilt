@@ -126,7 +126,6 @@ stilt_args <- list(
     met_subgrid_levels = as.numeric(args$met_subgrid_levels),
     mgmin = as.numeric(args$mgmin),
     n_hours = as.numeric(args$n_hours),
-    n_met_min = as.numeric(args$n_met_min),
     ncycl = as.numeric(args$ncycl),
     ndump = as.numeric(args$ndump),
     ninit = as.numeric(args$ninit),

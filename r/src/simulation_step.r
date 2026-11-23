@@ -62,7 +62,6 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             mgmin = 10,
                             mhrs = 9999,
                             n_hours = -24,
-                            n_met_min = 1,
                             ncycl = 0,
                             ndump = 0,
                             ninit = 1,
@@ -260,9 +259,9 @@ simulation_step <- function(before_footprint = list(function() {output}),
       # Find necessary met files
       met_files <- find_met_files(r_run_time, n_hours, met_path,
                                   met_file_format, met_file_tres)
-      if (length(met_files) < n_met_min) {
-        msg <- paste('Insufficient number of meteorological files found. Check',
-                     'specifications in run_stilt.r')
+      if (length(met_files) == 0) {
+        msg <- paste('A meteorological file this simulation needs is missing. Check',
+                     'met_path, met_file_format and met_file_tres')
         warning(msg)
         cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
         return()
@@ -278,9 +277,9 @@ simulation_step <- function(before_footprint = list(function() {output}),
         # Find necessary met files for subgrids
         met_files <- find_met_files(r_run_time, n_hours, met_path,
                                     met_file_format, met_file_tres)
-        if (length(met_files) < n_met_min) {
-          msg <- paste('Insufficient number of meteorological files found. Check',
-                      'specifications in run_stilt.r')
+        if (length(met_files) == 0) {
+          msg <- paste('A meteorological file this simulation needs is missing. Check',
+                     'met_path, met_file_format and met_file_tres')
           warning(msg)
           cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
           return()

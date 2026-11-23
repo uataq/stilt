@@ -56,7 +56,6 @@ met_file_tres      <- '6 hours'
 met_subgrid_buffer <- 0.2
 met_subgrid_enable <- F
 met_subgrid_levels <- NA
-n_met_min          <- 1
 
 # Model control
 n_hours       <- -24
@@ -243,7 +242,6 @@ stilt_apply(FUN = simulation_step,
             met_subgrid_levels = met_subgrid_levels,
             mgmin = mgmin,
             n_hours = n_hours,
-            n_met_min = n_met_min,
             ncycl = ncycl,
             ndump = ndump,
             ninit = ninit,
