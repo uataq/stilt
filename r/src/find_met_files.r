@@ -68,6 +68,6 @@ find_met_files <- function(t_start, n_hours, met_path,
     return()
   }
 
-  idx <- do.call(c, matches)
+  idx <- do.call('c', matches)
   unique(available[idx])  # Available files that match the request
 }

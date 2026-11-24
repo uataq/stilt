@@ -119,7 +119,7 @@ check_met_coverage <- function(met_files, t_start, n_hours) {
       return(paste('Meteorological file cut off partway through a time step:', f))
     times[[f]] <- met$times
   }
-  times <- sort(unique(do.call(c, unname(times))))
+  times <- sort(unique(do.call('c', unname(times))))
 
   if (length(times) < 2)
     return(paste('The meteorological files hold fewer than two time steps:',
