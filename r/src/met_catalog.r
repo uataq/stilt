@@ -54,7 +54,7 @@ met_catalog <- function(met_path, save = TRUE) {
   same <- !is.na(j)
   same[same] <- known$size[j[same]] == size[same] & known$mtime[j[same]] == mtime[same]
   fresh <- lapply(which(!same), function(i) read_catalog_row(paths[i], size[i], mtime[i]))
-  catalog <- do.call(rbind, c(list(empty_met_catalog()),
+  catalog <- do.call('rbind', c(list(empty_met_catalog()),
                               if (any(same)) list(known[j[same], ]),
                               fresh))
   catalog <- catalog[order(catalog$path), ]
