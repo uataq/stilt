@@ -18,7 +18,6 @@ r/stilt_cli.r \
   r_long=-112.0 \
   r_zagl=5 \
   met_path=$(pwd)/stilt-tutorials/03-wrf/arlout \
-  met_file_format=%Y-%m-%d \
   n_hours=-6 \
   numpar=100 \
   xmn=-113 \
