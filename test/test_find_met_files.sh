@@ -127,6 +127,18 @@ stopifnot(identical(
   basename(find_met_files('2016-10-08 12:00:00', -6, met, '%Y%m%d', '24 hours')),
   days[2]))
 message('missing files: ok')
+
+# A list made once (list_met_files) finds the same files as listing each time
+met <- tempfile('listed')
+dir.create(met)
+file.create(file.path(met, days))
+listed <- list_met_files(met)
+for (t in c('2016-10-09 12:00:00', '2016-10-10 00:00:00')) {
+  stopifnot(identical(
+    find_met_files(t, -36, met, '%Y%m%d', '24 hours', available = listed),
+    find_met_files(t, -36, met, '%Y%m%d', '24 hours')))
+}
+message('listed once: ok')
 REOF
 
 echo "met file search test successful"
