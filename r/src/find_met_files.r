@@ -12,13 +12,17 @@
 #'   meteorological data files necessary for the timing of the simulation
 #'   indicated by \code{t_start} and \code{n_hours}
 #' @param met_file_tres time resolution of meteorological data files
+#' @param available paths of the files in \code{met_path}, from
+#'   \code{list_met_files}. Listed here when \code{NULL}; a batch lists them
+#'   once and passes them to every simulation, since listing a large archive
+#'   takes seconds.
 #'
 #' @import dplyr
 #' @import lubridate
 #' @export
 
 find_met_files <- function(t_start, n_hours, met_path,
-                           met_file_format, met_file_tres) {
+                           met_file_format, met_file_tres, available = NULL) {
   require(dplyr)
   require(lubridate)
 
@@ -44,15 +48,8 @@ find_met_files <- function(t_start, n_hours, met_path,
   request <- unique(c(needed, next_file))
 
   # Find the available files
-  available <- dir(met_path, full.names = T, recursive = T)
-  available <- available[!grepl('.lock', available)]
-
-  # Some met archives expose the same file via multiple paths -- e.g. a
-  # top-level symlink pointing into a YYYY/MM/ subdirectory.  recursive=T
-  # finds both the symlink and the real file, and downstream grep yields
-  # duplicate entries that produce a malformed HYSPLIT CONTROL file.
-  # Dedupe by resolved path so each physical file is listed once.
-  available <- available[!duplicated(normalizePath(available, mustWork = FALSE))]
+  if (is.null(available))
+    available <- list_met_files(met_path)
 
   # Find the files that match the request
   matches <- lapply(request, function(pattern) {
@@ -70,4 +67,26 @@ find_met_files <- function(t_start, n_hours, met_path,
 
   idx <- do.call('c', matches)
   unique(available[idx])  # Available files that match the request
+}
+
+
+#' list_met_files lists the files in a meteorological data directory
+#' @author Ben Fasoli & James Mineau
+#'
+#' @param met_path directory to find meteorological data
+#'
+#' @return paths of the files under \code{met_path}, each physical file once,
+#'   without lock files
+#'
+#' @export
+list_met_files <- function(met_path) {
+  available <- dir(met_path, full.names = T, recursive = T)
+  available <- available[!grepl('.lock', available)]
+
+  # Some met archives expose the same file via multiple paths -- e.g. a
+  # top-level symlink pointing into a YYYY/MM/ subdirectory.  recursive=T
+  # finds both the symlink and the real file, and downstream grep yields
+  # duplicate entries that produce a malformed HYSPLIT CONTROL file.
+  # Dedupe by resolved path so each physical file is listed once.
+  available[!duplicated(normalizePath(available, mustWork = FALSE))]
 }

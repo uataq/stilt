@@ -55,6 +55,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             maxpar = numpar,
                             met_file_format,
                             met_file_tres = '6 hours',
+                            met_file_list = NULL,
                             met_path,
                             met_subgrid_buffer = 0.1,
                             met_subgrid_enable = F,
@@ -264,8 +265,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
                        'Check met_path, met_file_format and met_file_tres'))
         check_met_coverage(met_files, r_run_time, n_hours)
       }
+      # A batch lists met_path once (run_stilt.r) instead of in every simulation
+      available <- if (is.null(met_file_list)) NULL else readLines(met_file_list)
       met_files <- find_met_files(r_run_time, n_hours, met_path,
-                                  met_file_format, met_file_tres)
+                                  met_file_format, met_file_tres, available)
       msg <- met_problem(met_files)
       if (!is.null(msg)) {
         warning(msg)

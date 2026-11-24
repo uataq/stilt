@@ -181,6 +181,14 @@ for (d in c('by-id', 'particles', 'footprints')) {
     dir.create(d, recursive = T)
 }
 
+# List the met files once for every simulation; listing a large archive takes
+# seconds. Files added to met_path after this are not seen by this batch.
+met_file_list <- NULL
+if (run_trajec) {
+  met_file_list <- file.path(output_wd, 'met_files.txt')
+  writeLines(list_met_files(met_path), met_file_list)
+}
+
 
 # Run trajectory simulations ---------------------------------------------------
 stilt_apply(FUN = simulation_step,
@@ -236,6 +244,7 @@ stilt_apply(FUN = simulation_step,
             maxpar = maxpar,
             met_file_format = met_file_format,
             met_file_tres = met_file_tres,
+            met_file_list = met_file_list,
             met_path = met_path,
             met_subgrid_buffer = met_subgrid_buffer,
             met_subgrid_enable = met_subgrid_enable,
