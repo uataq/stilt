@@ -11,6 +11,7 @@ set -e
 Rscript - <<'REOF'
 for (f in c('r/src/check_met_coverage.r', 'r/src/find_met_files.r',
             'r/src/met_catalog.r', 'test/arl_files.r')) source(f)
+Sys.setenv(XDG_CACHE_HOME = tempfile('cache'))
 
 utc <- function(x) as.POSIXct(x, tz = 'UTC')
 steps <- function(from, n, by) utc(from) + by * 3600 * (seq_len(n) - 1)
@@ -78,46 +79,52 @@ stopifnot(
                check_met_coverage(find_met_files('2016-10-08 14:00:00', -10, catalog),
                                   '2016-10-08 14:00:00', -10)))
 )
+# One step shared at a boundary is one product
+write_arl(file.path(met, 'b'), steps('2016-10-08 05:00:00', 8, 1))
+stopifnot(length(find_met_files('2016-10-08 07:00:00', -4, met_catalog(met))) == 2)
 # Two files holding the same times
 write_arl(file.path(met, 'a_copy'), steps('2016-10-08 00:00:00', 6, 1))
 stopifnot(says(find_met_files('2016-10-08 04:00:00', -2, met_catalog(met)),
                'Two meteorological files hold the same times'))
 message('missing and doubled: ok')
 
-# Saved beside the files, reused, and updated when a file changes
+# Saved in the user's cache, never in met_path, reused, and updated when a
+# file changes
+Sys.setenv(XDG_CACHE_HOME = tempfile('cache'))
 met <- tempfile('saved')
 dir.create(met)
 write_arl(file.path(met, 'a'), steps('2016-10-08 00:00:00', 6, 1))
 catalog <- met_catalog(met)
-saved <- file.path(met, '.stilt-met-catalog.csv')
-stopifnot(identical(normalizePath(attr(catalog, 'file')), normalizePath(saved)))
-stopifnot(identical(read_met_catalog(saved)$first, utc('2016-10-08 00:00:00')))
+saved <- attr(catalog, 'file')
+stopifnot(startsWith(saved, Sys.getenv('XDG_CACHE_HOME')),
+          !file.exists(file.path(met, '.stilt-met-catalog.csv')),
+          identical(read_met_catalog(saved)$first, utc('2016-10-08 00:00:00')))
+# Not rewritten when nothing changed
+t0 <- file.mtime(saved)
+Sys.sleep(1.1)
+invisible(met_catalog(met))
+stopifnot(file.mtime(saved) == t0)
 # A row is reused while the file's size and time are unchanged
 table <- read.csv(saved, stringsAsFactors = FALSE)
 table$n_steps <- 99
 write.csv(table, saved, row.names = FALSE)
 stopifnot(met_catalog(met)$n_steps == 99)
 # and read again when the file changes
-Sys.sleep(1.1)
 write_arl(file.path(met, 'a'), steps('2016-10-09 00:00:00', 3, 1))
 catalog <- met_catalog(met)
 stopifnot(catalog$n_steps == 3, catalog$first == utc('2016-10-09 00:00:00'))
 message('saved: ok')
 
-# A directory the user cannot write: its catalog is the starting point, and
-# the user's own copy goes in the cache
-if (Sys.info()[['user']] != 'root') {
-  Sys.setenv(XDG_CACHE_HOME = tempfile('cache'))
-  table <- read.csv(saved, stringsAsFactors = FALSE)
-  table$n_steps <- 77
-  write.csv(table, saved, row.names = FALSE)
-  Sys.chmod(met, '0555')
-  catalog <- met_catalog(met)
-  Sys.chmod(met, '0755')
-  stopifnot(catalog$n_steps == 77,
-            startsWith(attr(catalog, 'file'), Sys.getenv('XDG_CACHE_HOME')))
-  message('read only: ok')
-}
+# A catalog put in met_path by its keeper is the starting point for a user
+# with no cached copy
+table <- read.csv(saved, stringsAsFactors = FALSE)
+table$n_steps <- 77
+write.csv(table, file.path(met, '.stilt-met-catalog.csv'), row.names = FALSE)
+Sys.setenv(XDG_CACHE_HOME = tempfile('cache'))
+catalog <- met_catalog(met)
+stopifnot(catalog$n_steps == 77,
+          startsWith(attr(catalog, 'file'), Sys.getenv('XDG_CACHE_HOME')))
+message('shared: ok')
 REOF
 
 echo "met file search test successful"

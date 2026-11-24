@@ -7,11 +7,10 @@
 #' archive takes minutes, so the table is saved and a later call reads only the
 #' files that are new or whose size or modification time changed.
 #'
-#' The table is saved as \code{.stilt-met-catalog.csv} in \code{met_path} when
-#' that is writable, so everyone who reads the directory can use it, and in
-#' \code{$XDG_CACHE_HOME/stilt/met_catalogs/} (\code{~/.cache} by default)
-#' otherwise. A table in \code{met_path} that the user cannot write is read as a
-#' starting point, so a shared archive needs it built only by whoever writes it.
+#' The table is saved in \code{$XDG_CACHE_HOME/stilt/met_catalogs/}
+#' (\code{~/.cache} by default), never in \code{met_path}, and rewritten only
+#' when it changed. A \code{.stilt-met-catalog.csv} in \code{met_path}, put
+#' there on purpose by whoever keeps the archive, is read as a starting point.
 #'
 #' @param met_path directory to find meteorological data
 #' @param save save the table for later calls. \code{FALSE} reads every file
@@ -27,8 +26,7 @@
 met_catalog <- function(met_path, save = TRUE) {
   met_path <- normalizePath(met_path, mustWork = TRUE)
   shared <- file.path(met_path, '.stilt-met-catalog.csv')
-  writable <- file.access(met_path, 2) == 0
-  cache <- if (writable) shared else file.path(
+  cache <- file.path(
     Sys.getenv('XDG_CACHE_HOME', file.path(Sys.getenv('HOME'), '.cache')),
     'stilt', 'met_catalogs', paste0(gsub('[^A-Za-z0-9]+', '_', met_path), '.csv'))
 
@@ -60,12 +58,16 @@ met_catalog <- function(met_path, save = TRUE) {
   catalog <- catalog[order(catalog$path), ]
   rownames(catalog) <- NULL
 
+  # Rewrite only when something changed, so a batch of CLI calls doesn't
+  # rewrite the same table every call
+  changed <- is.null(known) || !all(same) || nrow(known) != sum(same) ||
+    !file.exists(cache)
   file <- NULL
-  if (save) {
+  if (save && changed) {
     dir.create(dirname(cache), recursive = TRUE, showWarnings = FALSE)
     write_met_catalog(catalog, cache)
-    file <- cache
   }
+  if (save) file <- cache
   attr(catalog, 'file') <- file
   catalog
 }
@@ -177,9 +179,11 @@ find_met_files <- function(t_start, n_hours, catalog) {
   hit <- hit[order(hit$first), ]
 
   # Two files holding the same times are two products, or two copies, in one
-  # directory, and HYSPLIT would read whichever it was given first
+  # directory, and HYSPLIT would read whichever it was given first. One shared
+  # step at a boundary (a file ending at 06:00 and the next starting there) is
+  # one product.
   if (nrow(hit) > 1) {
-    overlap <- which(as.numeric(hit$first[-1]) <= as.numeric(hit$last[-nrow(hit)]))
+    overlap <- which(as.numeric(hit$first[-1]) < as.numeric(hit$last[-nrow(hit)]))
     if (length(overlap) > 0) {
       k <- overlap[1]
       return(none('Two meteorological files hold the same times: ',
