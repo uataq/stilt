@@ -25,6 +25,7 @@ read_met_times <- function(path) {
   record_length <- 50 + first$nx * first$ny
   step_length <- (1 + first$n_records) * record_length
   n_steps <- size %/% step_length
+  if (n_steps == 0) return(list(times = first$time, whole = FALSE))
 
   times <- first$time
   for (i in seq_len(n_steps - 1)) {

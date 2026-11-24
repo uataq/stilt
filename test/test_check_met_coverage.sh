@@ -93,6 +93,9 @@ invisible(file.copy(f1, cut))
 size <- file.size(cut)
 writeBin(readBin(f1, 'raw', size)[1:(size - 100)], cut)
 stopifnot(says(check_met_coverage(cut, '2016-10-08 03:00:00', -2), 'cut off partway'))
+# ... and one cut off inside its first time step
+writeBin(readBin(f1, 'raw', 1000), cut)
+stopifnot(says(check_met_coverage(cut, '2016-10-08 03:00:00', -2), 'cut off partway'))
 
 # A file that is not ARL
 junk <- file.path(met, 'junk')
