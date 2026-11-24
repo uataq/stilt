@@ -32,7 +32,6 @@
 #     r_long=-112.0 \
 #     r_zagl=5 \
 #     met_path=/app/met \
-#     met_file_format=%Y%m%d.%H \
 #     xmn=-112.3 \
 #     xmx=-111.52 \
 #     xres=0.01 \

@@ -10,7 +10,6 @@
 #     r_long=-112.0 \
 #     r_zagl=5 \
 #     met_path=/tmp/stilt-tutorials/01-wbb/met/ \
-#     met_file_format=%Y%m%d.%H \
 #     xmn=-112.3 \
 #     xmx=-111.52 \
 #     xres=0.01 \
@@ -29,7 +28,7 @@ for (arg in strsplit(arg_strings, '=', fixed = T)) {
 }
 
 # Validate required arguments exist
-req_args <- c('met_file_format', 'met_path', 'r_run_time', 'r_lati', 'r_long',
+req_args <- c('met_path', 'r_run_time', 'r_lati', 'r_long',
               'r_zagl', 'xmn', 'xmx', 'xres', 'ymn', 'ymx', 'yres')
 if (!all(req_args %in% names(args))) {
     stop(paste('Not all arguments supplied:', 
@@ -118,8 +117,6 @@ stilt_args <- list(
     lib.loc = as.character(args$lib.loc),
     maxdim = as.numeric(args$maxdim),
     maxpar = as.numeric(args$maxpar),
-    met_file_format = as.character(args$met_file_format),
-    met_file_tres = as.character(args$met_file_tres),
     met_path = as.character(args$met_path),
     met_subgrid_buffer = as.numeric(args$met_subgrid_buffer),
     met_subgrid_enable = as.logical(args$met_subgrid_enable),

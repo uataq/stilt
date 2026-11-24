@@ -51,8 +51,6 @@ yres <- xres
 
 # Meteorological data input
 met_path           <- '<path_to_arl_meteorological_data>'
-met_file_format    <- '%Y%m%d.%Hz.hrrra'
-met_file_tres      <- '6 hours'
 met_subgrid_buffer <- 0.2
 met_subgrid_enable <- F
 met_subgrid_levels <- NA
@@ -181,6 +179,16 @@ for (d in c('by-id', 'particles', 'footprints')) {
     dir.create(d, recursive = T)
 }
 
+# Catalog the met files once for every simulation: what each file holds, read
+# from its headers. Saved and reused, so only files new or changed since the
+# last batch are read. Files added to met_path after this are not seen by this
+# batch.
+met_catalog_file <- NULL
+if (run_trajec) {
+  message('Cataloging meteorological files in ', met_path)
+  met_catalog_file <- attr(met_catalog(met_path), 'file')
+}
+
 
 # Run trajectory simulations ---------------------------------------------------
 stilt_apply(FUN = simulation_step,
@@ -234,8 +242,7 @@ stilt_apply(FUN = simulation_step,
             kzmix = kzmix,
             maxdim = maxdim,
             maxpar = maxpar,
-            met_file_format = met_file_format,
-            met_file_tres = met_file_tres,
+            met_catalog_file = met_catalog_file,
             met_path = met_path,
             met_subgrid_buffer = met_subgrid_buffer,
             met_subgrid_enable = met_subgrid_enable,

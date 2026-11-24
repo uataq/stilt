@@ -15,7 +15,6 @@ r/stilt_cli.r \
   r_long=-112.0,-112.01 \
   r_zagl=0,1000 \
   met_path=$(pwd)/stilt-tutorials/01-wbb/met \
-  met_file_format=%Y%m%d.%Hz.hrrra \
   n_hours=-12 \
   xmn=-113 \
   xmx=-111 \

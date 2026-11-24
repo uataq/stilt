@@ -53,8 +53,7 @@ simulation_step <- function(before_footprint = list(function() {output}),
                             lib.loc = NULL,
                             maxdim = 1,
                             maxpar = numpar,
-                            met_file_format,
-                            met_file_tres = '6 hours',
+                            met_catalog_file = NULL,
                             met_path,
                             met_subgrid_buffer = 0.1,
                             met_subgrid_enable = F,
@@ -128,6 +127,10 @@ simulation_step <- function(before_footprint = list(function() {output}),
     setwd(stilt_wd)
     
     args <- list(...)
+    old <- intersect(c('met_file_format', 'met_file_tres'), names(args))
+    if (length(old) > 0)
+      warning(paste(old, collapse = ' and '), ' no longer used: met files are ',
+              'found by the times their headers hold. Remove from run_stilt.r')
     
     # Ensure user specified functions reference the simulation_step environment
     if (is.list(before_footprint)) {
@@ -256,16 +259,19 @@ simulation_step <- function(before_footprint = list(function() {output}),
       exe <- file.path(stilt_wd, 'exe')
       link_files(exe, rundir)
       
-      # Find necessary met files, and check from their headers that they hold
-      # every time step the run needs
+      # Find the met files by the times they hold, and check from their headers
+      # that they hold every time step the run needs. A batch makes the catalog
+      # of met_path once (run_stilt.r) instead of in every simulation.
       met_problem <- function(met_files) {
-        if (length(met_files) == 0)
-          return(paste('A meteorological file this simulation needs is missing.',
-                       'Check met_path, met_file_format and met_file_tres'))
+        if (length(met_files) == 0) {
+          reason <- attr(met_files, 'reason')
+          return(if (is.null(reason)) 'No meteorological files found' else reason)
+        }
         check_met_coverage(met_files, r_run_time, n_hours)
       }
-      met_files <- find_met_files(r_run_time, n_hours, met_path,
-                                  met_file_format, met_file_tres)
+      catalog <- if (is.null(met_catalog_file)) met_catalog(met_path) else
+        read_met_catalog(met_catalog_file)
+      met_files <- find_met_files(r_run_time, n_hours, catalog)
       msg <- met_problem(met_files)
       if (!is.null(msg)) {
         warning(msg)
@@ -280,10 +286,11 @@ simulation_step <- function(before_footprint = list(function() {output}),
                           levels = met_subgrid_levels,
                           met_subgrid_buffer = met_subgrid_buffer)
 
-        # Find necessary met files for subgrids
-        met_files <- find_met_files(r_run_time, n_hours, met_path,
-                                    met_file_format, met_file_tres)
-        msg <- met_problem(met_files)
+        # The subgrids are named as the files they were cut from
+        met_files <- file.path(met_path, basename(met_files))
+        msg <- if (all(file.exists(met_files))) met_problem(met_files) else
+          paste('Meteorological subgrid not made:',
+                paste(met_files[!file.exists(met_files)], collapse = ', '))
         if (!is.null(msg)) {
           warning(msg)
           cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)

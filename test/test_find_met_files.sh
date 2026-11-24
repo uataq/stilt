@@ -1,132 +1,131 @@
 #!/bin/bash
-# Checks that find_met_files lists every file a run needs, in either direction,
-# for each product in the NOAA ARL archive. HYSPLIT needs the met steps from the
-# one at or before the run's first time to the one at or after its last time.
+# Checks that find_met_files picks, from a catalog of the files' headers, every
+# file a run needs and no other, in either direction, for met laid out as NOAA
+# ARL's products are: 6-hour files of hourly steps (HRRR), daily files of
+# 3-hourly steps (NAM, GFS), and weekly files of 3-hourly steps with names no
+# date format can match (gdas1). HYSPLIT needs the met steps from the one at or
+# before the run's first time to the one at or after its last time. Then checks
+# that the catalog is saved, reused, updated and shared.
 set -e
 
 Rscript - <<'REOF'
-source('r/src/find_met_files.r')
-
-six_hour_block <- function(t) floor_date(t, '6 hours')
-
-# File names, time resolution, and hours between met steps of each product
-archives <- list(
-  hrrr = list(
-    format = '%Y%m%d_%H', tres = '6 hours', step = 1,
-    file = function(t) {
-      b <- six_hour_block(t)
-      paste0(strftime(b, '%Y%m%d_%H', tz = 'UTC'), '-',
-             sprintf('%02d', hour(b) + 5), '_hrrr')
-    }),
-  hrrr.v1 = list(
-    format = 'hysplit.%Y%m%d.%Hz.hrrra', tres = '6 hours', step = 1,
-    file = function(t) strftime(six_hour_block(t), 'hysplit.%Y%m%d.%Hz.hrrra',
-                                tz = 'UTC')),
-  nam12 = list(
-    format = '%Y%m%d_nam12', tres = '24 hours', step = 3,
-    file = function(t) strftime(t, '%Y%m%d_nam12', tz = 'UTC')),
-  nams = list(
-    format = '%Y%m%d_hysplit.t00z.namsa$', tres = '24 hours', step = 1,
-    file = function(t) strftime(t, '%Y%m%d_hysplit.t00z.namsa', tz = 'UTC')),
-  nams.ak = list(
-    format = '%Y%m%d_hysplit.t00z.namsa.AK', tres = '24 hours', step = 1,
-    file = function(t) strftime(t, '%Y%m%d_hysplit.t00z.namsa.AK', tz = 'UTC')),
-  nams.hi = list(
-    format = '%Y%m%d_hysplit.t00z.namsa.HI', tres = '24 hours', step = 1,
-    file = function(t) strftime(t, '%Y%m%d_hysplit.t00z.namsa.HI', tz = 'UTC')),
-  gfs0p25 = list(
-    format = '%Y%m%d_gfs0p25', tres = '24 hours', step = 3,
-    file = function(t) strftime(t, '%Y%m%d_gfs0p25', tz = 'UTC')),
-  gdas0p5 = list(
-    format = '%Y%m%d_gdas0p5', tres = '24 hours', step = 3,
-    file = function(t) strftime(t, '%Y%m%d_gdas0p5', tz = 'UTC')),
-  narr = list(
-    format = 'NARR%Y%m', tres = '1 month', step = 3,
-    file = function(t) strftime(t, 'NARR%Y%m', tz = 'UTC')),
-  reanalysis = list(
-    format = 'RP%Y%m.gbl', tres = '1 month', step = 6,
-    file = function(t) strftime(t, 'RP%Y%m.gbl', tz = 'UTC'))
-)
+for (f in c('r/src/check_met_coverage.r', 'r/src/find_met_files.r',
+            'r/src/met_catalog.r', 'test/arl_files.r')) source(f)
+Sys.setenv(XDG_CACHE_HOME = tempfile('cache'))
 
 utc <- function(x) as.POSIXct(x, tz = 'UTC')
+steps <- function(from, n, by) utc(from) + by * 3600 * (seq_len(n) - 1)
 
-# The end of a file, of a leap February, and of a year, every 30 minutes
-releases <- c(
-  seq(utc('2016-02-27 00:00:00'), utc('2016-03-02 00:00:00'), by = 1800),
-  seq(utc('2016-12-30 00:00:00'), utc('2017-01-02 00:00:00'), by = 1800)
+# Each layout: file names and the time steps each holds
+layouts <- list(
+  hrrr = lapply(0:15, function(i) {
+    t <- utc('2016-02-27 00:00:00') + i * 6 * 3600
+    list(name = paste0(strftime(t, '%Y%m%d_%H', tz = 'UTC'), '-xx_hrrr'),
+         times = steps(t, 6, 1))
+  }),
+  daily = lapply(0:4, function(i) {
+    t <- utc('2016-02-27 00:00:00') + i * 86400
+    list(name = paste0(strftime(t, '%Y%m%d', tz = 'UTC'), '_nam12'),
+         times = steps(t, 8, 3))
+  }),
+  weekly = lapply(1:3, function(w) {
+    t <- utc('2016-10-01 00:00:00') + (w - 1) * 7 * 86400
+    list(name = paste0('gdas1.oct16.w', w), times = steps(t, 56, 3))
+  })
 )
-hours <- seq(utc('2016-01-25 00:00:00'), utc('2017-02-05 00:00:00'), by = 3600)
 
-check <- function(name, a, n_hours) {
+check <- function(name, files) {
   met <- tempfile(name)
   dir.create(met)
-  file.create(file.path(met, unique(a$file(hours))))
+  for (f in files) write_arl(file.path(met, f$name), f$times)
+  catalog <- met_catalog(met)
+  all_times <- sort(do.call(c, lapply(files, `[[`, 'times')))
 
-  for (i in seq_along(releases)) {
-    t <- releases[i]
-    span <- range(t, t + n_hours * 3600)
-    step <- paste(a$step, 'hours')
-    steps <- seq(floor_date(span[1], step), ceiling_date(span[2], step),
-                 by = a$step * 3600)
-    needed <- unique(a$file(steps))
-    listed <- basename(suppressMessages(
-      find_met_files(t, n_hours, met, a$format, a$tres)))
-    missing <- setdiff(needed, listed)
-    if (length(missing) > 0) {
-      stop(sprintf('%s: %s %+d h needs %s, listed %s', name, format(t, tz = 'UTC'),
-                   n_hours, paste(missing, collapse = ' '),
-                   paste(listed, collapse = ' ')))
+  for (t in seq(all_times[1] + 86400, all_times[length(all_times)] - 86400, by = 3600)) {
+    for (n_hours in c(-24, -6, -1, 1, 6, 24)) {
+      t0 <- utc('1970-01-01') + t
+      ends <- sort(c(t0, t0 + n_hours * 3600))
+      if (ends[1] < all_times[1] || ends[2] > all_times[length(all_times)]) next
+      # Brute force: the steps the run needs, and the files that hold them
+      from <- max(all_times[all_times <= ends[1]])
+      to <- min(all_times[all_times >= ends[2]])
+      needed <- all_times[all_times >= from & all_times <= to]
+      expected <- sort(vapply(Filter(function(f) any(f$times %in% needed), files),
+                              `[[`, '', 'name'))
+      found <- find_met_files(t0, n_hours, catalog)
+      if (!identical(sort(basename(found)), expected) ||
+          !is.null(check_met_coverage(found, t0, n_hours))) {
+        stop(name, ' at ', format(t0, tz = 'UTC'), ', n_hours ', n_hours,
+             ': found ', paste(basename(found), collapse = ' '),
+             '; expected ', paste(expected, collapse = ' '))
+      }
     }
   }
-  unlink(met, recursive = TRUE)
-}
-
-suppressMessages(library(lubridate))
-for (name in names(archives)) {
-  for (n_hours in c(-24, -6, -1, 1, 6, 24)) check(name, archives[[name]], n_hours)
   message(name, ': ok')
 }
+for (name in names(layouts)) check(name, layouts[[name]])
 
-# gdas1 is weekly (gdas1.oct16.w2), and strftime has no week of the month and no
-# lowercase month, so a met_file_format can only name one month's files
-met <- tempfile('gdas1')
+# Outside the files, and a gap
+met <- tempfile('gap')
 dir.create(met)
-weeks <- paste0('gdas1.oct16.w', 1:5)
-file.create(file.path(met, weeks))
-listed <- basename(find_met_files('2016-10-07 22:00:00', -6, met,
-                                  'gdas1.oct16.w', '7 days'))
-stopifnot(all(weeks[1:2] %in% listed))
-message('gdas1: ok')
-
-# A run that ends on a file boundary needs nothing past that step
-met <- tempfile('boundary')
-dir.create(met)
-days <- paste0('201610', c('07', '08', '09', '10'))
-file.create(file.path(met, days))
+write_arl(file.path(met, 'a'), steps('2016-10-08 00:00:00', 6, 1))
+write_arl(file.path(met, 'c'), steps('2016-10-08 12:00:00', 6, 1))
+catalog <- met_catalog(met)
+says <- function(x, pattern) isTRUE(grepl(pattern, attr(x, 'reason')))
 stopifnot(
-  identical(basename(find_met_files('2016-10-09 00:00:00', -6, met, '%Y%m%d',
-                                    '24 hours')), days[2:3]),
-  identical(basename(find_met_files('2016-10-08 18:00:00', 6, met, '%Y%m%d',
-                                    '24 hours')), days[2:3])
+  says(find_met_files('2016-10-08 03:00:00', -6, catalog), 'at or before 2016-10-07 21:00'),
+  says(find_met_files('2016-10-08 15:00:00', 6, catalog), 'at or after 2016-10-08 21:00'),
+  isTRUE(grepl('between 2016-10-08 05:00 and 2016-10-08 12:00',
+               check_met_coverage(find_met_files('2016-10-08 14:00:00', -10, catalog),
+                                  '2016-10-08 14:00:00', -10)))
 )
-message('file boundary: ok')
+# One step shared at a boundary is one product
+write_arl(file.path(met, 'b'), steps('2016-10-08 05:00:00', 8, 1))
+stopifnot(length(find_met_files('2016-10-08 07:00:00', -4, met_catalog(met))) == 2)
+# Two files holding the same times
+write_arl(file.path(met, 'a_copy'), steps('2016-10-08 00:00:00', 6, 1))
+stopifnot(says(find_met_files('2016-10-08 04:00:00', -2, met_catalog(met)),
+               'Two meteorological files hold the same times'))
+message('missing and doubled: ok')
 
-# A file missing from a run's span stops the search; only the next file is optional
-for (day in days[2:3]) {
-  met <- tempfile('missing')
-  dir.create(met)
-  file.create(file.path(met, setdiff(days, day)))
-  files <- suppressWarnings(find_met_files('2016-10-09 12:00:00', -36, met,
-                                           '%Y%m%d', '24 hours'))
-  stopifnot(is.null(files))
-}
-met <- tempfile('last')
+# Saved beside the files when met_path is writable, reused, not rewritten
+# when nothing changed, and updated when a file changes
+met <- tempfile('saved')
 dir.create(met)
-file.create(file.path(met, days[1:2]))
-stopifnot(identical(
-  basename(find_met_files('2016-10-08 12:00:00', -6, met, '%Y%m%d', '24 hours')),
-  days[2]))
-message('missing files: ok')
+write_arl(file.path(met, 'a'), steps('2016-10-08 00:00:00', 6, 1))
+catalog <- met_catalog(met)
+saved <- file.path(met, '.stilt-met-catalog.csv')
+stopifnot(identical(normalizePath(attr(catalog, 'file')), normalizePath(saved)),
+          identical(read_met_catalog(saved)$first, utc('2016-10-08 00:00:00')))
+t0 <- file.mtime(saved)
+Sys.sleep(1.1)
+invisible(met_catalog(met))
+stopifnot(file.mtime(saved) == t0)
+# A row is reused while the file's size and time are unchanged
+table <- read.csv(saved, stringsAsFactors = FALSE)
+table$n_steps <- 99
+write.csv(table, saved, row.names = FALSE)
+stopifnot(met_catalog(met)$n_steps == 99)
+# and read again when the file changes
+write_arl(file.path(met, 'a'), steps('2016-10-09 00:00:00', 3, 1))
+catalog <- met_catalog(met)
+stopifnot(catalog$n_steps == 3, catalog$first == utc('2016-10-09 00:00:00'))
+message('saved: ok')
+
+# A directory the user cannot write: its catalog is the starting point, and
+# the user's own copy goes in the cache
+if (Sys.info()[['user']] != 'root') {
+  Sys.setenv(XDG_CACHE_HOME = tempfile('cache'))
+  table <- read.csv(saved, stringsAsFactors = FALSE)
+  table$n_steps <- 77
+  write.csv(table, saved, row.names = FALSE)
+  Sys.chmod(met, '0555')
+  catalog <- met_catalog(met)
+  Sys.chmod(met, '0755')
+  stopifnot(catalog$n_steps == 77,
+            startsWith(attr(catalog, 'file'), Sys.getenv('XDG_CACHE_HOME')))
+  message('read only: ok')
+}
 REOF
 
 echo "met file search test successful"
