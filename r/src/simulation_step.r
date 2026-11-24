@@ -256,12 +256,18 @@ simulation_step <- function(before_footprint = list(function() {output}),
       exe <- file.path(stilt_wd, 'exe')
       link_files(exe, rundir)
       
-      # Find necessary met files
+      # Find necessary met files, and check from their headers that they hold
+      # every time step the run needs
+      met_problem <- function(met_files) {
+        if (length(met_files) == 0)
+          return(paste('A meteorological file this simulation needs is missing.',
+                       'Check met_path, met_file_format and met_file_tres'))
+        check_met_coverage(met_files, r_run_time, n_hours)
+      }
       met_files <- find_met_files(r_run_time, n_hours, met_path,
                                   met_file_format, met_file_tres)
-      if (length(met_files) == 0) {
-        msg <- paste('A meteorological file this simulation needs is missing. Check',
-                     'met_path, met_file_format and met_file_tres')
+      msg <- met_problem(met_files)
+      if (!is.null(msg)) {
         warning(msg)
         cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
         return()
@@ -277,9 +283,8 @@ simulation_step <- function(before_footprint = list(function() {output}),
         # Find necessary met files for subgrids
         met_files <- find_met_files(r_run_time, n_hours, met_path,
                                     met_file_format, met_file_tres)
-        if (length(met_files) == 0) {
-          msg <- paste('A meteorological file this simulation needs is missing. Check',
-                     'met_path, met_file_format and met_file_tres')
+        msg <- met_problem(met_files)
+        if (!is.null(msg)) {
           warning(msg)
           cat(msg, '\n', file = file.path(rundir, 'stilt.log'), append = T)
           return()

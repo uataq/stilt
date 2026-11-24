@@ -53,6 +53,9 @@ jobs:
       - name: Run met file search test
         run: bash test/test_find_met_files.sh
 
+      - name: Run met coverage check test
+        run: bash test/test_check_met_coverage.sh
+
       - name: Run CLI test
         run: bash test/test_stilt_cli.sh
 

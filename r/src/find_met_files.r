@@ -37,7 +37,8 @@ find_met_files <- function(t_start, n_hours, met_path,
   # is the first step of the next file when the end is past the file's last step
   # (after 21:00 in a daily file of 3-hourly steps). Which file holds that step
   # depends on the met's time step, so include the next file in either direction
-  # when it exists, without requiring it.
+  # when it exists, without requiring it. check_met_coverage() then reads the
+  # files' time steps to tell whether the run needs it.
   next_file <- ceiling_date(met_end, unit = met_file_tres) %>%
     strftime(tz = 'UTC', format = met_file_format)
   request <- unique(c(needed, next_file))
