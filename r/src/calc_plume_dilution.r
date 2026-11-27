@@ -25,13 +25,20 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
     stop('calc_plume_dilution(): varsiwant must include: ',
          paste(collapse = ', ', varsineed))
 
+  # The plume grows by the vertical spread after a time t from Taylor's (1922)
+  # result with an exponential velocity correlation of timescale tlgr, as Eq. 2 of
+  # Fasoli et al. (2018) writes it:
+  # sigma_z^2 = 2 sigw^2 (tlgr t + tlgr^2 exp(-t / tlgr) - tlgr^2).
+  # It is 0 at t = 0 and grows as sigw t at first
+  #
   # HYSPLIT reads VEGHT as a fraction of the mixed-layer height when it is 1 or
   # less and as meters above ground otherwise. Compare the plume with the same
   # height HYSPLIT counted samt below
   p %>%
     mutate(foot_no_hnf_dilution = foot,
            sigma = samt * sqrt(2) * sigw *
-             sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr)-1),
+             sqrt(tlgr*abs(time*60) + tlgr^2 * exp(-abs(time*60)/tlgr) -
+                    tlgr^2),
            pbl_mixing = if (veght <= 1) veght * mlht else veght) %>%
     # Accumulate the spread in order of particle age. time is negative on a
     # backward run and positive on a forward run, so sort on its magnitude
