@@ -25,9 +25,11 @@ calc_plume_dilution <- function(p, numpar, r_zagl, veght) {
     stop('calc_plume_dilution(): varsiwant must include: ',
          paste(collapse = ', ', varsineed))
 
-  # The plume grows by Taylor's (1922) spread after a time t with Lagrangian
-  # timescale tlgr, sigma_z^2 = 2 sigw^2 (tlgr t + tlgr^2 exp(-t / tlgr) - tlgr^2),
-  # Eq. 2 of Fasoli et al. (2018). It starts at 0 and grows as sigw t at first
+  # The plume grows by the vertical spread after a time t from Taylor's (1922)
+  # result with an exponential velocity correlation of timescale tlgr, as Eq. 2 of
+  # Fasoli et al. (2018) writes it:
+  # sigma_z^2 = 2 sigw^2 (tlgr t + tlgr^2 exp(-t / tlgr) - tlgr^2).
+  # It is 0 at t = 0 and grows as sigw t at first
   #
   # HYSPLIT reads VEGHT as a fraction of the mixed-layer height when it is 1 or
   # less and as meters above ground otherwise. Compare the plume with the same
