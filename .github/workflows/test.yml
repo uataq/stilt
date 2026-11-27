@@ -47,6 +47,9 @@ jobs:
       - name: Run footprint kernel test
         run: bash test/test_footprint_kernel.sh
 
+      - name: Run plume growth test
+        run: bash test/test_plume_growth.sh
+
       - name: Run batch simulation test
         run: bash test/test_run_stilt.sh
 
